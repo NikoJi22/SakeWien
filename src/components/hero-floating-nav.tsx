@@ -16,6 +16,10 @@ function MenuIcon() {
 const ctaClass =
   "whitespace-nowrap rounded-full border border-[#b8956a]/95 bg-black/25 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#e8dcc8] transition hover:border-[#d4b896] hover:bg-white/[0.06] sm:px-4 sm:py-2 sm:text-[10px] sm:tracking-[0.22em]";
 
+/** Solid CTA for mobile drawer only (no translucent bg/border). */
+const drawerCtaClass =
+  "inline-flex w-full items-center justify-center whitespace-nowrap rounded-full border border-[#b8956a] bg-[#0d0d0d] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e8dcc8] transition hover:border-[#d4b896] hover:bg-[#1a1a1a]";
+
 const navLinkClass =
   "shrink-0 text-[9px] font-semibold uppercase tracking-[0.22em] text-white/88 transition hover:text-white sm:text-[10px] sm:tracking-[0.26em]";
 
@@ -65,12 +69,17 @@ export function HeroFloatingNav() {
       </nav>
 
       {open && (
-        <div className="pointer-events-auto fixed inset-0 z-[200]" role="dialog" aria-modal="true" aria-label="Navigation">
-          <button type="button" className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setOpen(false)} aria-label="Close" />
-          <div className="pointer-events-auto absolute left-0 top-0 z-[201] flex h-full w-[min(100%,340px)] flex-col gap-6 border-r border-white/10 bg-[#0a0a0a]/98 p-8 pt-14 shadow-2xl">
+        <div
+          className="pointer-events-auto fixed inset-0 z-[200] bg-black"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation"
+        >
+          <button type="button" className="absolute inset-0 z-0 bg-black" onClick={() => setOpen(false)} aria-label="Close" />
+          <div className="pointer-events-auto absolute left-0 top-0 z-[1] flex h-full w-full max-w-[340px] flex-col gap-6 border-r border-[#262626] bg-black p-8 pt-14">
             <button
               type="button"
-              className="absolute right-4 top-4 text-white/70 transition hover:text-white"
+              className="absolute right-4 top-4 text-[#a8a8a8] transition hover:text-white"
               onClick={() => setOpen(false)}
               aria-label="Close menu"
             >
@@ -81,7 +90,7 @@ export function HeroFloatingNav() {
             <Link href="/" className="font-serif text-xl tracking-[0.35em] text-[#e8dcc8]" onClick={() => setOpen(false)}>
               SAKE
             </Link>
-            <nav className="flex flex-col gap-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90">
+            <nav className="flex flex-col gap-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#f0f0f0]">
               <Link href="/" onClick={() => setOpen(false)}>
                 {t.nav.home}
               </Link>
@@ -95,16 +104,16 @@ export function HeroFloatingNav() {
                 {t.nav.contact}
               </Link>
             </nav>
-            <div className="mt-auto flex flex-col gap-3 border-t border-white/10 pt-6">
-              <Link href="/order-online" className={`${ctaClass} w-full justify-center py-2.5`} onClick={() => setOpen(false)}>
+            <div className="mt-auto flex flex-col gap-3 border-t border-[#262626] pt-6">
+              <Link href="/order-online" className={drawerCtaClass} onClick={() => setOpen(false)}>
                 {t.nav.orderShort}
               </Link>
-              <Link href="/reservation" className={`${ctaClass} w-full justify-center py-2.5`} onClick={() => setOpen(false)}>
+              <Link href="/reservation" className={drawerCtaClass} onClick={() => setOpen(false)}>
                 {t.nav.reserveTableNav}
               </Link>
             </div>
-            <div className="border-t border-white/10 pt-6">
-              <LanguageSwitcher />
+            <div className="border-t border-[#262626] pt-6">
+              <LanguageSwitcher variant="drawer" />
             </div>
           </div>
         </div>

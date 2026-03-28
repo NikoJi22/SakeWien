@@ -10,6 +10,9 @@ import { LanguageSwitcher } from "./language-switcher";
 const ctaClass =
   "inline-flex shrink-0 items-center justify-center rounded-full border border-[#b8956a]/95 bg-black/25 px-2.5 py-1.5 text-[8px] font-semibold uppercase tracking-[0.14em] text-[#e8dcc8] transition hover:border-[#d4b896] hover:bg-white/[0.06] sm:px-3.5 sm:py-2 sm:text-[10px] sm:tracking-[0.18em]";
 
+const drawerCtaClass =
+  "inline-flex w-full items-center justify-center rounded-full border border-[#b8956a] bg-[#0d0d0d] px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#e8dcc8] transition hover:border-[#d4b896] hover:bg-[#1a1a1a]";
+
 export function InteriorNavbar() {
   const { t } = useLanguage();
   const pathname = usePathname();
@@ -77,15 +80,20 @@ export function InteriorNavbar() {
       </div>
 
       {open && (
-        <div className="fixed inset-0 z-[100] md:hidden" role="dialog" aria-modal="true">
-          <button type="button" className="absolute inset-0 bg-black/75" onClick={() => setOpen(false)} aria-label="Close" />
-          <div className="absolute right-0 top-0 flex h-full w-[min(100%,320px)] flex-col border-l border-white/10 bg-[#0a0a0a] p-8 pt-16">
-            <button type="button" className="absolute right-4 top-4 text-white/70" onClick={() => setOpen(false)} aria-label="Close">
+        <div className="fixed inset-0 z-[100] bg-black md:hidden" role="dialog" aria-modal="true">
+          <button type="button" className="absolute inset-0 z-0 bg-black" onClick={() => setOpen(false)} aria-label="Close" />
+          <div className="absolute right-0 top-0 z-[1] flex h-full w-full max-w-[320px] flex-col border-l border-[#262626] bg-black p-8 pt-16">
+            <button
+              type="button"
+              className="absolute right-4 top-4 text-[#a8a8a8] transition hover:text-white"
+              onClick={() => setOpen(false)}
+              aria-label="Close"
+            >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <nav className="flex flex-col gap-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/90">
+            <nav className="flex flex-col gap-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#f0f0f0]">
               <Link href="/" onClick={() => setOpen(false)}>
                 {t.nav.home}
               </Link>
@@ -99,11 +107,11 @@ export function InteriorNavbar() {
                 {t.nav.contact}
               </Link>
             </nav>
-            <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-8">
+            <div className="mt-8 flex flex-col gap-3 border-t border-[#262626] pt-8">
               {onOrderPage ? (
                 <button
                   type="button"
-                  className={`${ctaClass} w-full justify-center py-2.5`}
+                  className={drawerCtaClass}
                   onClick={() => {
                     setOpen(false);
                     orderDrawer.open();
@@ -112,16 +120,16 @@ export function InteriorNavbar() {
                   {t.nav.orderShort}
                 </button>
               ) : (
-                <Link href="/order-online" className={`${ctaClass} w-full justify-center py-2.5`} onClick={() => setOpen(false)}>
+                <Link href="/order-online" className={drawerCtaClass} onClick={() => setOpen(false)}>
                   {t.nav.orderShort}
                 </Link>
               )}
-              <Link href="/reservation" className={`${ctaClass} w-full justify-center py-2.5`} onClick={() => setOpen(false)}>
+              <Link href="/reservation" className={drawerCtaClass} onClick={() => setOpen(false)}>
                 {t.nav.bookTable}
               </Link>
             </div>
-            <div className="mt-auto border-t border-white/10 pt-8">
-              <LanguageSwitcher />
+            <div className="mt-auto border-t border-[#262626] pt-8">
+              <LanguageSwitcher variant="drawer" />
             </div>
           </div>
         </div>
