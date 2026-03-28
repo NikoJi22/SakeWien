@@ -59,7 +59,7 @@ export function HeroFloatingNav() {
           {t.nav.reserveTableNav}
         </Link>
 
-        <div className="shrink-0">
+        <div className="hidden shrink-0 sm:block">
           <LanguageSwitcher compact />
         </div>
       </nav>

@@ -469,22 +469,32 @@ export function AdminDashboard() {
                             />
                           </AdminField>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          <span className="text-[10px] uppercase tracking-wider text-white/35">id: {cat.id}</span>
+                        <div className="flex flex-col gap-2 sm:items-end">
                           <button
                             type="button"
-                            onClick={() => addItem(ci)}
-                            className="text-[10px] font-semibold uppercase text-gold hover:underline"
+                            onClick={() => void saveMenu()}
+                            disabled={savingMenu}
+                            className="rounded-full border border-gold/80 bg-gold/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold hover:bg-gold/25 disabled:opacity-50"
                           >
-                            + Dish
+                            {savingMenu ? "Saving…" : "Save"}
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => deleteCategory(ci)}
-                            className="text-[10px] font-semibold uppercase text-red-400/80 hover:underline"
-                          >
-                            Delete category
-                          </button>
+                          <div className="flex flex-wrap gap-2 sm:justify-end">
+                            <span className="text-[10px] uppercase tracking-wider text-white/35">id: {cat.id}</span>
+                            <button
+                              type="button"
+                              onClick={() => addItem(ci)}
+                              className="text-[10px] font-semibold uppercase text-gold hover:underline"
+                            >
+                              + Dish
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteCategory(ci)}
+                              className="text-[10px] font-semibold uppercase text-red-400/80 hover:underline"
+                            >
+                              Delete category
+                            </button>
+                          </div>
                         </div>
                       </div>
 
