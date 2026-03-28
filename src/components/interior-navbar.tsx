@@ -82,7 +82,7 @@ export function InteriorNavbar() {
               {t.nav.bookTable}
             </Link>
           </div>
-          <div className="mt-auto border-t border-[#262626] pt-8">
+          <div className="mt-auto flex justify-center border-t border-[#262626] pt-8">
             <LanguageSwitcher variant="drawer" />
           </div>
         </div>

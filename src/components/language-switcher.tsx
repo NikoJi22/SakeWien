@@ -14,8 +14,8 @@ export function LanguageSwitcher({
 
   const shell =
     variant === "drawer"
-      ? `flex items-center rounded-full border border-[#333333] bg-[#141414] p-0.5 text-[10px] ${compact ? "scale-95" : "text-xs"}`
-      : `flex items-center rounded-full border border-white/20 bg-black/50 p-0.5 text-[10px] ${compact ? "scale-95" : "text-xs"}`;
+      ? `inline-flex w-fit shrink-0 items-center rounded-full border border-[#333333] bg-[#141414] p-0.5 text-[10px] ${compact ? "scale-95" : "text-xs"}`
+      : `inline-flex w-fit shrink-0 items-center rounded-full border border-white/20 bg-black/50 p-0.5 text-[10px] ${compact ? "scale-95" : "text-xs"}`;
 
   const inactiveBtn = variant === "drawer" ? "text-[#c4c4c4] hover:text-white" : "text-white/80 hover:text-white";
 

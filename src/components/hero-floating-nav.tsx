@@ -91,10 +91,10 @@ export function HeroFloatingNav() {
             </Link>
           </div>
           <div className="border-t border-[#262626] pt-6 md:border-white/10">
-            <div className="md:hidden">
+            <div className="flex justify-center md:hidden">
               <LanguageSwitcher variant="drawer" />
             </div>
-            <div className="hidden md:block">
+            <div className="hidden md:flex md:justify-center">
               <LanguageSwitcher />
             </div>
           </div>
