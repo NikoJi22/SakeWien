@@ -1,0 +1,310 @@
+export type Language = "en" | "de";
+
+type TranslationSchema = {
+  nav: {
+    home: string;
+    menu: string;
+    about: string;
+    order: string;
+    orderShort: string;
+    contact: string;
+    reservation: string;
+    bookTable: string;
+    /** Short label for hero nav CTA (styled uppercase in UI) */
+    reserveTableNav: string;
+  };
+  hero: {
+    title: string;
+    subtitle: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
+    cardMenu: string;
+    cardReservation: string;
+    cardRestaurant: string;
+    cardNewDishes: string;
+    cardAboutUs: string;
+  };
+  sections: { bestsellers: string; newDishes: string };
+  form: {
+    fullName: string;
+    phone: string;
+    email: string;
+    address: string;
+    message: string;
+    guests: string;
+    date: string;
+    time: string;
+    type: string;
+    pickup: string;
+    delivery: string;
+    submit: string;
+    sending: string;
+    success: string;
+    error: string;
+  };
+  page: {
+    menuTitle: string;
+    menuText: string;
+    orderTitle: string;
+    orderText: string;
+    contactTitle: string;
+    contactText: string;
+    reservationTitle: string;
+    reservationText: string;
+    newDishesTitle: string;
+    newDishesText: string;
+    bestsellersTitle: string;
+    bestsellersText: string;
+  };
+  about: {
+    title: string;
+    intro: string;
+    storyTitle: string;
+    storyBody: string;
+    qualityTitle: string;
+    qualityBody: string;
+    serviceTitle: string;
+    serviceBody: string;
+    locationTitle: string;
+    locationBody: string;
+    ctaLabel: string;
+  };
+  order: {
+    browseMenu: string;
+    yourOrder: string;
+    emptyCart: string;
+    subtotal: string;
+    addToCart: string;
+    qty: string;
+    newBadge: string;
+    bestsellerBadge: string;
+    vegetarian: string;
+    vegan: string;
+    spicy: string;
+    giftUnlocked: string;
+    giftHint: string;
+    fulfillment: string;
+    pickupTime: string;
+    deliveryTime: string;
+    paymentMethod: string;
+    cash: string;
+    card: string;
+    comment: string;
+    commentPlaceholder: string;
+    placeOrder: string;
+    scrollToCheckout: string;
+    itemsInCart: string;
+    emailOptional: string;
+  };
+};
+
+export const translations: Record<Language, TranslationSchema> = {
+  en: {
+    nav: {
+      home: "Home",
+      menu: "Menu",
+      about: "About",
+      order: "Order online",
+      orderShort: "Order",
+      contact: "Contact",
+      reservation: "Reservation",
+      bookTable: "Book a table",
+      reserveTableNav: "Reserve table"
+    },
+    hero: {
+      title: "Sushi Sensation",
+      subtitle: "Japanese fine dining in Vienna. Dark elegance, precise craft, unforgettable taste.",
+      ctaPrimary: "Book a table",
+      ctaSecondary: "View menu",
+      cardMenu: "Menu",
+      cardReservation: "Reservation",
+      cardRestaurant: "Our restaurant",
+      cardNewDishes: "New dishes",
+      cardAboutUs: "About us"
+    },
+    sections: {
+      bestsellers: "Bestsellers",
+      newDishes: "New dishes"
+    },
+    form: {
+      fullName: "Full name",
+      phone: "Phone",
+      email: "Email",
+      address: "Address",
+      message: "Message",
+      guests: "Guests",
+      date: "Date",
+      time: "Time",
+      type: "Type",
+      pickup: "Pickup",
+      delivery: "Delivery",
+      submit: "Send",
+      sending: "Sending...",
+      success: "Message sent successfully.",
+      error: "Something went wrong. Please try again."
+    },
+    page: {
+      menuTitle: "Digital Menu",
+      menuText: "Explore the full selection of Japanese dishes and handcrafted signatures.",
+      orderTitle: "Order online",
+      orderText: "Place your order for pickup or delivery in Vienna. We confirm quickly by phone.",
+      contactTitle: "Contact",
+      contactText: "Questions, private events or special requests. We are happy to help.",
+      reservationTitle: "Reservation",
+      reservationText: "Reserve your table and enjoy an elegant Japanese dining experience.",
+      newDishesTitle: "New Dishes",
+      newDishesText: "Discover our newest creations and seasonal specials.",
+      bestsellersTitle: "Bestsellers",
+      bestsellersText: "Guest favorites chosen most often from our menu."
+    },
+    about: {
+      title: "About us",
+      intro:
+        "SAKE Vienna brings refined Japanese cuisine to the Ring—dark elegance, precise craft, and warm hospitality in the heart of the city.",
+      storyTitle: "Atmosphere & story",
+      storyBody:
+        "In a calm, dark interior inspired by Japanese minimalism, we focus on precision, presentation, and the warmth of true omotenashi. Every detail is composed so you can slow down and savour the moment.",
+      qualityTitle: "Ingredients & craft",
+      qualityBody:
+        "We select fresh fish, seasonal produce, and pantry staples with care. Our kitchen prepares sushi, sashimi, and hot dishes daily—respecting tradition while refining each plate for Vienna.",
+      serviceTitle: "Dine in, takeaway & delivery",
+      serviceBody:
+        "Reserve a table for a full evening in our dining room, enjoy dishes to go, or order online for pickup and delivery across Vienna. Wherever you choose to experience SAKE, the same standards apply.",
+      locationTitle: "Find us",
+      locationBody:
+        "Kärntner Ring—in the heart of Vienna. For directions, opening hours, and private events, our team is one message away.",
+      ctaLabel: "Contact & directions"
+    },
+    order: {
+      browseMenu: "Menu",
+      yourOrder: "Your order",
+      emptyCart: "Your cart is empty. Add dishes from the menu.",
+      subtotal: "Subtotal",
+      addToCart: "Add",
+      qty: "Qty",
+      newBadge: "New",
+      bestsellerBadge: "Bestseller",
+      vegetarian: "Vegetarian",
+      vegan: "Vegan",
+      spicy: "Spicy",
+      giftUnlocked: "Bonus unlocked",
+      giftHint: "Spend more to unlock a complimentary gift.",
+      fulfillment: "Pickup or delivery",
+      pickupTime: "Pickup time",
+      deliveryTime: "Delivery time",
+      paymentMethod: "Payment on delivery",
+      cash: "Cash",
+      card: "Card (terminal)",
+      comment: "Comment for the kitchen",
+      commentPlaceholder: "Allergies, cutlery, special requests…",
+      placeOrder: "Send order",
+      scrollToCheckout: "Review order",
+      itemsInCart: "items",
+      emailOptional: "Email (optional)"
+    }
+  },
+  de: {
+    nav: {
+      home: "Startseite",
+      menu: "Speisekarte",
+      about: "Über uns",
+      order: "Online bestellen",
+      orderShort: "Bestellen",
+      contact: "Kontakt",
+      reservation: "Reservierung",
+      bookTable: "Tisch reservieren",
+      reserveTableNav: "Tisch reservieren"
+    },
+    hero: {
+      title: "Sushi Sensation",
+      subtitle: "Japanisches Fine Dining in Wien. Dunkle Eleganz, praezise Handwerkskunst, unvergesslicher Geschmack.",
+      ctaPrimary: "Tisch reservieren",
+      ctaSecondary: "Speisekarte ansehen",
+      cardMenu: "Speisekarte",
+      cardReservation: "Reservierung",
+      cardRestaurant: "Unser Restaurant",
+      cardNewDishes: "Neue Gerichte",
+      cardAboutUs: "Über uns"
+    },
+    sections: {
+      bestsellers: "Bestseller",
+      newDishes: "Neue Gerichte"
+    },
+    form: {
+      fullName: "Vollstaendiger Name",
+      phone: "Telefon",
+      email: "E-Mail",
+      address: "Adresse",
+      message: "Nachricht",
+      guests: "Gaeste",
+      date: "Datum",
+      time: "Uhrzeit",
+      type: "Typ",
+      pickup: "Abholung",
+      delivery: "Lieferung",
+      submit: "Senden",
+      sending: "Wird gesendet...",
+      success: "Nachricht erfolgreich gesendet.",
+      error: "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+    },
+    page: {
+      menuTitle: "Digitale Speisekarte",
+      menuText: "Entdecken Sie die gesamte Auswahl an japanischen Gerichten und Signature-Kreationen.",
+      orderTitle: "Online bestellen",
+      orderText: "Bestellen Sie zur Abholung oder Lieferung in Wien. Wir bestaetigen rasch telefonisch.",
+      contactTitle: "Kontakt",
+      contactText: "Fragen, private Events oder spezielle Wuensche. Wir helfen gerne weiter.",
+      reservationTitle: "Reservierung",
+      reservationText: "Reservieren Sie Ihren Tisch und geniessen Sie ein elegantes japanisches Erlebnis.",
+      newDishesTitle: "Neue Gerichte",
+      newDishesText: "Entdecken Sie unsere neuesten Kreationen und saisonalen Specials.",
+      bestsellersTitle: "Bestseller",
+      bestsellersText: "Die beliebtesten Gerichte unserer Gaeste."
+    },
+    about: {
+      title: "Über uns",
+      intro:
+        "SAKE Vienna verbindet japanische Präzision mit Wiener Gastfreundschaft—dunkle Eleganz, sorgfältiges Handwerk und echte Herzlichkeit am Ring.",
+      storyTitle: "Atmosphäre & Geschichte",
+      storyBody:
+        "In ruhigem, dunklem Ambiente inspiriert von japanischer Reduktion legen wir Wert auf Präsentation, Präzision und die Wärme echter Omotenashi. Jedes Detail ist darauf ausgelegt, den Moment bewusst zu genießen.",
+      qualityTitle: "Zutaten & Handwerk",
+      qualityBody:
+        "Wir wählen frischen Fisch, saisonales Gemüse und ausgewählte Spezialitäten mit Sorgfalt. Küche und Sushi-Bar bereiten täglich Sushi, Sashimi und warme Gerichte zu—traditionsbewusst und zugleich fein auf Wien abgestimmt.",
+      serviceTitle: "Restaurant, Takeaway & Lieferung",
+      serviceBody:
+        "Reservieren Sie einen Tisch für den Abend im Restaurant, genießen Sie Gerichte zum Mitnehmen oder bestellen Sie online zur Abholung oder Lieferung in Wien. Überall gilt derselbe Anspruch an Qualität und Sorgfalt.",
+      locationTitle: "Besuchen Sie uns",
+      locationBody:
+        "Am Kärntner Ring, im Herzen Wiens. Für Anfahrt, Öffnungszeiten und private Anlässe erreichen Sie uns direkt über die Kontaktseite.",
+      ctaLabel: "Kontakt & Anfahrt"
+    },
+    order: {
+      browseMenu: "Speisekarte",
+      yourOrder: "Ihre Bestellung",
+      emptyCart: "Ihr Warenkorb ist leer. Waehlen Sie Gerichte aus der Karte.",
+      subtotal: "Zwischensumme",
+      addToCart: "Hinzufuegen",
+      qty: "Menge",
+      newBadge: "Neu",
+      bestsellerBadge: "Bestseller",
+      vegetarian: "Vegetarisch",
+      vegan: "Vegan",
+      spicy: "Scharf",
+      giftUnlocked: "Bonus freigeschaltet",
+      giftHint: "Mehr bestellen, um ein Gratis-Geschenk zu erhalten.",
+      fulfillment: "Abholung oder Lieferung",
+      pickupTime: "Abholzeit",
+      deliveryTime: "Lieferzeit",
+      paymentMethod: "Zahlung bei Lieferung",
+      cash: "Bar",
+      card: "Karte (Terminal)",
+      comment: "Anmerkung fuer die Kueche",
+      commentPlaceholder: "Allergien, Besteck, Wuensche…",
+      placeOrder: "Bestellung senden",
+      scrollToCheckout: "Zur Bestellung",
+      itemsInCart: "Artikel",
+      emailOptional: "E-Mail (optional)"
+    }
+  }
+};
