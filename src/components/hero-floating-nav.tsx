@@ -33,22 +33,17 @@ export function HeroFloatingNav() {
 
   const menuLayer =
     open && mounted ? (
-      <div
-        className="mobile-menu-fullscreen-overlay pointer-events-auto"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Navigation"
-      >
+      <div className="hero-nav-overlay-root" role="dialog" aria-modal="true" aria-label="Navigation">
         <button
           type="button"
-          className="mobile-menu-fullscreen-overlay__dismiss"
+          className="hero-nav-overlay-backdrop"
           onClick={() => setOpen(false)}
           aria-label="Close"
         />
-        <div className="mobile-menu-fullscreen-overlay__panel pointer-events-auto absolute left-0 top-0 z-[1] flex h-full w-full max-w-[340px] flex-col gap-6 border-r border-[#262626] p-8 pt-14">
+        <div className="hero-nav-overlay-panel">
           <button
             type="button"
-            className="absolute right-4 top-4 text-[#a8a8a8] transition hover:text-white"
+            className="absolute right-4 top-4 text-[#a8a8a8] transition hover:text-white md:text-white/70"
             onClick={() => setOpen(false)}
             aria-label="Close menu"
           >
@@ -59,7 +54,7 @@ export function HeroFloatingNav() {
           <Link href="/" className="font-serif text-xl tracking-[0.35em] text-[#e8dcc8]" onClick={() => setOpen(false)}>
             SAKE
           </Link>
-          <nav className="flex flex-col gap-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#f0f0f0]">
+          <nav className="flex flex-col gap-4 text-[11px] font-semibold uppercase tracking-[0.25em] text-[#f0f0f0] md:text-white/90">
             <Link href="/" onClick={() => setOpen(false)}>
               {t.nav.home}
             </Link>
@@ -73,16 +68,35 @@ export function HeroFloatingNav() {
               {t.nav.contact}
             </Link>
           </nav>
-          <div className="mt-auto flex flex-col gap-3 border-t border-[#262626] pt-6">
-            <Link href="/order-online" className={drawerCtaClass} onClick={() => setOpen(false)}>
+          <div className="mt-auto flex flex-col gap-3 border-t border-[#262626] pt-6 md:border-white/10">
+            <Link href="/order-online" className={`${drawerCtaClass} md:hidden`} onClick={() => setOpen(false)}>
               {t.nav.orderShort}
             </Link>
-            <Link href="/reservation" className={drawerCtaClass} onClick={() => setOpen(false)}>
+            <Link href="/reservation" className={`${drawerCtaClass} md:hidden`} onClick={() => setOpen(false)}>
+              {t.nav.reserveTableNav}
+            </Link>
+            <Link
+              href="/order-online"
+              className={`${ctaClass} hidden w-full justify-center py-2.5 md:inline-flex`}
+              onClick={() => setOpen(false)}
+            >
+              {t.nav.orderShort}
+            </Link>
+            <Link
+              href="/reservation"
+              className={`${ctaClass} hidden w-full justify-center py-2.5 md:inline-flex`}
+              onClick={() => setOpen(false)}
+            >
               {t.nav.reserveTableNav}
             </Link>
           </div>
-          <div className="border-t border-[#262626] pt-6">
-            <LanguageSwitcher variant="drawer" />
+          <div className="border-t border-[#262626] pt-6 md:border-white/10">
+            <div className="md:hidden">
+              <LanguageSwitcher variant="drawer" />
+            </div>
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       </div>
