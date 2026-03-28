@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem } from "@/lib/menu-types";
-import { AdminField, adminInputClass, adminTextareaClass } from "./admin-field";
+import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
+import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 
 function cloneMenu(c: MenuCategory[]): MenuCategory[] {
   return JSON.parse(JSON.stringify(c)) as MenuCategory[];
@@ -15,7 +16,13 @@ function emptyDish(): MenuItem {
     name: { de: "Neues Gericht", en: "New dish" },
     description: { de: "", en: "" },
     priceEur: 0,
-    image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80"
+    image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+    allergens: [],
+    isNew: false,
+    isBestseller: false,
+    vegetarian: false,
+    vegan: false,
+    spicy: false
   };
 }
 
@@ -183,6 +190,20 @@ export function AdminDashboard() {
     });
   }
 
+  function toggleItemAllergen(catIndex: number, itemIndex: number, code: string) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const item = next[catIndex].items[itemIndex];
+      if (!item) return prev;
+      const cur = new Set(normalizeAllergenCodes(item.allergens));
+      const u = code.toUpperCase();
+      if (cur.has(u)) cur.delete(u);
+      else cur.add(u);
+      item.allergens = normalizeAllergenCodes([...cur]);
+      return next;
+    });
+  }
+
   function deleteItem(catIndex: number, itemIndex: number) {
     if (!confirm("Delete this dish?")) return;
     setCategories((prev) => {
@@ -242,7 +263,7 @@ export function AdminDashboard() {
   if (loadError) {
     return (
       <div className="px-4 py-16 text-center">
-        <p className="text-red-400">{loadError}</p>
+        <p className="text-red-600">{loadError}</p>
         <button type="button" onClick={() => void load()} className="mt-4 text-sm text-gold underline">
           Retry
         </button>
@@ -253,11 +274,11 @@ export function AdminDashboard() {
   return (
     <div className="min-h-screen pb-24 lg:pb-12">
       {/* Sticky toolbar */}
-      <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#060606]/95 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-[#eeeeee] bg-white shadow-sm">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6">
           <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-lg tracking-wide text-[#ebe3d6] sm:text-xl">Admin</h1>
-            <p className="hidden text-[11px] text-white/40 sm:block">Search, jump to a category, or expand one section at a time.</p>
+            <h1 className="font-serif text-lg tracking-wide text-neutral-900 sm:text-xl">Admin</h1>
+            <p className="hidden text-[11px] text-neutral-500 sm:block">Search, jump to a category, or expand one section at a time.</p>
           </div>
           <div className="flex w-full flex-col gap-2 sm:max-w-md sm:flex-1">
             <input
@@ -270,7 +291,7 @@ export function AdminDashboard() {
             />
           </div>
           <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
-            {menuStatus && <span className="text-[11px] text-emerald-400/90">{menuStatus}</span>}
+            {menuStatus && <span className="text-[11px] font-medium text-emerald-700">{menuStatus}</span>}
             <button
               type="button"
               onClick={() => void saveMenu()}
@@ -282,20 +303,20 @@ export function AdminDashboard() {
             <button
               type="button"
               onClick={() => void logout()}
-              className="rounded-full border border-white/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/65 hover:bg-white/5"
+              className="rounded-full border border-[#ccc] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:bg-neutral-100"
             >
               Log out
             </button>
           </div>
         </div>
         {/* Mobile jump menu */}
-        <div className="border-t border-white/[0.05] px-4 py-2 lg:hidden">
+        <div className="border-t border-[#eeeeee] px-4 py-2 lg:hidden">
           <label className="sr-only" htmlFor="admin-jump-mobile">
             Jump to section
           </label>
           <select
             id="admin-jump-mobile"
-            className={`${adminInputClass} w-full py-2 text-sm`}
+            className={`${adminSelectClass} w-full py-2 text-sm`}
             value=""
             onChange={(e) => {
               const v = e.target.value;
@@ -318,32 +339,32 @@ export function AdminDashboard() {
       <div className="mx-auto grid max-w-[1600px] gap-8 px-4 py-8 lg:grid-cols-[minmax(200px,240px)_1fr] lg:gap-10 lg:px-8">
         {/* Sidebar TOC — desktop */}
         <aside className="hidden lg:block">
-          <nav className="sticky top-[7.5rem] space-y-1 rounded-xl border border-white/[0.08] bg-[#0a0a0a] p-3">
-            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">On this page</p>
+          <nav className="sticky top-[7.5rem] space-y-1 rounded-xl border border-[#eeeeee] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">On this page</p>
             <button
               type="button"
               onClick={goToGift}
-              className="w-full rounded-lg px-2 py-2 text-left text-sm text-white/75 transition hover:bg-white/[0.06] hover:text-white"
+              className="w-full rounded-lg px-2 py-2 text-left text-sm text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900"
             >
               Order gift
             </button>
-            <div className="my-2 border-t border-white/10" />
+            <div className="my-2 border-t border-[#eeeeee]" />
             {categories.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => goToCategory(c.id)}
-                className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-2 text-left text-sm text-white/75 transition hover:bg-white/[0.06] hover:text-white"
+                className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-2 text-left text-sm text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900"
               >
                 <span className="truncate">{c.title.de || c.id}</span>
-                <span className="shrink-0 text-[11px] tabular-nums text-white/35">{c.items.length}</span>
+                <span className="shrink-0 text-[11px] tabular-nums text-neutral-400">{c.items.length}</span>
               </button>
             ))}
-            <div className="mt-3 border-t border-white/10 pt-3">
+            <div className="mt-3 border-t border-[#eeeeee] pt-3">
               <button type="button" onClick={expandAll} className="w-full py-1.5 text-left text-[11px] text-gold/90 hover:underline">
                 Expand all categories
               </button>
-              <button type="button" onClick={collapseAll} className="w-full py-1.5 text-left text-[11px] text-white/45 hover:underline">
+              <button type="button" onClick={collapseAll} className="w-full py-1.5 text-left text-[11px] text-neutral-500 hover:underline">
                 Collapse all
               </button>
             </div>
@@ -351,12 +372,12 @@ export function AdminDashboard() {
         </aside>
 
         <div className="min-w-0 space-y-10">
-          <section id="admin-gift" className="scroll-mt-28 space-y-4 rounded-2xl border border-white/[0.08] bg-[#0a0a0a] p-5 sm:p-6">
+          <section id="admin-gift" className="scroll-mt-28 space-y-4 rounded-2xl border border-[#eeeeee] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-serif text-xl text-[#ebe3d6]">Order gift</h2>
-              <span className="text-[10px] uppercase tracking-wider text-white/30">Checkout bonus</span>
+              <h2 className="font-serif text-xl text-neutral-900">Order gift</h2>
+              <span className="text-[10px] uppercase tracking-wider text-neutral-400">Checkout bonus</span>
             </div>
-            <p className="text-xs text-white/40">Shown when the cart reaches the threshold.</p>
+            <p className="text-xs text-neutral-500">Shown when the cart reaches the threshold.</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <AdminField label="Threshold (EUR)">
                 <input
@@ -385,25 +406,25 @@ export function AdminDashboard() {
                 rows={2}
               />
             </AdminField>
-            {giftStatus && <p className="text-sm text-emerald-400/90">{giftStatus}</p>}
+            {giftStatus && <p className="text-sm font-medium text-emerald-700">{giftStatus}</p>}
             <button
               type="button"
               onClick={() => void saveGift()}
               disabled={savingGift}
-              className="rounded-full border border-white/20 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/85 hover:bg-white/5 disabled:opacity-50"
+              className="rounded-full border border-[#ccc] bg-white px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
             >
               {savingGift ? "Saving…" : "Save gift settings"}
             </button>
           </section>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-serif text-xl text-[#ebe3d6]">Menu</h2>
+            <h2 className="font-serif text-xl text-neutral-900">Menu</h2>
             <div className="flex flex-wrap items-center gap-3">
-              <button type="button" onClick={expandAll} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50 hover:text-white">
+              <button type="button" onClick={expandAll} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500 hover:text-neutral-900">
                 Expand all
               </button>
-              <span className="text-white/20">|</span>
-              <button type="button" onClick={collapseAll} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/50 hover:text-white">
+              <span className="text-neutral-300">|</span>
+              <button type="button" onClick={collapseAll} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500 hover:text-neutral-900">
                 Collapse all
               </button>
               <button
@@ -417,7 +438,7 @@ export function AdminDashboard() {
           </div>
 
           {search.trim() && filteredEntries.length === 0 && (
-            <p className="rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/50">No categories or dishes match “{search.trim()}”.</p>
+            <p className="rounded-lg border border-[#eeeeee] bg-neutral-50 px-4 py-3 text-sm text-neutral-600">No categories or dishes match “{search.trim()}”.</p>
           )}
 
           <div className="space-y-4">
@@ -430,29 +451,29 @@ export function AdminDashboard() {
                 <section
                   key={cat.id}
                   id={`admin-cat-${cat.id}`}
-                  className="scroll-mt-28 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0c0c]"
+                  className="scroll-mt-28 overflow-hidden rounded-2xl border border-[#eeeeee] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
                 >
                   <button
                     type="button"
                     onClick={() => toggleCat(cat.id)}
-                    className="flex w-full items-center gap-3 border-b border-white/[0.06] bg-black/20 px-4 py-4 text-left transition hover:bg-white/[0.03] sm:px-5"
+                    className="flex w-full items-center gap-3 border-b border-[#eeeeee] bg-neutral-50/80 px-4 py-4 text-left transition hover:bg-neutral-100 sm:px-5"
                   >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-gold/90">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#ccc] text-amber-800">
                       {open ? "−" : "+"}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-[#ebe3d6]">{cat.title.de || cat.title.en || cat.id}</p>
-                      <p className="text-[11px] text-white/40">
+                      <p className="font-medium text-neutral-900">{cat.title.de || cat.title.en || cat.id}</p>
+                      <p className="text-[11px] text-neutral-500">
                         {cat.items.length} dish{cat.items.length === 1 ? "" : "es"}
                         {q && visibleItems.length !== cat.items.length && ` · ${visibleItems.length} match search`}
                       </p>
                     </div>
-                    <span className="hidden text-[10px] uppercase tracking-wider text-white/30 sm:inline">{open ? "Collapse" : "Expand"}</span>
+                    <span className="hidden text-[10px] uppercase tracking-wider text-neutral-400 sm:inline">{open ? "Collapse" : "Expand"}</span>
                   </button>
 
                   {open && (
                     <div className="space-y-0 p-4 sm:p-5 sm:pt-2">
-                      <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+                      <div className="mb-6 flex flex-col gap-4 border-b border-[#eeeeee] pb-6 sm:flex-row sm:items-end sm:justify-between">
                         <div className="grid flex-1 gap-3 sm:grid-cols-2">
                           <AdminField label="Category title (DE)">
                             <input
@@ -479,7 +500,7 @@ export function AdminDashboard() {
                             {savingMenu ? "Saving…" : "Save"}
                           </button>
                           <div className="flex flex-wrap gap-2 sm:justify-end">
-                            <span className="text-[10px] uppercase tracking-wider text-white/35">id: {cat.id}</span>
+                            <span className="text-[10px] uppercase tracking-wider text-neutral-400">id: {cat.id}</span>
                             <button
                               type="button"
                               onClick={() => addItem(ci)}
@@ -500,17 +521,17 @@ export function AdminDashboard() {
 
                       <div className="space-y-8">
                         {(q ? visibleItems : cat.items.map((item, ii) => ({ item, ii }))).map(({ item, ii }) => (
-                          <div key={item.id} className="rounded-xl border border-white/[0.06] bg-black/30 p-4 sm:p-5">
+                          <div key={item.id} className="rounded-xl border border-[#eeeeee] bg-neutral-50/80 p-4 sm:p-5">
                             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                              <span className="font-medium text-white/80">{item.name.de || item.name.en || item.id}</span>
+                              <span className="font-medium text-neutral-800">{item.name.de || item.name.en || item.id}</span>
                               <div className="flex flex-wrap items-center gap-3">
-                                <span className="text-[10px] text-white/35">{item.id}</span>
-                                <label className="flex items-center gap-2 text-xs text-white/60">
+                                <span className="text-[10px] text-neutral-400">{item.id}</span>
+                                <label className="flex items-center gap-2 text-xs text-neutral-600">
                                   <span className="text-[10px] uppercase tracking-wider">Move</span>
                                   <select
                                     value={cat.id}
                                     onChange={(e) => moveItem(ci, ii, e.target.value)}
-                                    className={`${adminInputClass} py-1.5 text-xs`}
+                                    className={`${adminSelectClass} py-1.5 text-xs`}
                                   >
                                     {categories.map((c) => (
                                       <option key={c.id} value={c.id}>
@@ -577,26 +598,56 @@ export function AdminDashboard() {
                                   className={adminInputClass}
                                 />
                               </AdminField>
-                              <div className="flex flex-wrap gap-4 lg:col-span-2">
-                                {(
-                                  [
-                                    ["isNew", "New"],
-                                    ["isBestseller", "Bestseller"],
-                                    ["vegetarian", "Vegetarian"],
-                                    ["vegan", "Vegan"],
-                                    ["spicy", "Spicy"]
-                                  ] as const
-                                ).map(([key, label]) => (
-                                  <label key={key} className="flex cursor-pointer items-center gap-2 text-sm text-white/70">
-                                    <input
-                                      type="checkbox"
-                                      checked={!!item[key]}
-                                      onChange={(e) => setItemField(ci, ii, key, e.target.checked)}
-                                      className="accent-gold"
-                                    />
-                                    {label}
-                                  </label>
-                                ))}
+                              <div className="lg:col-span-2">
+                                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Flags</p>
+                                <div className="flex flex-wrap gap-3 sm:gap-4">
+                                  {(
+                                    [
+                                      ["isNew", "New"],
+                                      ["isBestseller", "Bestseller"],
+                                      ["vegetarian", "Vegetarian"],
+                                      ["vegan", "Vegan"],
+                                      ["spicy", "Spicy"]
+                                    ] as const
+                                  ).map(([key, label]) => (
+                                    <label
+                                      key={key}
+                                      className="flex cursor-pointer items-center gap-2 rounded-lg border border-[#eee] bg-white px-3 py-2 text-sm text-neutral-800 shadow-sm"
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={!!item[key]}
+                                        onChange={(e) => setItemField(ci, ii, key, e.target.checked)}
+                                        className="accent-gold h-4 w-4"
+                                      />
+                                      {label}
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="lg:col-span-2">
+                                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+                                  Allergens (EU codes)
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {ALLERGEN_CODES_ORDER.map((code) => {
+                                    const active = normalizeAllergenCodes(item.allergens).includes(code);
+                                    return (
+                                      <button
+                                        key={code}
+                                        type="button"
+                                        onClick={() => toggleItemAllergen(ci, ii, code)}
+                                        className={`min-w-[2rem] rounded-md border px-2 py-1.5 font-mono text-xs font-semibold transition ${
+                                          active
+                                            ? "border-amber-600/80 bg-amber-50 text-amber-950"
+                                            : "border-[#ddd] bg-neutral-50 text-neutral-500 hover:border-neutral-400"
+                                        }`}
+                                      >
+                                        {code}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -609,7 +660,7 @@ export function AdminDashboard() {
             })}
           </div>
 
-          <div className="flex justify-center border-t border-white/10 pt-8">
+          <div className="flex justify-center border-t border-[#eeeeee] pt-8">
             <button
               type="button"
               onClick={() => void saveMenu()}

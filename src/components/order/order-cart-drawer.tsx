@@ -25,24 +25,24 @@ export function OrderCartDrawer() {
     <div className="fixed inset-0 z-[110] lg:hidden" role="presentation">
       <button
         type="button"
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-neutral-600/35"
         aria-label="Close"
         onClick={close}
       />
       <div
-        className="absolute bottom-0 left-0 right-0 flex max-h-[min(92dvh,920px)] flex-col rounded-t-[1.25rem] border border-white/[0.12] border-b-0 bg-[#080808] shadow-[0_-12px_48px_rgba(0,0,0,0.55)]"
+        className="absolute bottom-0 left-0 right-0 flex max-h-[min(92dvh,920px)] flex-col rounded-t-[1.25rem] border border-brand-line border-b-0 bg-brand-card shadow-[0_-12px_48px_rgba(22,20,18,0.12)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/10 px-4 py-3 pt-4 sm:px-6">
-          <p id={titleId} className="font-serif text-lg tracking-wide text-[#ebe3d6]">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-brand-line bg-brand-canvas/40 px-4 py-3 pt-4 sm:px-6">
+          <p id={titleId} className="font-serif text-lg font-medium tracking-wide text-brand-ink">
             {t.order.yourOrder}
           </p>
           <button
             type="button"
             onClick={close}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-white/80 transition hover:bg-white/10 hover:text-white"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-line bg-brand-card text-brand-body transition hover:border-brand-line-strong hover:bg-brand-muted hover:text-brand-ink"
             aria-label="Close"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">

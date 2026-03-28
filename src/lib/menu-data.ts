@@ -34,6 +34,7 @@ const ph = {
 
 type ItemOptions = MenuItemFlags & {
   description?: { de: string; en: string };
+  allergens?: string[];
 };
 
 function item(
@@ -44,31 +45,174 @@ function item(
   image: string,
   opts?: ItemOptions
 ): MenuItem {
-  const { description, ...flags } = opts || {};
+  const { description, allergens, ...flags } = opts || {};
   return {
     id,
     name: { de, en },
     description: description ?? { de: ph.de, en: ph.en },
     priceEur,
     image,
+    ...(allergens?.length ? { allergens } : {}),
     ...flags
   };
 }
 
 export const menuCategories: MenuCategory[] = [
-  { id: "soups", title: { en: "Soups", de: "Suppen" }, items: [] },
-  { id: "starters-salads", title: { en: "Starters & Salads", de: "Vorspeisen & Salate" }, items: [] },
-  { id: "sushi", title: { en: "Sushi", de: "Sushi" }, items: [] },
-  { id: "maki-cat", title: { en: "Maki", de: "Maki" }, items: [] },
-  { id: "sashimi", title: { en: "Sashimi", de: "Sashimi" }, items: [] },
+  {
+    id: "soups",
+    title: { en: "Soups", de: "Suppen" },
+    items: [
+      item("soup-miso", "Miso Suppe", "Miso soup", 3.9, I.lunch, { vegetarian: true, vegan: true, allergens: ["F"] }),
+      item(
+        "soup-hot-sour",
+        "Peking-Sauer-Suppe",
+        "Hot & sour soup",
+        4.5,
+        I.lunch,
+        { spicy: true, description: { de: "Leicht scharf, asiatisch-würzig.", en: "Lightly spicy, aromatic." }, allergens: ["A", "F", "G", "C"] }
+      ),
+      item(
+        "soup-tom-yam",
+        "Tom Yum Suppe",
+        "Tom yum soup",
+        5.9,
+        I.shrimp,
+        {
+          spicy: true,
+          isBestseller: true,
+          description: { de: "Mit Garnelen, Zitronengras und Chili.", en: "With prawns, lemongrass and chili." },
+          allergens: ["B", "D", "F", "G", "N"]
+        }
+      )
+    ]
+  },
+  {
+    id: "starters-salads",
+    title: { en: "Starters & Salads", de: "Vorspeisen & Salate" },
+    items: [
+      item("starter-edamame", "Edamame", "Edamame", 4.5, I.tofu, { vegetarian: true, vegan: true, allergens: ["F"] }),
+      item(
+        "starter-gyoza",
+        "Gyoza (6 Stk.)",
+        "Gyoza (6 pcs.)",
+        6.9,
+        I.chicken,
+        { description: { de: "Hausgemachte Teigtaschen, leicht angebraten.", en: "Pan-fried dumplings." }, allergens: ["A", "F", "G", "C"] }
+      ),
+      item("starter-wakame", "Wakame Salat", "Wakame salad", 5.5, I.tofu, { vegetarian: true, vegan: true, allergens: ["D", "F", "G", "P"] }),
+      item(
+        "starter-thai-beef",
+        "Thai Beef Salat",
+        "Thai beef salad",
+        8.9,
+        I.beef,
+        { spicy: true, description: { de: "Rindfleischstreifen, Kräuter, Limette.", en: "Beef strips, herbs, lime." }, allergens: ["F", "G", "P", "N"] }
+      ),
+      item(
+        "starter-summer-roll",
+        "Sommerrollen (2 Stk.)",
+        "Summer rolls (2 pcs.)",
+        6.5,
+        I.tofu,
+        { vegetarian: true, vegan: true, isNew: true, description: { de: "Reispapier, Gemüse, Kräuter, Erdnussdip.", en: "Rice paper, vegetables, herbs, peanut dip." }, allergens: ["A", "E", "F", "P"] }
+      )
+    ]
+  },
+  {
+    id: "sushi",
+    title: { en: "Sushi", de: "Sushi" },
+    items: [
+      item("sushi-nigiri-salmon", "Nigiri Lachs (2 Stk.)", "Salmon nigiri (2 pcs.)", 4.9, I.salmon, { allergens: ["D", "G", "F", "C"] }),
+      item("sushi-nigiri-tuna", "Nigiri Thunfisch (2 Stk.)", "Tuna nigiri (2 pcs.)", 5.2, I.salmon, { allergens: ["D", "G", "F", "C"] }),
+      item("sushi-nigiri-ebi", "Nigiri Garnele (2 Stk.)", "Prawn nigiri (2 pcs.)", 5.2, I.shrimp, { allergens: ["B", "D", "G", "F", "C"] }),
+      item(
+        "sushi-nigiri-tamago",
+        "Nigiri Tamago (2 Stk.)",
+        "Egg nigiri (2 pcs.)",
+        4.5,
+        I.lunch,
+        { vegetarian: true, allergens: ["C", "G", "F", "A"] }
+      ),
+      item(
+        "sushi-set-9",
+        "Sushi Set klein (9 Stk.)",
+        "Small sushi set (9 pcs.)",
+        14.9,
+        I.lunch,
+        { isBestseller: true, description: { de: "Auswahl Nigiri & Maki.", en: "Assorted nigiri & maki." }, allergens: ["A", "D", "G", "F", "C", "B"] }
+      ),
+      item(
+        "sushi-set-15",
+        "Sushi Set gross (15 Stk.)",
+        "Large sushi set (15 pcs.)",
+        22.9,
+        I.lunch,
+        { description: { de: "Auswahl Nigiri & Maki.", en: "Assorted nigiri & maki." }, allergens: ["A", "D", "G", "F", "C", "B"] }
+      )
+    ]
+  },
+  {
+    id: "maki-cat",
+    title: { en: "Maki", de: "Maki" },
+    items: [
+      item("maki-salmon", "Maki Lachs (8 Stk.)", "Salmon maki (8 pcs.)", 7.9, I.salmon, { allergens: ["A", "D", "G", "F", "C"] }),
+      item("maki-avocado", "Maki Avocado (8 Stk.)", "Avocado maki (8 pcs.)", 6.9, I.tofu, { vegetarian: true, vegan: true, allergens: ["A", "F"] }),
+      item("maki-cucumber", "Maki Gurke (8 Stk.)", "Cucumber maki (8 pcs.)", 6.5, I.tofu, { vegetarian: true, vegan: true, allergens: ["A", "F"] }),
+      item("maki-tuna", "Maki Thunfisch (8 Stk.)", "Tuna maki (8 pcs.)", 8.9, I.salmon, { allergens: ["A", "D", "G", "F", "C"] }),
+      item(
+        "maki-california",
+        "California Roll (8 Stk.)",
+        "California roll (8 pcs.)",
+        9.9,
+        I.salmon,
+        { isBestseller: true, allergens: ["A", "D", "G", "F", "C", "B"] }
+      ),
+      item(
+        "maki-spicy-tuna",
+        "Spicy Tuna Roll (8 Stk.)",
+        "Spicy tuna roll (8 pcs.)",
+        10.5,
+        I.salmon,
+        { spicy: true, allergens: ["A", "D", "G", "F", "C", "O"] }
+      ),
+      item(
+        "maki-dragon",
+        "Dragon Roll (8 Stk.)",
+        "Dragon roll (8 pcs.)",
+        12.9,
+        I.salmon,
+        { isNew: true, description: { de: "Lachs, Avocado, Sesam.", en: "Salmon, avocado, sesame." }, allergens: ["A", "D", "G", "F", "C", "P"] }
+      )
+    ]
+  },
+  {
+    id: "sashimi",
+    title: { en: "Sashimi", de: "Sashimi" },
+    items: [
+      item("sashimi-salmon-5", "Sashimi Lachs (5 Stk.)", "Salmon sashimi (5 pcs.)", 11.9, I.salmon, { allergens: ["D"] }),
+      item("sashimi-tuna-5", "Sashimi Thunfisch (5 Stk.)", "Tuna sashimi (5 pcs.)", 12.9, I.salmon, { allergens: ["D"] }),
+      item(
+        "sashimi-mix-9",
+        "Sashimi Mix (9 Stk.)",
+        "Sashimi mix (9 pcs.)",
+        21.9,
+        I.salmon,
+        { isBestseller: true, description: { de: "Lachs, Thunfisch, weißer Fisch.", en: "Salmon, tuna, white fish." }, allergens: ["D"] }
+      )
+    ]
+  },
   {
     id: "fried-noodles-rice",
     title: { en: "Fried Noodles & Rice", de: "Gebratene Nudeln & Reis" },
     items: [
-      item("veg-eierreis-gemuese", "Eierreis mit Gemüse", "Egg fried rice with vegetables", 9.5, I.rice, { vegetarian: true }),
+      item("veg-eierreis-gemuese", "Eierreis mit Gemüse", "Egg fried rice with vegetables", 9.5, I.rice, {
+        vegetarian: true,
+        allergens: ["C", "G", "F", "A"]
+      }),
       item("veg-gebratene-nudeln-gemuese", "Gebratene Nudeln mit Gemüse", "Fried noodles with vegetables", 9.5, I.noodles, {
         vegetarian: true,
-        vegan: true
+        vegan: true,
+        allergens: ["A", "F", "G"]
       })
     ]
   },
@@ -76,22 +220,22 @@ export const menuCategories: MenuCategory[] = [
     id: "warm-dishes",
     title: { en: "Warm Dishes with Rice", de: "Warme Speisen mit Reis" },
     items: [
-      item("warm-wok-chicken", "Wok Chicken", "Wok chicken", 12.9, I.chicken, { isBestseller: true }),
-      item("warm-teriyaki-chicken", "Teriyaki Chicken", "Teriyaki chicken", 13.5, I.chicken, { isBestseller: true }),
-      item("warm-basilikum-chicken", "Basilikum Chicken", "Basil chicken", 13.5, I.chicken, { spicy: true }),
-      item("warm-red-curry-chicken", "Red Curry Chicken", "Red curry chicken", 13.5, I.chicken, { spicy: true }),
-      item("warm-sesam-chicken", "Sesam Chicken", "Sesame chicken", 13.5, I.chicken),
-      item("warm-cashew-chicken", "Cashew Chicken", "Cashew chicken", 13.5, I.chicken),
-      item("warm-wok-duck", "Wok Duck", "Wok duck", 14.5, I.duck),
-      item("warm-mango-duck", "Mango Duck", "Mango duck", 14.5, I.duck),
-      item("warm-red-curry-duck", "Red Curry Duck", "Red curry duck", 14.5, I.duck, { spicy: true }),
-      item("warm-wok-beef", "Wok Beef", "Wok beef", 14.5, I.beef),
-      item("warm-chili-beef", "Chili Beef", "Chili beef", 14.5, I.beef, { spicy: true }),
-      item("warm-black-pfeffer-beef", "Black Pfeffer Beef", "Black pepper beef", 14.5, I.beef, { spicy: true }),
-      item("warm-bulgogi", "Bulgogi", "Bulgogi", 14.9, I.beef, { isBestseller: true }),
-      item("warm-lachs-teriyaki", "Lachs Teriyaki", "Salmon teriyaki", 14.9, I.salmon, { isBestseller: true }),
-      item("warm-red-curry-garnelen", "Red Curry Garnelen", "Red curry prawns", 17.9, I.shrimp, { spicy: true }),
-      item("warm-pfeffer-garnelen", "Pfeffer Garnelen", "Pepper prawns", 17.9, I.shrimp, { spicy: true })
+      item("warm-wok-chicken", "Wok Chicken", "Wok chicken", 12.9, I.chicken, { isBestseller: true, allergens: ["G", "F", "A", "C"] }),
+      item("warm-teriyaki-chicken", "Teriyaki Chicken", "Teriyaki chicken", 13.5, I.chicken, { isBestseller: true, allergens: ["G", "F", "A", "C"] }),
+      item("warm-basilikum-chicken", "Basilikum Chicken", "Basil chicken", 13.5, I.chicken, { spicy: true, allergens: ["G", "F", "A", "C", "N"] }),
+      item("warm-red-curry-chicken", "Red Curry Chicken", "Red curry chicken", 13.5, I.chicken, { spicy: true, allergens: ["G", "F", "A", "C"] }),
+      item("warm-sesam-chicken", "Sesam Chicken", "Sesame chicken", 13.5, I.chicken, { allergens: ["G", "F", "A", "C", "P"] }),
+      item("warm-cashew-chicken", "Cashew Chicken", "Cashew chicken", 13.5, I.chicken, { allergens: ["G", "F", "A", "C", "H"] }),
+      item("warm-wok-duck", "Wok Duck", "Wok duck", 14.5, I.duck, { allergens: ["G", "F", "A"] }),
+      item("warm-mango-duck", "Mango Duck", "Mango duck", 14.5, I.duck, { allergens: ["G", "F", "A"] }),
+      item("warm-red-curry-duck", "Red Curry Duck", "Red curry duck", 14.5, I.duck, { spicy: true, allergens: ["G", "F", "A"] }),
+      item("warm-wok-beef", "Wok Beef", "Wok beef", 14.5, I.beef, { allergens: ["G", "F", "A"] }),
+      item("warm-chili-beef", "Chili Beef", "Chili beef", 14.5, I.beef, { spicy: true, allergens: ["G", "F", "A"] }),
+      item("warm-black-pfeffer-beef", "Black Pfeffer Beef", "Black pepper beef", 14.5, I.beef, { spicy: true, allergens: ["G", "F", "A"] }),
+      item("warm-bulgogi", "Bulgogi", "Bulgogi", 14.9, I.beef, { isBestseller: true, allergens: ["G", "F", "A", "C"] }),
+      item("warm-lachs-teriyaki", "Lachs Teriyaki", "Salmon teriyaki", 14.9, I.salmon, { isBestseller: true, allergens: ["D", "G", "F", "C"] }),
+      item("warm-red-curry-garnelen", "Red Curry Garnelen", "Red curry prawns", 17.9, I.shrimp, { spicy: true, allergens: ["B", "D", "G", "F"] }),
+      item("warm-pfeffer-garnelen", "Pfeffer Garnelen", "Pepper prawns", 17.9, I.shrimp, { spicy: true, allergens: ["B", "D", "G", "F"] })
     ]
   },
   {
@@ -104,7 +248,10 @@ export const menuCategories: MenuCategory[] = [
         "Duck bento",
         13.5,
         I.bento,
-        { description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." } }
+        {
+          description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." },
+          allergens: ["A", "D", "G", "F", "C", "B"]
+        }
       ),
       item(
         "bento-lachs",
@@ -112,7 +259,11 @@ export const menuCategories: MenuCategory[] = [
         "Salmon bento",
         13.5,
         I.bento,
-        { isBestseller: true, description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." } }
+        {
+          isBestseller: true,
+          description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." },
+          allergens: ["A", "D", "G", "F", "C", "B"]
+        }
       ),
       item(
         "bento-vegan",
@@ -124,7 +275,8 @@ export const menuCategories: MenuCategory[] = [
           vegetarian: true,
           vegan: true,
           isNew: true,
-          description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." }
+          description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." },
+          allergens: ["A", "F"]
         }
       ),
       item(
@@ -133,7 +285,10 @@ export const menuCategories: MenuCategory[] = [
         "Tuna bento",
         14.5,
         I.bento,
-        { description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." } }
+        {
+          description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." },
+          allergens: ["A", "D", "G", "F", "C", "B"]
+        }
       ),
       item(
         "bento-sesam-chicken",
@@ -141,7 +296,10 @@ export const menuCategories: MenuCategory[] = [
         "Sesame chicken bento",
         13.5,
         I.bento,
-        { description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." } }
+        {
+          description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." },
+          allergens: ["A", "G", "F", "C", "P"]
+        }
       ),
       item(
         "bento-bulgogi",
@@ -149,7 +307,10 @@ export const menuCategories: MenuCategory[] = [
         "Bulgogi bento",
         14.5,
         I.bento,
-        { description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." } }
+        {
+          description: { de: "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.", en: "With miso soup, salad, fruit, 2 sushi & 3 maki." },
+          allergens: ["A", "G", "F", "C"]
+        }
       )
     ]
   },
@@ -159,75 +320,90 @@ export const menuCategories: MenuCategory[] = [
     items: [
       item("veg-wok-gemuese-reis", "Wok Gemüse mit Reis", "Wok vegetables with rice", 12.9, I.wok, {
         vegetarian: true,
-        vegan: true
+        vegan: true,
+        allergens: ["F", "G", "A"]
       }),
       item("veg-red-curry-tofu", "Red Curry Tofu mit Reis", "Red curry tofu with rice", 12.9, I.tofu, {
         vegetarian: true,
         vegan: true,
         spicy: true,
-        isNew: true
+        isNew: true,
+        allergens: ["F", "G", "A"]
       }),
-      item("veg-cashew-tofu", "Cashew Tofu mit Reis", "Cashew tofu with rice", 12.9, I.tofu, { vegetarian: true, vegan: true }),
-      item("veg-basilikum-tofu", "Basilikum Tofu mit Reis", "Basil tofu with rice", 12.9, I.tofu, { vegetarian: true, vegan: true, spicy: true })
+      item("veg-cashew-tofu", "Cashew Tofu mit Reis", "Cashew tofu with rice", 12.9, I.tofu, {
+        vegetarian: true,
+        vegan: true,
+        allergens: ["F", "G", "A", "H"]
+      }),
+      item("veg-basilikum-tofu", "Basilikum Tofu mit Reis", "Basil tofu with rice", 12.9, I.tofu, {
+        vegetarian: true,
+        vegan: true,
+        spicy: true,
+        allergens: ["F", "G", "A", "N"]
+      })
     ]
   },
   {
     id: "lunch",
     title: { en: "Lunch Menu (Mon–Fri 11:00–15:00)", de: "Mittagsmenü (Mo–Fr 11:00–15:00)" },
     items: [
-      item("m1", "M1 Wok Gemüse mit Reis", "M1 Wok vegetables with rice", 8.9, I.wok, { vegetarian: true, vegan: true }),
-      item("m2", "M2 Wok Chicken mit Reis", "M2 Wok chicken with rice", 8.9, I.chicken),
-      item("m3", "M3 Wok Rindfleisch mit Reis", "M3 Wok beef with rice", 9.5, I.beef),
-      item("m4", "M4 Wok Ente mit Teriyaki und Reis", "M4 Wok duck with teriyaki and rice", 9.5, I.duck),
-      item("m5", "M5 Eierreis mit Hühnerfleisch", "M5 Egg fried rice with chicken", 8.9, I.rice),
-      item("m6", "M6 Gebratene Nudeln mit Hühnerfleisch", "M6 Fried noodles with chicken", 8.9, I.noodles),
-      item("m7", "M7 Eierreis mit Lachs", "M7 Egg fried rice with salmon", 9.9, I.salmon),
-      item("m8", "M8 Gebratene Nudeln mit Lachs", "M8 Fried noodles with salmon", 9.9, I.noodles),
-      item("m9", "M9 Lachs Teriyaki mit Gemüse", "M9 Salmon teriyaki with vegetables", 9.9, I.salmon),
+      item("m1", "M1 Wok Gemüse mit Reis", "M1 Wok vegetables with rice", 8.9, I.wok, { vegetarian: true, vegan: true, allergens: ["F", "G", "A"] }),
+      item("m2", "M2 Wok Chicken mit Reis", "M2 Wok chicken with rice", 8.9, I.chicken, { allergens: ["G", "F", "A", "C"] }),
+      item("m3", "M3 Wok Rindfleisch mit Reis", "M3 Wok beef with rice", 9.5, I.beef, { allergens: ["G", "F", "A"] }),
+      item("m4", "M4 Wok Ente mit Teriyaki und Reis", "M4 Wok duck with teriyaki and rice", 9.5, I.duck, { allergens: ["G", "F", "A"] }),
+      item("m5", "M5 Eierreis mit Hühnerfleisch", "M5 Egg fried rice with chicken", 8.9, I.rice, { allergens: ["C", "G", "F", "A"] }),
+      item("m6", "M6 Gebratene Nudeln mit Hühnerfleisch", "M6 Fried noodles with chicken", 8.9, I.noodles, { allergens: ["A", "G", "F", "C"] }),
+      item("m7", "M7 Eierreis mit Lachs", "M7 Egg fried rice with salmon", 9.9, I.salmon, { allergens: ["C", "D", "G", "F", "A"] }),
+      item("m8", "M8 Gebratene Nudeln mit Lachs", "M8 Fried noodles with salmon", 9.9, I.noodles, { allergens: ["A", "D", "G", "F", "C"] }),
+      item("m9", "M9 Lachs Teriyaki mit Gemüse", "M9 Salmon teriyaki with vegetables", 9.9, I.salmon, { allergens: ["D", "G", "F", "C"] }),
       item(
         "m10",
         "M10 Sushi Set klein (6 Nigiri, 3 Maki)",
         "M10 Small sushi set (6 nigiri, 3 maki)",
         10.9,
         I.lunch,
-        { isBestseller: true }
+        { isBestseller: true, allergens: ["A", "D", "G", "F", "C", "B"] }
       ),
-      item("m11", "M11 Vietn. Basilikum Chicken", "M11 Vietnamese basil chicken", 9.5, I.chicken, { spicy: true }),
-      item("m12", "M12 Maki Mix", "M12 Maki mix", 10.9, I.lunch, { isNew: true }),
-      item("m13", "M13 Eierreis mit Gemüse & knusprigem Huhn", "M13 Egg fried rice with vegetables & crispy chicken", 9.5, I.rice),
-      item("m14", "M14 Nudeln mit Gemüse & knusprigem Huhn", "M14 Noodles with vegetables & crispy chicken", 9.5, I.noodles),
-      item("m15", "M15 Knuspriges Huhn", "M15 Crispy chicken", 9.9, I.chicken, { isNew: true })
+      item("m11", "M11 Vietn. Basilikum Chicken", "M11 Vietnamese basil chicken", 9.5, I.chicken, { spicy: true, allergens: ["G", "F", "A", "C", "N"] }),
+      item("m12", "M12 Maki Mix", "M12 Maki mix", 10.9, I.lunch, { isNew: true, allergens: ["A", "D", "G", "F", "C"] }),
+      item("m13", "M13 Eierreis mit Gemüse & knusprigem Huhn", "M13 Egg fried rice with vegetables & crispy chicken", 9.5, I.rice, {
+        allergens: ["C", "G", "F", "A"]
+      }),
+      item("m14", "M14 Nudeln mit Gemüse & knusprigem Huhn", "M14 Noodles with vegetables & crispy chicken", 9.5, I.noodles, {
+        allergens: ["A", "G", "F", "C"]
+      }),
+      item("m15", "M15 Knuspriges Huhn", "M15 Crispy chicken", 9.9, I.chicken, { isNew: true, allergens: ["A", "G", "F", "C"] })
     ]
   },
   {
     id: "sides-dessert",
     title: { en: "Side Dishes & Dessert", de: "Beilagen & Dessert" },
     items: [
-      item("side-nudeln", "Gebratene Nudeln", "Fried noodles", 5.0, I.noodles),
-      item("side-eierreis", "Eierreis", "Egg fried rice", 5.0, I.rice),
-      item("side-bananen", "Gebackene Bananen", "Baked bananas", 3.9, I.dessert),
-      item("side-mochi-sesam", "Mochi Sesam (2 Stk.)", "Mochi sesame (2 pcs.)", 3.5, I.dessert),
-      item("side-mochi-peanut", "Mochi Peanut (2 Stk.)", "Mochi peanut (2 pcs.)", 3.5, I.dessert)
+      item("side-nudeln", "Gebratene Nudeln", "Fried noodles", 5.0, I.noodles, { allergens: ["A", "F", "G"] }),
+      item("side-eierreis", "Eierreis", "Egg fried rice", 5.0, I.rice, { allergens: ["C", "G", "F", "A"] }),
+      item("side-bananen", "Gebackene Bananen", "Baked bananas", 3.9, I.dessert, { vegetarian: true, allergens: ["A", "G"] }),
+      item("side-mochi-sesam", "Mochi Sesam (2 Stk.)", "Mochi sesame (2 pcs.)", 3.5, I.dessert, { vegetarian: true, allergens: ["A", "G", "P"] }),
+      item("side-mochi-peanut", "Mochi Peanut (2 Stk.)", "Mochi peanut (2 pcs.)", 3.5, I.dessert, { vegetarian: true, allergens: ["A", "G", "E"] })
     ]
   },
   {
     id: "drinks",
     title: { en: "Drinks", de: "Getränke" },
     items: [
-      item("drink-soft", "Cola / Cola Zero / Almdudler / Fanta (0,33L)", "Cola / Cola Zero / Almdudler / Fanta (0.33L)", 2.0, I.drink),
-      item("drink-eistee", "Rauch Eistee (0,5L)", "Rauch iced tea (0.5L)", 2.8, I.drink),
-      item("drink-aloe", "Aloe Vera", "Aloe vera", 3.5, I.drink),
-      item("drink-roemer", "Römerquelle", "Römerquelle mineral water", 2.6, I.drink),
-      item("drink-mango-lychee", "Mango / Lychee Saft", "Mango / lychee juice", 3.5, I.drink),
-      item("drink-apfel", "Apfelsaft 0,25L", "Apple juice 0.25L", 2.9, I.drink),
-      item("drink-apfel-soda", "Apfelsaft mit Soda", "Apple juice with soda", 4.5, I.drink),
-      item("drink-apfel-wasser", "Apfelsaft mit Wasser", "Apple juice with water", 3.9, I.drink),
-      item("drink-redbull", "Red Bull", "Red Bull", 3.5, I.drink),
-      item("drink-gruener-tee", "Grüner Tee", "Green tea", 3.9, I.drink),
-      item("drink-tsingtao", "Tsing Dao Bier", "Tsingtao beer", 3.5, I.drink),
-      item("drink-kirin", "Kirin Ichiban Bier", "Kirin Ichiban beer", 3.5, I.drink),
-      item("drink-stiegl", "Stiegl Bier", "Stiegl beer", 3.0, I.drink),
-      item("drink-ottakringer", "Ottakringer Bier", "Ottakringer beer", 2.8, I.drink)
+      item("drink-soft", "Cola / Cola Zero / Almdudler / Fanta (0,33L)", "Cola / Cola Zero / Almdudler / Fanta (0.33L)", 2.0, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-eistee", "Rauch Eistee (0,5L)", "Rauch iced tea (0.5L)", 2.8, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-aloe", "Aloe Vera", "Aloe vera", 3.5, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-roemer", "Römerquelle", "Römerquelle mineral water", 2.6, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-mango-lychee", "Mango / Lychee Saft", "Mango / lychee juice", 3.5, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-apfel", "Apfelsaft 0,25L", "Apple juice 0.25L", 2.9, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-apfel-soda", "Apfelsaft mit Soda", "Apple juice with soda", 4.5, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-apfel-wasser", "Apfelsaft mit Wasser", "Apple juice with water", 3.9, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-redbull", "Red Bull", "Red Bull", 3.5, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-gruener-tee", "Grüner Tee", "Green tea", 3.9, I.drink, { vegan: true, vegetarian: true }),
+      item("drink-tsingtao", "Tsing Dao Bier", "Tsingtao beer", 3.5, I.drink, { vegetarian: true, allergens: ["A"] }),
+      item("drink-kirin", "Kirin Ichiban Bier", "Kirin Ichiban beer", 3.5, I.drink, { vegetarian: true, allergens: ["A"] }),
+      item("drink-stiegl", "Stiegl Bier", "Stiegl beer", 3.0, I.drink, { vegetarian: true, allergens: ["A"] }),
+      item("drink-ottakringer", "Ottakringer Bier", "Ottakringer beer", 2.8, I.drink, { vegetarian: true, allergens: ["A"] })
     ]
   }
 ];

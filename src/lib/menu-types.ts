@@ -12,6 +12,8 @@ export type MenuItem = {
   description: { en: string; de: string };
   priceEur: number;
   image: string;
+  /** EU/AT-style allergen codes, e.g. ["A","G","D"] */
+  allergens?: string[];
 } & MenuItemFlags;
 
 export type MenuCategory = {

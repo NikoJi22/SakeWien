@@ -27,23 +27,29 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-2xl border border-white/[0.08] bg-[#0a0a0a]/80 p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-9"
+      className="space-y-6 rounded-2xl border border-[#eeeeee] bg-white p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-9"
     >
       <div className="grid gap-5 md:grid-cols-2">
         <Input label={t.form.fullName} name="name" />
-        <Input label={t.form.phone} name="phone" />
+        <Input
+          label={t.form.phone}
+          name="phone"
+          type="tel"
+          placeholder={t.form.phonePlaceholder}
+          hint={t.form.phoneHint}
+        />
         <Input label={t.form.email} name="email" type="email" />
       </div>
       <TextArea label={t.form.message} name="message" />
 
       <button
         type="submit"
-        className="rounded-full bg-gold px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-black shadow-[0_8px_28px_rgba(196,165,116,0.28)] transition hover:brightness-105"
+        className="rounded-full bg-brand-accent px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-brand-accent/15 transition hover:bg-brand-accent-hover"
       >
         {status === "loading" ? t.form.sending : t.form.submit}
       </button>
-      {status === "success" && <p className="text-sm text-green-400">{t.form.success}</p>}
-      {status === "error" && <p className="text-sm text-red-400">{t.form.error}</p>}
+      {status === "success" && <p className="text-sm font-medium text-brand-success">{t.form.success}</p>}
+      {status === "error" && <p className="text-sm font-medium text-brand-danger">{t.form.error}</p>}
     </form>
   );
 }

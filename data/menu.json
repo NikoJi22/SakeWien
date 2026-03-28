@@ -5,7 +5,68 @@
       "en": "Soups",
       "de": "Suppen"
     },
-    "items": []
+    "items": [
+      {
+        "id": "soup-miso",
+        "name": {
+          "de": "Miso Suppe",
+          "en": "Miso soup"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "soup-hot-sour",
+        "name": {
+          "de": "Peking-Sauer-Suppe",
+          "en": "Hot & sour soup"
+        },
+        "description": {
+          "de": "Leicht scharf, asiatisch-würzig.",
+          "en": "Lightly spicy, aromatic."
+        },
+        "priceEur": 4.5,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "spicy": true
+      },
+      {
+        "id": "soup-tom-yam",
+        "name": {
+          "de": "Tom Yum Suppe",
+          "en": "Tom yum soup"
+        },
+        "description": {
+          "de": "Mit Garnelen, Zitronengras und Chili.",
+          "en": "With prawns, lemongrass and chili."
+        },
+        "priceEur": 5.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "B",
+          "D",
+          "F",
+          "G",
+          "N"
+        ],
+        "spicy": true,
+        "isBestseller": true
+      }
+    ]
   },
   {
     "id": "starters-salads",
@@ -13,7 +74,108 @@
       "en": "Starters & Salads",
       "de": "Vorspeisen & Salate"
     },
-    "items": []
+    "items": [
+      {
+        "id": "starter-edamame",
+        "name": {
+          "de": "Edamame",
+          "en": "Edamame"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 4.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "starter-gyoza",
+        "name": {
+          "de": "Gyoza (6 Stk.)",
+          "en": "Gyoza (6 pcs.)"
+        },
+        "description": {
+          "de": "Hausgemachte Teigtaschen, leicht angebraten.",
+          "en": "Pan-fried dumplings."
+        },
+        "priceEur": 6.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
+      },
+      {
+        "id": "starter-wakame",
+        "name": {
+          "de": "Wakame Salat",
+          "en": "Wakame salad"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D",
+          "F",
+          "G",
+          "P"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "starter-thai-beef",
+        "name": {
+          "de": "Thai Beef Salat",
+          "en": "Thai beef salad"
+        },
+        "description": {
+          "de": "Rindfleischstreifen, Kräuter, Limette.",
+          "en": "Beef strips, herbs, lime."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F",
+          "G",
+          "N",
+          "P"
+        ],
+        "spicy": true
+      },
+      {
+        "id": "starter-summer-roll",
+        "name": {
+          "de": "Sommerrollen (2 Stk.)",
+          "en": "Summer rolls (2 pcs.)"
+        },
+        "description": {
+          "de": "Reispapier, Gemüse, Kräuter, Erdnussdip.",
+          "en": "Rice paper, vegetables, herbs, peanut dip."
+        },
+        "priceEur": 6.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "E",
+          "F",
+          "P"
+        ],
+        "vegetarian": true,
+        "vegan": true,
+        "isNew": true
+      }
+    ]
   },
   {
     "id": "sushi",
@@ -23,19 +185,125 @@
     },
     "items": [
       {
-        "id": "dish-f35af2f8-2",
+        "id": "sushi-nigiri-salmon",
         "name": {
-          "de": "Neues GerichtTEst",
-          "en": "New dish"
+          "de": "Nigiri Lachs (2 Stk.)",
+          "en": "Salmon nigiri (2 pcs.)"
         },
         "description": {
-          "de": "asddsa",
-          "en": "fsadfdsfsd"
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
         },
-        "priceEur": 2,
+        "priceEur": 4.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
+      },
+      {
+        "id": "sushi-nigiri-tuna",
+        "name": {
+          "de": "Nigiri Thunfisch (2 Stk.)",
+          "en": "Tuna nigiri (2 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.2,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
+      },
+      {
+        "id": "sushi-nigiri-ebi",
+        "name": {
+          "de": "Nigiri Garnele (2 Stk.)",
+          "en": "Prawn nigiri (2 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.2,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
+      },
+      {
+        "id": "sushi-nigiri-tamago",
+        "name": {
+          "de": "Nigiri Tamago (2 Stk.)",
+          "en": "Egg nigiri (2 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 4.5,
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
-        "isBestseller": true,
-        "spicy": true
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "vegetarian": true
+      },
+      {
+        "id": "sushi-set-9",
+        "name": {
+          "de": "Sushi Set klein (9 Stk.)",
+          "en": "Small sushi set (9 pcs.)"
+        },
+        "description": {
+          "de": "Auswahl Nigiri & Maki.",
+          "en": "Assorted nigiri & maki."
+        },
+        "priceEur": 14.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "isBestseller": true
+      },
+      {
+        "id": "sushi-set-15",
+        "name": {
+          "de": "Sushi Set gross (15 Stk.)",
+          "en": "Large sushi set (15 pcs.)"
+        },
+        "description": {
+          "de": "Auswahl Nigiri & Maki.",
+          "en": "Assorted nigiri & maki."
+        },
+        "priceEur": 22.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
       }
     ]
   },
@@ -45,7 +313,153 @@
       "en": "Maki",
       "de": "Maki"
     },
-    "items": []
+    "items": [
+      {
+        "id": "maki-salmon",
+        "name": {
+          "de": "Maki Lachs (8 Stk.)",
+          "en": "Salmon maki (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 7.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "isBestseller": true
+      },
+      {
+        "id": "maki-avocado",
+        "name": {
+          "de": "Maki Avocado (8 Stk.)",
+          "en": "Avocado maki (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 6.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-cucumber",
+        "name": {
+          "de": "Maki Gurke (8 Stk.)",
+          "en": "Cucumber maki (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 6.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-tuna",
+        "name": {
+          "de": "Maki Thunfisch (8 Stk.)",
+          "en": "Tuna maki (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
+      },
+      {
+        "id": "maki-california",
+        "name": {
+          "de": "California Roll (8 Stk.)",
+          "en": "California roll (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "isBestseller": true
+      },
+      {
+        "id": "maki-spicy-tuna",
+        "name": {
+          "de": "Spicy Tuna Roll (8 Stk.)",
+          "en": "Spicy tuna roll (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.5,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G",
+          "O"
+        ],
+        "spicy": true
+      },
+      {
+        "id": "maki-dragon",
+        "name": {
+          "de": "Dragon Roll (8 Stk.)",
+          "en": "Dragon roll (8 pcs.)"
+        },
+        "description": {
+          "de": "Lachs, Avocado, Sesam.",
+          "en": "Salmon, avocado, sesame."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G",
+          "P"
+        ],
+        "isNew": true
+      }
+    ]
   },
   {
     "id": "sashimi",
@@ -53,7 +467,57 @@
       "en": "Sashimi",
       "de": "Sashimi"
     },
-    "items": []
+    "items": [
+      {
+        "id": "sashimi-salmon-5",
+        "name": {
+          "de": "Sashimi Lachs (5 Stk.)",
+          "en": "Salmon sashimi (5 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sashimi-tuna-5",
+        "name": {
+          "de": "Sashimi Thunfisch (5 Stk.)",
+          "en": "Tuna sashimi (5 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sashimi-mix-9",
+        "name": {
+          "de": "Sashimi Mix (9 Stk.)",
+          "en": "Sashimi mix (9 pcs.)"
+        },
+        "description": {
+          "de": "Lachs, Thunfisch, weißer Fisch.",
+          "en": "Salmon, tuna, white fish."
+        },
+        "priceEur": 21.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ],
+        "isBestseller": true
+      }
+    ]
   },
   {
     "id": "fried-noodles-rice",
@@ -74,6 +538,12 @@
         },
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
         "vegetarian": true
       },
       {
@@ -88,6 +558,11 @@
         },
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
         "vegetarian": true,
         "vegan": true
       }
@@ -112,6 +587,12 @@
         },
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
         "isBestseller": true
       },
       {
@@ -126,6 +607,12 @@
         },
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
         "isBestseller": true
       },
       {
@@ -140,6 +627,13 @@
         },
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G",
+          "N"
+        ],
         "spicy": true
       },
       {
@@ -154,6 +648,12 @@
         },
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
         "spicy": true
       },
       {
@@ -167,7 +667,14 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G",
+          "P"
+        ]
       },
       {
         "id": "warm-cashew-chicken",
@@ -180,7 +687,14 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G",
+          "H"
+        ]
       },
       {
         "id": "warm-wok-duck",
@@ -193,7 +707,12 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "warm-mango-duck",
@@ -206,7 +725,12 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "warm-red-curry-duck",
@@ -220,6 +744,11 @@
         },
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
         "spicy": true
       },
       {
@@ -233,7 +762,12 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "warm-chili-beef",
@@ -247,6 +781,11 @@
         },
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
         "spicy": true
       },
       {
@@ -261,6 +800,11 @@
         },
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
         "spicy": true
       },
       {
@@ -275,6 +819,12 @@
         },
         "priceEur": 14.9,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
         "isBestseller": true
       },
       {
@@ -289,6 +839,12 @@
         },
         "priceEur": 14.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
         "isBestseller": true
       },
       {
@@ -303,6 +859,12 @@
         },
         "priceEur": 17.9,
         "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "B",
+          "D",
+          "F",
+          "G"
+        ],
         "spicy": true
       },
       {
@@ -317,6 +879,12 @@
         },
         "priceEur": 17.9,
         "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "B",
+          "D",
+          "F",
+          "G"
+        ],
         "spicy": true
       }
     ]
@@ -339,7 +907,15 @@
           "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
         },
         "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "bento-lachs",
@@ -353,6 +929,14 @@
         },
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
         "isBestseller": true
       },
       {
@@ -367,6 +951,10 @@
         },
         "priceEur": 12.5,
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F"
+        ],
         "vegetarian": true,
         "vegan": true,
         "isNew": true
@@ -382,7 +970,15 @@
           "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
         },
         "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "bento-sesam-chicken",
@@ -395,7 +991,14 @@
           "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
         },
         "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G",
+          "P"
+        ]
       },
       {
         "id": "bento-bulgogi",
@@ -408,7 +1011,13 @@
           "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
         },
         "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
       }
     ]
   },
@@ -431,6 +1040,11 @@
         },
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
         "vegetarian": true,
         "vegan": true
       },
@@ -446,6 +1060,11 @@
         },
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
         "vegetarian": true,
         "vegan": true,
         "spicy": true,
@@ -463,6 +1082,12 @@
         },
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G",
+          "H"
+        ],
         "vegetarian": true,
         "vegan": true
       },
@@ -478,6 +1103,12 @@
         },
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G",
+          "N"
+        ],
         "vegetarian": true,
         "vegan": true,
         "spicy": true
@@ -503,6 +1134,11 @@
         },
         "priceEur": 8.9,
         "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
         "vegetarian": true,
         "vegan": true
       },
@@ -517,7 +1153,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m3",
@@ -530,7 +1172,12 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m4",
@@ -543,7 +1190,12 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m5",
@@ -556,7 +1208,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m6",
@@ -569,7 +1227,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m7",
@@ -582,7 +1246,14 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m8",
@@ -595,7 +1266,14 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m9",
@@ -608,7 +1286,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C",
+          "D",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m10",
@@ -622,6 +1306,14 @@
         },
         "priceEur": 10.9,
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
         "isBestseller": true
       },
       {
@@ -636,6 +1328,13 @@
         },
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G",
+          "N"
+        ],
         "spicy": true
       },
       {
@@ -650,6 +1349,13 @@
         },
         "priceEur": 10.9,
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
         "isNew": true
       },
       {
@@ -663,7 +1369,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m14",
@@ -676,7 +1388,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "m15",
@@ -690,6 +1408,12 @@
         },
         "priceEur": 9.9,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
         "isNew": true
       }
     ]
@@ -712,7 +1436,12 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 5,
-        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "side-eierreis",
@@ -725,7 +1454,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 5,
-        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ]
       },
       {
         "id": "side-bananen",
@@ -738,7 +1473,12 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.9,
-        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "G"
+        ],
+        "vegetarian": true
       },
       {
         "id": "side-mochi-sesam",
@@ -751,7 +1491,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "G",
+          "P"
+        ],
+        "vegetarian": true
       },
       {
         "id": "side-mochi-peanut",
@@ -764,7 +1510,13 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "E",
+          "G"
+        ],
+        "vegetarian": true
       }
     ]
   },
@@ -786,7 +1538,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 2,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-eistee",
@@ -799,7 +1553,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 2.8,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-aloe",
@@ -812,7 +1568,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-roemer",
@@ -825,7 +1583,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 2.6,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-mango-lychee",
@@ -838,7 +1598,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-apfel",
@@ -851,7 +1613,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 2.9,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-apfel-soda",
@@ -864,7 +1628,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 4.5,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-apfel-wasser",
@@ -877,7 +1643,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.9,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-redbull",
@@ -890,7 +1658,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-gruener-tee",
@@ -903,7 +1673,9 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.9,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-tsingtao",
@@ -916,7 +1688,11 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ],
+        "vegetarian": true
       },
       {
         "id": "drink-kirin",
@@ -929,7 +1705,11 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ],
+        "vegetarian": true
       },
       {
         "id": "drink-stiegl",
@@ -942,7 +1722,11 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 3,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ],
+        "vegetarian": true
       },
       {
         "id": "drink-ottakringer",
@@ -955,7 +1739,11 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 2.8,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ],
+        "vegetarian": true
       }
     ]
   }

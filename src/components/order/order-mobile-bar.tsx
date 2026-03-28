@@ -11,21 +11,21 @@ export function OrderMobileBar() {
   const { open } = useOrderCartDrawer();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#080808]/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl lg:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-brand-line bg-brand-card px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(22,20,18,0.08)] lg:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-between gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">{t.order.yourOrder}</p>
-          <p className="mt-0.5 font-serif text-lg text-[#ebe3d6]">{formatPriceEur(subtotalEur, language)}</p>
-          <p className="text-xs text-white/40">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-subtle">{t.order.yourOrder}</p>
+          <p className="mt-0.5 font-serif text-lg font-semibold tabular-nums text-brand-ink">{formatPriceEur(subtotalEur, language)}</p>
+          <p className="text-xs text-brand-body">
             {itemCount} {t.order.itemsInCart}
           </p>
         </div>
         <button
           type="button"
           onClick={open}
-          className="shrink-0 rounded-full border border-gold/80 bg-gold/15 px-5 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-gold transition hover:bg-gold/25"
+          className="shrink-0 rounded-full bg-brand-accent px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-md shadow-brand-accent/15 transition hover:bg-brand-accent-hover"
         >
-          {t.order.scrollToCheckout}
+          {t.order.openCart}
         </button>
       </div>
     </div>

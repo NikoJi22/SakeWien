@@ -14,10 +14,10 @@ export default function NewDishesPage() {
     <div>
       <PageHeader title={t.page.newDishesTitle} subtitle={t.page.newDishesText} />
       <PageShell>
-        {loading && <p className="text-sm text-white/50">…</p>}
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {loading && <p className="text-sm text-brand-subtle">…</p>}
+        {error && <p className="text-sm text-brand-danger">{error}</p>}
         {!loading && !error && newDishes.length === 0 && (
-          <p className="text-sm text-white/50">No new dishes at the moment.</p>
+          <p className="text-sm text-brand-body">No new dishes at the moment.</p>
         )}
         {!loading && !error && newDishes.length > 0 && (
           <div className="grid gap-7 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-9">

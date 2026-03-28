@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
 import type { MenuCategory } from "@/lib/menu-types";
+import { normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { readMenuFromDisk, writeMenuToDisk } from "@/lib/menu-store";
 import { menuCategories } from "@/lib/menu-data";
 import { cookies } from "next/headers";
@@ -63,9 +64,22 @@ export async function POST(request: Request) {
       ) {
         return NextResponse.json({ error: `Invalid item in category ${cat.id}` }, { status: 400 });
       }
+      if (item.allergens !== undefined) {
+        if (!Array.isArray(item.allergens) || !item.allergens.every((x) => typeof x === "string")) {
+          return NextResponse.json({ error: `Invalid allergens for item ${item.id}` }, { status: 400 });
+        }
+      }
     }
   }
 
-  await writeMenuToDisk(body);
+  const sanitized = body.map((cat) => ({
+    ...cat,
+    items: cat.items.map((item) => {
+      const allergens = item.allergens?.length ? normalizeAllergenCodes(item.allergens) : undefined;
+      return { ...item, ...(allergens?.length ? { allergens } : { allergens: undefined }) };
+    })
+  }));
+
+  await writeMenuToDisk(sanitized);
   return NextResponse.json({ ok: true });
 }

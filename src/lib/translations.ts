@@ -25,9 +25,26 @@ type TranslationSchema = {
     cardAboutUs: string;
   };
   sections: { bestsellers: string; newDishes: string };
+  menu: {
+    filterLabel: string;
+    filterVegan: string;
+    filterVegetarian: string;
+    filterSpicy: string;
+    filterBestseller: string;
+    filterNew: string;
+    clearFilters: string;
+    allergensShort: string;
+    allergenLegendTitle: string;
+    allergenLegendHint: string;
+    noDishesFilter: string;
+  };
   form: {
     fullName: string;
     phone: string;
+    /** Shown inside tel field as format hint */
+    phonePlaceholder: string;
+    /** Short hint under or near phone field */
+    phoneHint: string;
     email: string;
     address: string;
     message: string;
@@ -93,8 +110,32 @@ type TranslationSchema = {
     commentPlaceholder: string;
     placeOrder: string;
     scrollToCheckout: string;
+    /** Mobile bar / drawer — open cart (no scroll) */
+    openCart: string;
+    /** Brief confirmation after + without opening drawer */
+    addedToCart: string;
     itemsInCart: string;
     emailOptional: string;
+    smsVerifyTitle: string;
+    sendCode: string;
+    enterCode: string;
+    confirmCode: string;
+    codeSending: string;
+    codeVerifying: string;
+    verifiedPhone: string;
+    errInvalidPhone: string;
+    errSendCode: string;
+    errVerifyCode: string;
+    errRateLimit: string;
+    errWaitResend: string;
+    errPhoneNotVerified: string;
+    errPhoneMismatch: string;
+    errServerConfig: string;
+    paymentHeading: string;
+    paymentPickupCash: string;
+    paymentPickupCardNote: string;
+    paymentDeliveryCash: string;
+    orderErrorGeneric: string;
   };
 };
 
@@ -126,9 +167,25 @@ export const translations: Record<Language, TranslationSchema> = {
       bestsellers: "Bestsellers",
       newDishes: "New dishes"
     },
+    menu: {
+      filterLabel: "Filter",
+      filterVegan: "Vegan",
+      filterVegetarian: "Vegetarian",
+      filterSpicy: "Spicy",
+      filterBestseller: "Bestsellers",
+      filterNew: "New",
+      clearFilters: "Clear all",
+      allergensShort: "Allergens",
+      allergenLegendTitle: "Allergen key",
+      allergenLegendHint: "According to EU regulation — codes on dishes refer to the following allergens.",
+      noDishesFilter: "No dishes match these filters. Try clearing a filter."
+    },
     form: {
       fullName: "Full name",
       phone: "Phone",
+      phonePlaceholder: "+43 660 1234567",
+      phoneHint:
+        "Use country code +43 or national format (e.g. 0660 1234567). Spaces and dashes are fine.",
       email: "Email",
       address: "Address",
       message: "Message",
@@ -199,8 +256,30 @@ export const translations: Record<Language, TranslationSchema> = {
       commentPlaceholder: "Allergies, cutlery, special requests…",
       placeOrder: "Send order",
       scrollToCheckout: "Review order",
+      openCart: "Cart",
+      addedToCart: "Added to cart",
       itemsInCart: "items",
-      emailOptional: "Email (optional)"
+      emailOptional: "Email (optional)",
+      smsVerifyTitle: "Verify your phone",
+      sendCode: "Send code",
+      enterCode: "SMS code",
+      confirmCode: "Confirm",
+      codeSending: "Sending…",
+      codeVerifying: "Checking…",
+      verifiedPhone: "Phone verified",
+      errInvalidPhone: "Please enter a valid mobile number.",
+      errSendCode: "Could not send SMS. Please try again later.",
+      errVerifyCode: "Invalid or expired code. Please try again.",
+      errRateLimit: "Too many requests. Please try again later.",
+      errWaitResend: "Please wait a minute before requesting a new code.",
+      errPhoneNotVerified: "Please verify your phone with SMS before ordering.",
+      errPhoneMismatch: "Verified phone does not match the number in the form.",
+      errServerConfig: "Ordering is temporarily unavailable.",
+      paymentHeading: "Payment",
+      paymentPickupCash: "Payment is made in cash when you pick up your order.",
+      paymentPickupCardNote: "At the restaurant you can also pay by card (terminal).",
+      paymentDeliveryCash: "Delivery is paid in cash to the driver. No online payment.",
+      orderErrorGeneric: "Order could not be sent. Please try again."
     }
   },
   de: {
@@ -217,7 +296,7 @@ export const translations: Record<Language, TranslationSchema> = {
     },
     hero: {
       title: "Sushi Sensation",
-      subtitle: "Japanisches Fine Dining in Wien. Dunkle Eleganz, praezise Handwerkskunst, unvergesslicher Geschmack.",
+      subtitle: "Japanisches Fine Dining in Wien. Dunkle Eleganz, präzise Handwerkskunst, unvergesslicher Geschmack.",
       ctaPrimary: "Tisch reservieren",
       ctaSecondary: "Speisekarte ansehen",
       cardMenu: "Speisekarte",
@@ -230,13 +309,29 @@ export const translations: Record<Language, TranslationSchema> = {
       bestsellers: "Bestseller",
       newDishes: "Neue Gerichte"
     },
+    menu: {
+      filterLabel: "Filter",
+      filterVegan: "Vegan",
+      filterVegetarian: "Vegetarisch",
+      filterSpicy: "Scharf",
+      filterBestseller: "Bestseller",
+      filterNew: "Neu",
+      clearFilters: "Alle zurücksetzen",
+      allergensShort: "Allergene",
+      allergenLegendTitle: "Allergenkennzeichnung",
+      allergenLegendHint: "Gemäß EU-Verordnung — die Codes bei den Gerichten beziehen sich auf folgende Allergene.",
+      noDishesFilter: "Keine Gerichte mit diesen Filtern. Filter zurücksetzen."
+    },
     form: {
-      fullName: "Vollstaendiger Name",
+      fullName: "Vollständiger Name",
       phone: "Telefon",
+      phonePlaceholder: "+43 660 1234567",
+      phoneHint:
+        "Mit Ländervorwahl +43 oder national z. B. 0660 1234567. Leerzeichen und Bindestriche sind in Ordnung.",
       email: "E-Mail",
       address: "Adresse",
       message: "Nachricht",
-      guests: "Gaeste",
+      guests: "Gäste",
       date: "Datum",
       time: "Uhrzeit",
       type: "Typ",
@@ -245,21 +340,21 @@ export const translations: Record<Language, TranslationSchema> = {
       submit: "Senden",
       sending: "Wird gesendet...",
       success: "Nachricht erfolgreich gesendet.",
-      error: "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+      error: "Etwas ist schief gelaufen. Bitte erneut versuchen."
     },
     page: {
       menuTitle: "Digitale Speisekarte",
       menuText: "Entdecken Sie die gesamte Auswahl an japanischen Gerichten und Signature-Kreationen.",
       orderTitle: "Online bestellen",
-      orderText: "Bestellen Sie zur Abholung oder Lieferung in Wien. Wir bestaetigen rasch telefonisch.",
+      orderText: "Bestellen Sie zur Abholung oder Lieferung in Wien. Wir bestätigen rasch telefonisch.",
       contactTitle: "Kontakt",
-      contactText: "Fragen, private Events oder spezielle Wuensche. Wir helfen gerne weiter.",
+      contactText: "Fragen, private Events oder spezielle Wünsche. Wir helfen gerne weiter.",
       reservationTitle: "Reservierung",
-      reservationText: "Reservieren Sie Ihren Tisch und geniessen Sie ein elegantes japanisches Erlebnis.",
+      reservationText: "Reservieren Sie Ihren Tisch und genießen Sie ein elegantes japanisches Erlebnis.",
       newDishesTitle: "Neue Gerichte",
       newDishesText: "Entdecken Sie unsere neuesten Kreationen und saisonalen Specials.",
       bestsellersTitle: "Bestseller",
-      bestsellersText: "Die beliebtesten Gerichte unserer Gaeste."
+      bestsellersText: "Die beliebtesten Gerichte unserer Gäste."
     },
     about: {
       title: "Über uns",
@@ -282,9 +377,9 @@ export const translations: Record<Language, TranslationSchema> = {
     order: {
       browseMenu: "Speisekarte",
       yourOrder: "Ihre Bestellung",
-      emptyCart: "Ihr Warenkorb ist leer. Waehlen Sie Gerichte aus der Karte.",
+      emptyCart: "Ihr Warenkorb ist leer. Wählen Sie Gerichte aus der Karte.",
       subtotal: "Zwischensumme",
-      addToCart: "Hinzufuegen",
+      addToCart: "Hinzufügen",
       qty: "Menge",
       newBadge: "Neu",
       bestsellerBadge: "Bestseller",
@@ -299,12 +394,34 @@ export const translations: Record<Language, TranslationSchema> = {
       paymentMethod: "Zahlung bei Lieferung",
       cash: "Bar",
       card: "Karte (Terminal)",
-      comment: "Anmerkung fuer die Kueche",
-      commentPlaceholder: "Allergien, Besteck, Wuensche…",
+      comment: "Anmerkung für die Küche",
+      commentPlaceholder: "Allergien, Besteck, Wünsche…",
       placeOrder: "Bestellung senden",
       scrollToCheckout: "Zur Bestellung",
+      openCart: "Warenkorb",
+      addedToCart: "Zum Warenkorb hinzugefügt",
       itemsInCart: "Artikel",
-      emailOptional: "E-Mail (optional)"
+      emailOptional: "E-Mail (optional)",
+      smsVerifyTitle: "Handy-Verifizierung",
+      sendCode: "Code senden",
+      enterCode: "SMS-Code",
+      confirmCode: "Bestätigen",
+      codeSending: "Wird gesendet…",
+      codeVerifying: "Wird geprüft…",
+      verifiedPhone: "Telefon bestätigt",
+      errInvalidPhone: "Bitte geben Sie eine gültige Mobilnummer ein.",
+      errSendCode: "SMS konnte nicht gesendet werden. Bitte später erneut versuchen.",
+      errVerifyCode: "Code ungültig oder abgelaufen. Bitte erneut versuchen.",
+      errRateLimit: "Zu viele Anfragen. Bitte später erneut versuchen.",
+      errWaitResend: "Bitte warten Sie eine Minute, bevor Sie einen neuen Code anfordern.",
+      errPhoneNotVerified: "Bitte bestätigen Sie Ihre Nummer per SMS, bevor Sie bestellen.",
+      errPhoneMismatch: "Die bestätigte Nummer stimmt nicht mit dem Formular überein.",
+      errServerConfig: "Bestellen ist vorübergehend nicht möglich.",
+      paymentHeading: "Bezahlung",
+      paymentPickupCash: "Die Bezahlung erfolgt bei Abholung in bar.",
+      paymentPickupCardNote: "Vor Ort können Sie zusätzlich mit Karte (Bankomat/Terminal) zahlen.",
+      paymentDeliveryCash: "Lieferung wird bar beim Fahrer bezahlt. Keine Online-Zahlung.",
+      orderErrorGeneric: "Bestellung konnte nicht gesendet werden. Bitte erneut versuchen."
     }
   }
 };

@@ -40,7 +40,7 @@ export function HeroSocial() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/35 text-[#d4c4a8] backdrop-blur-sm transition hover:border-[#c4a574]/50 hover:text-[#e8dcc8]"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/50 bg-neutral-900/35 text-[#ebe3d6] transition hover:border-white hover:bg-neutral-900/50 hover:text-white"
         >
           {icon}
         </a>

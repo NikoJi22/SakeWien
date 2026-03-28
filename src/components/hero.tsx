@@ -55,8 +55,8 @@ export function Hero() {
             priority
             sizes="(max-width: 1024px) 100vw, 72vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/30" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/55 via-neutral-900/15 to-neutral-900/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/35 via-transparent to-transparent" />
 
           <div className="absolute left-0 right-0 top-3 z-20 flex justify-center px-3 sm:top-6 sm:px-8 md:top-8 md:px-10">
             <HeroFloatingNav />

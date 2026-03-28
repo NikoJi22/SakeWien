@@ -31,8 +31,8 @@ export function HeroSideCard({ href, label, imageSrc, imageAlt }: Props) {
         className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
         sizes="(max-width: 1024px) 100vw, 30vw"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent transition group-hover:from-black/80" />
-      <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-full bg-black/85 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/95 backdrop-blur-sm transition group-hover:bg-black">
+      <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/50 via-neutral-900/10 to-transparent transition group-hover:from-neutral-900/60" />
+      <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-ink shadow-md transition group-hover:bg-white">
         {label}
         <ArrowIcon />
       </span>
