@@ -1,34 +1,14 @@
-import type { Language } from "./translations";
+import type { MenuCategory, MenuItem, MenuItemFlags } from "./menu-types";
+import { formatPriceEur, labelMenuItem } from "./menu-helpers";
+
+export type { MenuCategory, MenuItem, MenuItemFlags } from "./menu-types";
+
+export { formatPriceEur, labelMenuItem };
 
 /**
- * Menu content sourced from: `sake-vienna_speisekarte.pdf` (project root / `public/` copy).
- * The PDF text layer only contains: Vegetarisch, Warme Speisen mit Reis, Bento, Mittagsmenü,
- * Beilagen & Dessert, Getränke. Sections such as separate Suppen / Vorspeisen / Sushi-Karten
- * are not present in this file — add them here when you have prices from an updated PDF.
+ * Seed menu (also written to `data/menu.json` via `npm run export-menu`).
+ * Live site reads from `data/menu.json` through `/api/menu` and MenuDataProvider.
  */
-
-/** Flags you can toggle per dish in the data below */
-export type MenuItemFlags = {
-  isNew?: boolean;
-  isBestseller?: boolean;
-  vegetarian?: boolean;
-  vegan?: boolean;
-  spicy?: boolean;
-};
-
-export type MenuItem = {
-  id: string;
-  name: { en: string; de: string };
-  description: { en: string; de: string };
-  priceEur: number;
-  image: string;
-} & MenuItemFlags;
-
-export type MenuCategory = {
-  id: string;
-  title: { en: string; de: string };
-  items: MenuItem[];
-};
 
 /** Premium dark food photography (Unsplash) — placeholders per dish */
 const I = {
@@ -254,23 +234,12 @@ export const menuCategories: MenuCategory[] = [
 
 const flatItems = menuCategories.flatMap((c) => c.items);
 
+/** @deprecated Use MenuDataProvider itemById — kept for export script compatibility */
 export const menuItemById: Record<string, MenuItem> = Object.fromEntries(flatItems.map((i) => [i.id, i]));
 
+/** @deprecated Use MenuDataProvider */
 export function getMenuItem(id: string): MenuItem | undefined {
   return menuItemById[id];
-}
-
-export function formatPriceEur(value: number, lang: Language): string {
-  const locale = lang === "de" ? "de-AT" : "en-AT";
-  return new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }).format(value);
-}
-
-export function labelMenuItem(item: MenuItem, lang: Language) {
-  return {
-    name: item.name[lang],
-    description: item.description[lang],
-    price: formatPriceEur(item.priceEur, lang)
-  };
 }
 
 export const bestsellers: MenuItem[] = flatItems.filter((d) => d.isBestseller);

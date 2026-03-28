@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { getMenuItem, type MenuItem } from "@/lib/menu-data";
+import { useMenuData } from "@/context/menu-data-context";
+import type { MenuItem } from "@/lib/menu-types";
 
 export type CartLine = {
   item: MenuItem;
@@ -22,6 +23,7 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { itemById } = useMenuData();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const setQuantity = useCallback((itemId: string, quantity: number) => {
@@ -61,14 +63,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     let subtotalEur = 0;
     for (const [id, qty] of Object.entries(quantities)) {
       if (qty <= 0) continue;
-      const item = getMenuItem(id);
+      const item = itemById[id];
       if (!item) continue;
       lines.push({ item, quantity: qty });
       itemCount += qty;
       subtotalEur += item.priceEur * qty;
     }
     return { lines, itemCount, subtotalEur };
-  }, [quantities]);
+  }, [quantities, itemById]);
 
   const value = useMemo(
     () => ({

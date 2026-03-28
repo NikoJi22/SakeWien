@@ -3,7 +3,7 @@
 import { useLanguage } from "@/context/language-context";
 import { useCart } from "@/context/cart-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
-import { formatPriceEur } from "@/lib/menu-data";
+import { formatPriceEur } from "@/lib/menu-helpers";
 
 export function OrderMobileBar() {
   const { language, t } = useLanguage();

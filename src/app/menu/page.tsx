@@ -4,14 +4,15 @@ import Link from "next/link";
 import { MenuGrid } from "@/components/menu-grid";
 import { PageHeader } from "@/components/page-header";
 import { PageShell } from "@/components/page-shell";
+import { useMenuData } from "@/context/menu-data-context";
 import { useLanguage } from "@/context/language-context";
-import { menuCategories } from "@/lib/menu-data";
 
 const pillClass =
   "inline-flex items-center justify-center rounded-full border border-white/[0.12] bg-black/35 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/88 transition hover:border-[#b8956a]/70 hover:bg-white/[0.05] hover:text-white";
 
 export default function MenuPage() {
   const { t } = useLanguage();
+  const { categories, loading, error } = useMenuData();
 
   return (
     <div>
@@ -25,7 +26,9 @@ export default function MenuPage() {
             {t.page.bestsellersTitle}
           </Link>
         </div>
-        <MenuGrid categories={menuCategories} />
+        {loading && <p className="text-sm text-white/50">…</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
+        {!loading && !error && <MenuGrid categories={categories} />}
       </PageShell>
     </div>
   );

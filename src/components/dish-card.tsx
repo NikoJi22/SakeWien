@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { labelMenuItem, type MenuItem } from "@/lib/menu-data";
+import type { MenuItem } from "@/lib/menu-types";
+import { labelMenuItem } from "@/lib/menu-helpers";
 import { useLanguage } from "@/context/language-context";
 
 function Badge({ children, className }: { children: React.ReactNode; className: string }) {

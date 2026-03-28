@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/language-context";
+import { GiftConfigProvider } from "@/context/gift-config-context";
+import { MenuDataProvider } from "@/context/menu-data-context";
 import { OrderCartDrawerProvider } from "@/context/order-cart-drawer-context";
 import { ConditionalNav } from "@/components/conditional-nav";
 import { ConditionalFooter } from "@/components/conditional-footer";
@@ -31,9 +33,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans">
         <LanguageProvider>
           <OrderCartDrawerProvider>
-            <ConditionalNav />
-            <main className="min-h-screen">{children}</main>
-            <ConditionalFooter />
+            <MenuDataProvider>
+              <GiftConfigProvider>
+                <ConditionalNav />
+                <main className="min-h-screen">{children}</main>
+                <ConditionalFooter />
+              </GiftConfigProvider>
+            </MenuDataProvider>
           </OrderCartDrawerProvider>
         </LanguageProvider>
       </body>

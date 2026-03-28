@@ -1,11 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { orderGiftConfig } from "@/config/order-gift";
 import { useCart } from "@/context/cart-context";
+import { useGiftConfig } from "@/context/gift-config-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
 import { useLanguage } from "@/context/language-context";
-import { formatPriceEur, labelMenuItem } from "@/lib/menu-data";
+import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 
 type OrderCheckoutProps = {
   /** Sidebar: full card with anchor id. Drawer: compact, no duplicate title (drawer shell provides header). */
@@ -15,12 +15,13 @@ type OrderCheckoutProps = {
 export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const { language, t } = useLanguage();
   const { lines, subtotalEur, itemCount, clear } = useCart();
+  const { config: giftConfig } = useGiftConfig();
   const { close: closeCartDrawer } = useOrderCartDrawer();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [fulfillment, setFulfillment] = useState<"pickup" | "delivery">("pickup");
 
-  const giftUnlocked = subtotalEur >= orderGiftConfig.thresholdEur;
-  const giftMessage = orderGiftConfig.message[language];
+  const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
+  const giftMessage = giftConfig.message[language];
 
   const isDrawer = variant === "drawer";
 

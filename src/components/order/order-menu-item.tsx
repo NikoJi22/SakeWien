@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import type { MenuItem } from "@/lib/menu-data";
-import { labelMenuItem } from "@/lib/menu-data";
+import type { MenuItem } from "@/lib/menu-types";
+import { labelMenuItem } from "@/lib/menu-helpers";
 import { useCart } from "@/context/cart-context";
 import { useLanguage } from "@/context/language-context";
 

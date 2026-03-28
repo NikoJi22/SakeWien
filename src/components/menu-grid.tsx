@@ -1,7 +1,7 @@
 "use client";
 
 import { DishCard } from "./dish-card";
-import type { MenuCategory } from "@/lib/menu-data";
+import type { MenuCategory } from "@/lib/menu-types";
 import { useLanguage } from "@/context/language-context";
 
 export function MenuGrid({ categories }: { categories: MenuCategory[] }) {

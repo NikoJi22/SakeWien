@@ -5,6 +5,6 @@ import { InteriorNavbar } from "./interior-navbar";
 
 export function ConditionalNav() {
   const pathname = usePathname();
-  if (pathname === "/") return null;
+  if (pathname === "/" || pathname?.startsWith("/admin")) return null;
   return <InteriorNavbar />;
 }

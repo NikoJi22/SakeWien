@@ -1,0 +1,962 @@
+[
+  {
+    "id": "soups",
+    "title": {
+      "en": "Soups",
+      "de": "Suppen"
+    },
+    "items": []
+  },
+  {
+    "id": "starters-salads",
+    "title": {
+      "en": "Starters & Salads",
+      "de": "Vorspeisen & Salate"
+    },
+    "items": []
+  },
+  {
+    "id": "sushi",
+    "title": {
+      "en": "Sushi",
+      "de": "Sushi"
+    },
+    "items": [
+      {
+        "id": "dish-f35af2f8-2",
+        "name": {
+          "de": "Neues GerichtTEst",
+          "en": "New dish"
+        },
+        "description": {
+          "de": "asddsa",
+          "en": "fsadfdsfsd"
+        },
+        "priceEur": 2,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "isBestseller": true,
+        "spicy": true
+      }
+    ]
+  },
+  {
+    "id": "maki-cat",
+    "title": {
+      "en": "Maki",
+      "de": "Maki"
+    },
+    "items": []
+  },
+  {
+    "id": "sashimi",
+    "title": {
+      "en": "Sashimi",
+      "de": "Sashimi"
+    },
+    "items": []
+  },
+  {
+    "id": "fried-noodles-rice",
+    "title": {
+      "en": "Fried Noodles & Rice",
+      "de": "Gebratene Nudeln & Reis"
+    },
+    "items": [
+      {
+        "id": "veg-eierreis-gemuese",
+        "name": {
+          "de": "Eierreis mit Gemüse",
+          "en": "Egg fried rice with vegetables"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true
+      },
+      {
+        "id": "veg-gebratene-nudeln-gemuese",
+        "name": {
+          "de": "Gebratene Nudeln mit Gemüse",
+          "en": "Fried noodles with vegetables"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      }
+    ]
+  },
+  {
+    "id": "warm-dishes",
+    "title": {
+      "en": "Warm Dishes with Rice",
+      "de": "Warme Speisen mit Reis"
+    },
+    "items": [
+      {
+        "id": "warm-wok-chicken",
+        "name": {
+          "de": "Wok Chicken",
+          "en": "Wok chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "isBestseller": true
+      },
+      {
+        "id": "warm-teriyaki-chicken",
+        "name": {
+          "de": "Teriyaki Chicken",
+          "en": "Teriyaki chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "isBestseller": true
+      },
+      {
+        "id": "warm-basilikum-chicken",
+        "name": {
+          "de": "Basilikum Chicken",
+          "en": "Basil chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      },
+      {
+        "id": "warm-red-curry-chicken",
+        "name": {
+          "de": "Red Curry Chicken",
+          "en": "Red curry chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      },
+      {
+        "id": "warm-sesam-chicken",
+        "name": {
+          "de": "Sesam Chicken",
+          "en": "Sesame chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "warm-cashew-chicken",
+        "name": {
+          "de": "Cashew Chicken",
+          "en": "Cashew chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "warm-wok-duck",
+        "name": {
+          "de": "Wok Duck",
+          "en": "Wok duck"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "warm-mango-duck",
+        "name": {
+          "de": "Mango Duck",
+          "en": "Mango duck"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "warm-red-curry-duck",
+        "name": {
+          "de": "Red Curry Duck",
+          "en": "Red curry duck"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      },
+      {
+        "id": "warm-wok-beef",
+        "name": {
+          "de": "Wok Beef",
+          "en": "Wok beef"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "warm-chili-beef",
+        "name": {
+          "de": "Chili Beef",
+          "en": "Chili beef"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      },
+      {
+        "id": "warm-black-pfeffer-beef",
+        "name": {
+          "de": "Black Pfeffer Beef",
+          "en": "Black pepper beef"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      },
+      {
+        "id": "warm-bulgogi",
+        "name": {
+          "de": "Bulgogi",
+          "en": "Bulgogi"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.9,
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "isBestseller": true
+      },
+      {
+        "id": "warm-lachs-teriyaki",
+        "name": {
+          "de": "Lachs Teriyaki",
+          "en": "Salmon teriyaki"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "isBestseller": true
+      },
+      {
+        "id": "warm-red-curry-garnelen",
+        "name": {
+          "de": "Red Curry Garnelen",
+          "en": "Red curry prawns"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 17.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      },
+      {
+        "id": "warm-pfeffer-garnelen",
+        "name": {
+          "de": "Pfeffer Garnelen",
+          "en": "Pepper prawns"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 17.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      }
+    ]
+  },
+  {
+    "id": "bento",
+    "title": {
+      "en": "Bento",
+      "de": "Bento mit Reis"
+    },
+    "items": [
+      {
+        "id": "bento-ente",
+        "name": {
+          "de": "Ente Bento",
+          "en": "Duck bento"
+        },
+        "description": {
+          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
+          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "bento-lachs",
+        "name": {
+          "de": "Lachs Bento",
+          "en": "Salmon bento"
+        },
+        "description": {
+          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
+          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "isBestseller": true
+      },
+      {
+        "id": "bento-vegan",
+        "name": {
+          "de": "Vegan Bento",
+          "en": "Vegan bento"
+        },
+        "description": {
+          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
+          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
+        },
+        "priceEur": 12.5,
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true,
+        "isNew": true
+      },
+      {
+        "id": "bento-thunfisch",
+        "name": {
+          "de": "Thunfisch Bento",
+          "en": "Tuna bento"
+        },
+        "description": {
+          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
+          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "bento-sesam-chicken",
+        "name": {
+          "de": "Sesam Chicken Bento",
+          "en": "Sesame chicken bento"
+        },
+        "description": {
+          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
+          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
+        },
+        "priceEur": 13.5,
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "bento-bulgogi",
+        "name": {
+          "de": "Bulgogi Bento",
+          "en": "Bulgogi bento"
+        },
+        "description": {
+          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
+          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
+        },
+        "priceEur": 14.5,
+        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80"
+      }
+    ]
+  },
+  {
+    "id": "vegetarian",
+    "title": {
+      "en": "Vegetarian",
+      "de": "Vegetarisch"
+    },
+    "items": [
+      {
+        "id": "veg-wok-gemuese-reis",
+        "name": {
+          "de": "Wok Gemüse mit Reis",
+          "en": "Wok vegetables with rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "veg-red-curry-tofu",
+        "name": {
+          "de": "Red Curry Tofu mit Reis",
+          "en": "Red curry tofu with rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true,
+        "spicy": true,
+        "isNew": true
+      },
+      {
+        "id": "veg-cashew-tofu",
+        "name": {
+          "de": "Cashew Tofu mit Reis",
+          "en": "Cashew tofu with rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "veg-basilikum-tofu",
+        "name": {
+          "de": "Basilikum Tofu mit Reis",
+          "en": "Basil tofu with rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true,
+        "spicy": true
+      }
+    ]
+  },
+  {
+    "id": "lunch",
+    "title": {
+      "en": "Lunch Menu (Mon–Fri 11:00–15:00)",
+      "de": "Mittagsmenü (Mo–Fr 11:00–15:00)"
+    },
+    "items": [
+      {
+        "id": "m1",
+        "name": {
+          "de": "M1 Wok Gemüse mit Reis",
+          "en": "M1 Wok vegetables with rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "m2",
+        "name": {
+          "de": "M2 Wok Chicken mit Reis",
+          "en": "M2 Wok chicken with rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m3",
+        "name": {
+          "de": "M3 Wok Rindfleisch mit Reis",
+          "en": "M3 Wok beef with rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m4",
+        "name": {
+          "de": "M4 Wok Ente mit Teriyaki und Reis",
+          "en": "M4 Wok duck with teriyaki and rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m5",
+        "name": {
+          "de": "M5 Eierreis mit Hühnerfleisch",
+          "en": "M5 Egg fried rice with chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m6",
+        "name": {
+          "de": "M6 Gebratene Nudeln mit Hühnerfleisch",
+          "en": "M6 Fried noodles with chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m7",
+        "name": {
+          "de": "M7 Eierreis mit Lachs",
+          "en": "M7 Egg fried rice with salmon"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m8",
+        "name": {
+          "de": "M8 Gebratene Nudeln mit Lachs",
+          "en": "M8 Fried noodles with salmon"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m9",
+        "name": {
+          "de": "M9 Lachs Teriyaki mit Gemüse",
+          "en": "M9 Salmon teriyaki with vegetables"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m10",
+        "name": {
+          "de": "M10 Sushi Set klein (6 Nigiri, 3 Maki)",
+          "en": "M10 Small sushi set (6 nigiri, 3 maki)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "isBestseller": true
+      },
+      {
+        "id": "m11",
+        "name": {
+          "de": "M11 Vietn. Basilikum Chicken",
+          "en": "M11 Vietnamese basil chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "spicy": true
+      },
+      {
+        "id": "m12",
+        "name": {
+          "de": "M12 Maki Mix",
+          "en": "M12 Maki mix"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "isNew": true
+      },
+      {
+        "id": "m13",
+        "name": {
+          "de": "M13 Eierreis mit Gemüse & knusprigem Huhn",
+          "en": "M13 Egg fried rice with vegetables & crispy chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m14",
+        "name": {
+          "de": "M14 Nudeln mit Gemüse & knusprigem Huhn",
+          "en": "M14 Noodles with vegetables & crispy chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "m15",
+        "name": {
+          "de": "M15 Knuspriges Huhn",
+          "en": "M15 Crispy chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "isNew": true
+      }
+    ]
+  },
+  {
+    "id": "sides-dessert",
+    "title": {
+      "en": "Side Dishes & Dessert",
+      "de": "Beilagen & Dessert"
+    },
+    "items": [
+      {
+        "id": "side-nudeln",
+        "name": {
+          "de": "Gebratene Nudeln",
+          "en": "Fried noodles"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "side-eierreis",
+        "name": {
+          "de": "Eierreis",
+          "en": "Egg fried rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "side-bananen",
+        "name": {
+          "de": "Gebackene Bananen",
+          "en": "Baked bananas"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.9,
+        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "side-mochi-sesam",
+        "name": {
+          "de": "Mochi Sesam (2 Stk.)",
+          "en": "Mochi sesame (2 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "side-mochi-peanut",
+        "name": {
+          "de": "Mochi Peanut (2 Stk.)",
+          "en": "Mochi peanut (2 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80"
+      }
+    ]
+  },
+  {
+    "id": "drinks",
+    "title": {
+      "en": "Drinks",
+      "de": "Getränke"
+    },
+    "items": [
+      {
+        "id": "drink-soft",
+        "name": {
+          "de": "Cola / Cola Zero / Almdudler / Fanta (0,33L)",
+          "en": "Cola / Cola Zero / Almdudler / Fanta (0.33L)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 2,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-eistee",
+        "name": {
+          "de": "Rauch Eistee (0,5L)",
+          "en": "Rauch iced tea (0.5L)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 2.8,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-aloe",
+        "name": {
+          "de": "Aloe Vera",
+          "en": "Aloe vera"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-roemer",
+        "name": {
+          "de": "Römerquelle",
+          "en": "Römerquelle mineral water"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 2.6,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-mango-lychee",
+        "name": {
+          "de": "Mango / Lychee Saft",
+          "en": "Mango / lychee juice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-apfel",
+        "name": {
+          "de": "Apfelsaft 0,25L",
+          "en": "Apple juice 0.25L"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 2.9,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-apfel-soda",
+        "name": {
+          "de": "Apfelsaft mit Soda",
+          "en": "Apple juice with soda"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 4.5,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-apfel-wasser",
+        "name": {
+          "de": "Apfelsaft mit Wasser",
+          "en": "Apple juice with water"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.9,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-redbull",
+        "name": {
+          "de": "Red Bull",
+          "en": "Red Bull"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-gruener-tee",
+        "name": {
+          "de": "Grüner Tee",
+          "en": "Green tea"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.9,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-tsingtao",
+        "name": {
+          "de": "Tsing Dao Bier",
+          "en": "Tsingtao beer"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-kirin",
+        "name": {
+          "de": "Kirin Ichiban Bier",
+          "en": "Kirin Ichiban beer"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-stiegl",
+        "name": {
+          "de": "Stiegl Bier",
+          "en": "Stiegl beer"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "drink-ottakringer",
+        "name": {
+          "de": "Ottakringer Bier",
+          "en": "Ottakringer beer"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 2.8,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80"
+      }
+    ]
+  }
+]
