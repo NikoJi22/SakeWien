@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type DragEvent } from "react
 import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
+import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 
 const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
@@ -329,6 +330,81 @@ export function AdminDashboard() {
     setCategories((prev) => {
       const next = cloneMenu(prev);
       next[catIndex].title[lang] = value;
+      return next;
+    });
+  }
+
+  function setLunchStarterEnabled(catIndex: number, itemIndex: number, enabled: boolean) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const dish = next[catIndex]?.items[itemIndex];
+      if (!dish) return prev;
+      if (enabled) {
+        dish.lunchStarterChoice = JSON.parse(JSON.stringify(LUNCH_STARTER_CHOICE)) as MenuItem["lunchStarterChoice"];
+      } else {
+        delete dish.lunchStarterChoice;
+      }
+      return next;
+    });
+  }
+
+  function updateLunchStarterLabelField(catIndex: number, itemIndex: number, lang: "de" | "en", value: string) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const ch = next[catIndex]?.items[itemIndex]?.lunchStarterChoice;
+      if (!ch) return prev;
+      ch.label[lang] = value;
+      return next;
+    });
+  }
+
+  function updateLunchStarterOptionId(catIndex: number, itemIndex: number, optIdx: number, id: string) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const opt = next[catIndex]?.items[itemIndex]?.lunchStarterChoice?.options[optIdx];
+      if (!opt) return prev;
+      opt.id = id;
+      return next;
+    });
+  }
+
+  function updateLunchStarterOptionName(
+    catIndex: number,
+    itemIndex: number,
+    optIdx: number,
+    lang: "de" | "en",
+    value: string
+  ) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const opt = next[catIndex]?.items[itemIndex]?.lunchStarterChoice?.options[optIdx];
+      if (!opt) return prev;
+      opt.name[lang] = value;
+      return next;
+    });
+  }
+
+  function addLunchStarterOptionRow(catIndex: number, itemIndex: number) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const ch = next[catIndex]?.items[itemIndex]?.lunchStarterChoice;
+      if (!ch) return prev;
+      ch.options.push({
+        id: `ls-${crypto.randomUUID().slice(0, 8)}`,
+        name: { de: "", en: "" }
+      });
+      return next;
+    });
+  }
+
+  function removeLunchStarterOptionRow(catIndex: number, itemIndex: number, optIdx: number) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const dish = next[catIndex]?.items[itemIndex];
+      const ch = dish?.lunchStarterChoice;
+      if (!ch) return prev;
+      ch.options.splice(optIdx, 1);
+      if (ch.options.length === 0 && dish) delete dish.lunchStarterChoice;
       return next;
     });
   }
@@ -806,6 +882,90 @@ export function AdminDashboard() {
                                     </label>
                                   ))}
                                 </div>
+                              </div>
+                              <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
+                                <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+                                  Mittagsmenü — Vorspeise (Online-Bestellung)
+                                </p>
+                                <p className="text-xs text-neutral-500">
+                                  Aktiv: Gäste wählen beim Bestellen eine Option. Deaktivieren entfernt die Auswahl für dieses Gericht.
+                                </p>
+                                <label className="flex cursor-pointer items-center gap-2 text-sm text-neutral-800">
+                                  <input
+                                    type="checkbox"
+                                    className="accent-gold h-4 w-4"
+                                    checked={!!item.lunchStarterChoice?.options?.length}
+                                    onChange={(e) => setLunchStarterEnabled(ci, ii, e.target.checked)}
+                                  />
+                                  Vorspeisenwahl beim Bestellen
+                                </label>
+                                {item.lunchStarterChoice?.options?.length ? (
+                                  <div className="space-y-3 border-t border-[#eeeeee] pt-3">
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                      <AdminField label="Vorspeise — Überschrift (DE)">
+                                        <input
+                                          value={item.lunchStarterChoice.label.de}
+                                          onChange={(e) => updateLunchStarterLabelField(ci, ii, "de", e.target.value)}
+                                          className={adminInputClass}
+                                          placeholder="z. B. Vorspeise"
+                                        />
+                                      </AdminField>
+                                      <AdminField label="Vorspeise — Überschrift (EN)">
+                                        <input
+                                          value={item.lunchStarterChoice.label.en}
+                                          onChange={(e) => updateLunchStarterLabelField(ci, ii, "en", e.target.value)}
+                                          className={adminInputClass}
+                                          placeholder="e.g. Starter"
+                                        />
+                                      </AdminField>
+                                    </div>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Optionen</p>
+                                    <div className="space-y-3">
+                                      {item.lunchStarterChoice.options.map((opt, oi) => (
+                                        <div
+                                          key={`${opt.id}-${oi}`}
+                                          className="flex flex-col gap-2 rounded-lg border border-[#eeeeee] bg-neutral-50/80 p-3 sm:flex-row sm:flex-wrap sm:items-end"
+                                        >
+                                          <AdminField label="Option-ID" className="min-w-[140px] flex-1">
+                                            <input
+                                              value={opt.id}
+                                              onChange={(e) => updateLunchStarterOptionId(ci, ii, oi, e.target.value)}
+                                              className={`${adminInputClass} font-mono text-xs`}
+                                            />
+                                          </AdminField>
+                                          <AdminField label="Name DE" className="min-w-[160px] flex-1">
+                                            <input
+                                              value={opt.name.de}
+                                              onChange={(e) => updateLunchStarterOptionName(ci, ii, oi, "de", e.target.value)}
+                                              className={adminInputClass}
+                                            />
+                                          </AdminField>
+                                          <AdminField label="Name EN" className="min-w-[160px] flex-1">
+                                            <input
+                                              value={opt.name.en}
+                                              onChange={(e) => updateLunchStarterOptionName(ci, ii, oi, "en", e.target.value)}
+                                              className={adminInputClass}
+                                            />
+                                          </AdminField>
+                                          <button
+                                            type="button"
+                                            onClick={() => removeLunchStarterOptionRow(ci, ii, oi)}
+                                            className="text-[10px] font-semibold uppercase text-red-400/90 hover:underline sm:mb-2"
+                                          >
+                                            Remove option
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => addLunchStarterOptionRow(ci, ii)}
+                                      className="text-[10px] font-semibold uppercase text-gold hover:underline"
+                                    >
+                                      + Option
+                                    </button>
+                                  </div>
+                                ) : null}
                               </div>
                               <div className="lg:col-span-2">
                                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">

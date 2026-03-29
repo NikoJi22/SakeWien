@@ -122,9 +122,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       subtotalEur,
       giftEligible: giftUnlocked,
       giftMessage: giftUnlocked ? giftMessage : "",
-      lines: lines.map(({ item, quantity }) => ({
-        id: item.id,
-        name: item.name[language],
+      lines: lines.map(({ lineKey, item, quantity, starterChoice }) => ({
+        id: lineKey,
+        name: starterChoice
+          ? `${item.name[language]} — ${item.lunchStarterChoice!.label[language]}: ${starterChoice.name[language]}`
+          : item.name[language],
         quantity,
         unitPriceEur: item.priceEur,
         lineTotalEur: item.priceEur * quantity
@@ -223,12 +225,17 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <p className={emptyCart}>{t.order.emptyCart}</p>
         ) : (
           <ul className="space-y-4">
-            {lines.map(({ item, quantity }) => {
+            {lines.map(({ lineKey, item, quantity, starterChoice }) => {
               const L = labelMenuItem(item, language);
               return (
-                <li key={item.id} className="flex justify-between gap-3 text-sm">
+                <li key={lineKey} className="flex justify-between gap-3 text-sm">
                   <span className={lineName}>
-                    <span className="font-medium">{L.name}</span>
+                    <span className="block font-medium">{L.name}</span>
+                    {starterChoice && item.lunchStarterChoice && (
+                      <span className="mt-0.5 block text-xs font-normal text-brand-body">
+                        {item.lunchStarterChoice.label[language]}: {starterChoice.name[language]}
+                      </span>
+                    )}
                     <span className={lineQty}> × {quantity}</span>
                   </span>
                   <span className={linePrice}>{formatPriceEur(item.priceEur * quantity, language)}</span>

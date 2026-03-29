@@ -71,7 +71,7 @@ export function OrderPageContent() {
                   <MenuHighlightSection navId={MENU_NAV_BESTSELLERS} title={t.sections.bestsellers} variant="amber">
                     <div className="space-y-6 sm:space-y-8">
                       {filteredBestsellers.map((item) => (
-                        <OrderMenuItem key={item.id} item={item} spotlight />
+                        <OrderMenuItem key={`spotlight-bs-${item.id}`} item={item} spotlight starterGroupId="bestsellers" />
                       ))}
                     </div>
                   </MenuHighlightSection>
@@ -80,7 +80,7 @@ export function OrderPageContent() {
                   <MenuHighlightSection navId={MENU_NAV_NEW} title={t.sections.newDishes} variant="emerald">
                     <div className="space-y-6 sm:space-y-8">
                       {filteredNew.map((item) => (
-                        <OrderMenuItem key={item.id} item={item} spotlight />
+                        <OrderMenuItem key={`spotlight-nw-${item.id}`} item={item} spotlight starterGroupId="new-dishes" />
                       ))}
                     </div>
                   </MenuHighlightSection>
@@ -89,7 +89,7 @@ export function OrderPageContent() {
                   <MenuSection key={category.id} categoryId={category.id} title={category.title[language]}>
                     <div className="space-y-6 sm:space-y-8">
                       {category.items.map((item) => (
-                        <OrderMenuItem key={item.id} item={item} />
+                        <OrderMenuItem key={`${category.id}-${item.id}`} item={item} starterGroupId={category.id} />
                       ))}
                     </div>
                   </MenuSection>

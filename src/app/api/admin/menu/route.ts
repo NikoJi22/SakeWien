@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
-import type { MenuCategory } from "@/lib/menu-types";
+import type { LunchStarterChoice, LunchStarterOption, MenuCategory, MenuItem } from "@/lib/menu-types";
 import { normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { readMenuFromDisk, writeMenuToDisk } from "@/lib/menu-store";
 import { menuCategories } from "@/lib/menu-data";
@@ -18,6 +18,30 @@ function isMenuCategoryArray(x: unknown): x is MenuCategory[] {
       typeof (c as MenuCategory).title.de === "string" &&
       Array.isArray((c as MenuCategory).items)
   );
+}
+
+function sanitizeLunchStarterChoice(raw: unknown): LunchStarterChoice | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const r = raw as Record<string, unknown>;
+  const label = r.label;
+  if (!label || typeof label !== "object") return undefined;
+  const lb = label as Record<string, unknown>;
+  if (typeof lb.en !== "string" || typeof lb.de !== "string") return undefined;
+  const options = r.options;
+  if (!Array.isArray(options) || options.length === 0) return undefined;
+  const cleaned: LunchStarterOption[] = [];
+  for (const o of options) {
+    if (!o || typeof o !== "object") continue;
+    const rec = o as Record<string, unknown>;
+    if (typeof rec.id !== "string" || !rec.name || typeof rec.name !== "object") continue;
+    const n = rec.name as Record<string, unknown>;
+    if (typeof n.en !== "string" || typeof n.de !== "string") continue;
+    const id = rec.id.trim();
+    if (!id) continue;
+    cleaned.push({ id, name: { de: n.de.trim(), en: n.en.trim() } });
+  }
+  if (cleaned.length === 0) return undefined;
+  return { label: { de: lb.de.trim(), en: lb.en.trim() }, options: cleaned };
 }
 
 async function requireAdmin() {
@@ -75,8 +99,14 @@ export async function POST(request: Request) {
   const sanitized = body.map((cat) => ({
     ...cat,
     items: cat.items.map((item) => {
-      const allergens = item.allergens?.length ? normalizeAllergenCodes(item.allergens) : undefined;
-      return { ...item, ...(allergens?.length ? { allergens } : { allergens: undefined }) };
+      const mi = item as MenuItem;
+      const allergens = mi.allergens?.length ? normalizeAllergenCodes(mi.allergens) : undefined;
+      const lunchStarterChoice = sanitizeLunchStarterChoice(mi.lunchStarterChoice);
+      return {
+        ...mi,
+        ...(allergens?.length ? { allergens } : { allergens: undefined }),
+        lunchStarterChoice
+      };
     })
   }));
 

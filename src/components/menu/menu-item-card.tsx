@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { MenuItem } from "@/lib/menu-types";
+import { itemRequiresLunchStarter } from "@/lib/cart-line-key";
 import { labelMenuItem } from "@/lib/menu-helpers";
 import { useLanguage } from "@/context/language-context";
 import { MenuAllergenChips, MenuDietBadges } from "./menu-diet-allergen";
@@ -49,6 +50,12 @@ export function MenuItemCard({ item, variant = "default" }: Props) {
         </div>
         <MenuDietBadges item={item} />
         <p className="text-sm leading-relaxed text-brand-body">{L.description}</p>
+        {itemRequiresLunchStarter(item) && item.lunchStarterChoice && (
+          <p className="text-xs leading-relaxed text-brand-subtle">
+            {item.lunchStarterChoice.label[language]}:{" "}
+            {item.lunchStarterChoice.options.map((o) => o.name[language]).join(" · ")}
+          </p>
+        )}
         <MenuAllergenChips item={item} className="pt-1" />
       </div>
     </article>

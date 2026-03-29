@@ -6,6 +6,17 @@ export type MenuItemFlags = {
   spicy?: boolean;
 };
 
+export type LunchStarterOption = {
+  id: string;
+  name: { en: string; de: string };
+};
+
+/** Mittagsmenü: Kunde wählt beim Bestellen eine Vorspeise (z. B. Miso, Süßsauer, Frühlingsrollen). */
+export type LunchStarterChoice = {
+  label: { en: string; de: string };
+  options: LunchStarterOption[];
+};
+
 export type MenuItem = {
   id: string;
   name: { en: string; de: string };
@@ -14,6 +25,7 @@ export type MenuItem = {
   image: string;
   /** EU/AT-style allergen codes, e.g. ["A","G","D"] */
   allergens?: string[];
+  lunchStarterChoice?: LunchStarterChoice;
 } & MenuItemFlags;
 
 export type MenuCategory = {

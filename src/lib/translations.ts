@@ -136,6 +136,8 @@ type TranslationSchema = {
     paymentPickupCardNote: string;
     paymentDeliveryCash: string;
     orderErrorGeneric: string;
+    /** Mittagsmenü — explain starter choice */
+    lunchStarterHint: string;
   };
 };
 
@@ -279,7 +281,8 @@ export const translations: Record<Language, TranslationSchema> = {
       paymentPickupCash: "Payment is made in cash when you pick up your order.",
       paymentPickupCardNote: "At the restaurant you can also pay by card (terminal).",
       paymentDeliveryCash: "Delivery is paid in cash to the driver. No online payment.",
-      orderErrorGeneric: "Order could not be sent. Please try again."
+      orderErrorGeneric: "Order could not be sent. Please try again.",
+      lunchStarterHint: "Included with this lunch menu — pick one."
     }
   },
   de: {
@@ -421,7 +424,8 @@ export const translations: Record<Language, TranslationSchema> = {
       paymentPickupCash: "Die Bezahlung erfolgt bei Abholung in bar.",
       paymentPickupCardNote: "Vor Ort können Sie zusätzlich mit Karte (Bankomat/Terminal) zahlen.",
       paymentDeliveryCash: "Lieferung wird bar beim Fahrer bezahlt. Keine Online-Zahlung.",
-      orderErrorGeneric: "Bestellung konnte nicht gesendet werden. Bitte erneut versuchen."
+      orderErrorGeneric: "Bestellung konnte nicht gesendet werden. Bitte erneut versuchen.",
+      lunchStarterHint: "Im Mittagsmenü enthalten — bitte eine Option wählen."
     }
   }
 };

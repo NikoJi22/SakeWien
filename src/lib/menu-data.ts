@@ -1,4 +1,4 @@
-import type { MenuCategory, MenuItem, MenuItemFlags } from "./menu-types";
+import type { LunchStarterChoice, MenuCategory, MenuItem, MenuItemFlags } from "./menu-types";
 import { formatPriceEur, labelMenuItem } from "./menu-helpers";
 
 export type { MenuCategory, MenuItem, MenuItemFlags } from "./menu-types";
@@ -32,9 +32,30 @@ const ph = {
   de: "Gericht von unserer Speisekarte."
 };
 
+const drinkDesc = {
+  de: "Aus unserer Getränkekarte.",
+  en: "From our drinks menu."
+};
+
 type ItemOptions = MenuItemFlags & {
   description?: { de: string; en: string };
   allergens?: string[];
+  lunchStarterChoice?: LunchStarterChoice;
+};
+
+/** Shared Mittagsmenü Vorspeisen — Kunde wählt eine beim Bestellen. */
+export const LUNCH_STARTER_CHOICE: LunchStarterChoice = {
+  label: { de: "Vorspeise", en: "Starter" },
+  options: [
+    { id: "ls-miso", name: { de: "Miso Suppe", en: "Miso soup" } },
+    { id: "ls-sweet-sour", name: { de: "Süßsauer Suppe", en: "Sweet & sour soup" } },
+    { id: "ls-spring-rolls", name: { de: "Mini Frühlingsrollen", en: "Mini spring rolls" } }
+  ]
+};
+
+const lunchMenuDescription = {
+  de: "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+  en: "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
 };
 
 function item(
@@ -45,7 +66,7 @@ function item(
   image: string,
   opts?: ItemOptions
 ): MenuItem {
-  const { description, allergens, ...flags } = opts || {};
+  const { description, allergens, lunchStarterChoice, ...flags } = opts || {};
   return {
     id,
     name: { de, en },
@@ -53,6 +74,7 @@ function item(
     priceEur,
     image,
     ...(allergens?.length ? { allergens } : {}),
+    ...(lunchStarterChoice ? { lunchStarterChoice } : {}),
     ...flags
   };
 }
@@ -345,34 +367,99 @@ export const menuCategories: MenuCategory[] = [
   },
   {
     id: "lunch",
-    title: { en: "Lunch Menu (Mon–Fri 11:00–15:00)", de: "Mittagsmenü (Mo–Fr 11:00–15:00)" },
+    title: {
+      en: "Lunch menu (Mon–Fri 11:00–15:00)\n(Starter: miso soup / sweet & sour soup / mini spring rolls)",
+      de: "Mittagsmenü (Mo–Fr 11:00–15:00)\n(Vorspeise: Miso Suppe / Süßsauer Suppe / Mini Frühlingsrollen)"
+    },
     items: [
-      item("m1", "M1 Wok Gemüse mit Reis", "M1 Wok vegetables with rice", 8.9, I.wok, { vegetarian: true, vegan: true, allergens: ["F", "G", "A"] }),
-      item("m2", "M2 Wok Chicken mit Reis", "M2 Wok chicken with rice", 8.9, I.chicken, { allergens: ["G", "F", "A", "C"] }),
-      item("m3", "M3 Wok Rindfleisch mit Reis", "M3 Wok beef with rice", 9.5, I.beef, { allergens: ["G", "F", "A"] }),
-      item("m4", "M4 Wok Ente mit Teriyaki und Reis", "M4 Wok duck with teriyaki and rice", 9.5, I.duck, { allergens: ["G", "F", "A"] }),
-      item("m5", "M5 Eierreis mit Hühnerfleisch", "M5 Egg fried rice with chicken", 8.9, I.rice, { allergens: ["C", "G", "F", "A"] }),
-      item("m6", "M6 Gebratene Nudeln mit Hühnerfleisch", "M6 Fried noodles with chicken", 8.9, I.noodles, { allergens: ["A", "G", "F", "C"] }),
-      item("m7", "M7 Eierreis mit Lachs", "M7 Egg fried rice with salmon", 9.9, I.salmon, { allergens: ["C", "D", "G", "F", "A"] }),
-      item("m8", "M8 Gebratene Nudeln mit Lachs", "M8 Fried noodles with salmon", 9.9, I.noodles, { allergens: ["A", "D", "G", "F", "C"] }),
-      item("m9", "M9 Lachs Teriyaki mit Gemüse", "M9 Salmon teriyaki with vegetables", 9.9, I.salmon, { allergens: ["D", "G", "F", "C"] }),
+      item("m1", "M1 Wok Gemüse mit Reis", "M1 Wok vegetables with rice", 8.9, I.wok, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        vegetarian: true,
+        vegan: true,
+        allergens: ["F", "G", "A"]
+      }),
+      item("m2", "M2 Wok Chicken mit Reis", "M2 Wok chicken with rice", 8.9, I.chicken, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["G", "F", "A", "C"]
+      }),
+      item("m3", "M3 Wok Rindfleisch mit Reis", "M3 Wok beef with rice", 9.5, I.beef, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["G", "F", "A"]
+      }),
+      item("m4", "M4 Wok Ente mit Teriyaki und Reis", "M4 Wok duck with teriyaki and rice", 9.5, I.duck, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["G", "F", "A"]
+      }),
+      item("m5", "M5 Eierreis mit Hühnerfleisch", "M5 Egg fried rice with chicken", 8.9, I.rice, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["C", "G", "F", "A"]
+      }),
+      item("m6", "M6 Gebratene Nudeln mit Hühnerfleisch", "M6 Fried noodles with chicken", 8.9, I.noodles, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["A", "G", "F", "C"]
+      }),
+      item("m7", "M7 Eierreis mit Lachs", "M7 Egg fried rice with salmon", 9.9, I.salmon, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["C", "D", "G", "F", "A"]
+      }),
+      item("m8", "M8 Gebratene Nudeln mit Lachs", "M8 Fried noodles with salmon", 9.9, I.noodles, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["A", "D", "G", "F", "C"]
+      }),
+      item("m9", "M9 Lachs Teriyaki mit Gemüse", "M9 Salmon teriyaki with vegetables", 9.9, I.salmon, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        allergens: ["D", "G", "F", "C"]
+      }),
       item(
         "m10",
         "M10 Sushi Set klein (6 Nigiri, 3 Maki)",
         "M10 Small sushi set (6 nigiri, 3 maki)",
         10.9,
         I.lunch,
-        { isBestseller: true, allergens: ["A", "D", "G", "F", "C", "B"] }
+        {
+          description: lunchMenuDescription,
+          lunchStarterChoice: LUNCH_STARTER_CHOICE,
+          isBestseller: true,
+          allergens: ["A", "D", "G", "F", "C", "B"]
+        }
       ),
-      item("m11", "M11 Vietn. Basilikum Chicken", "M11 Vietnamese basil chicken", 9.5, I.chicken, { spicy: true, allergens: ["G", "F", "A", "C", "N"] }),
-      item("m12", "M12 Maki Mix", "M12 Maki mix", 10.9, I.lunch, { isNew: true, allergens: ["A", "D", "G", "F", "C"] }),
+      item("m11", "M11 Vietn. Basilikum Chicken", "M11 Vietnamese basil chicken", 9.5, I.chicken, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        spicy: true,
+        allergens: ["G", "F", "A", "C", "N"]
+      }),
+      item("m12", "M12 Maki Mix", "M12 Maki mix", 10.9, I.lunch, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        isNew: true,
+        allergens: ["A", "D", "G", "F", "C"]
+      }),
       item("m13", "M13 Eierreis mit Gemüse & knusprigem Huhn", "M13 Egg fried rice with vegetables & crispy chicken", 9.5, I.rice, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
         allergens: ["C", "G", "F", "A"]
       }),
       item("m14", "M14 Nudeln mit Gemüse & knusprigem Huhn", "M14 Noodles with vegetables & crispy chicken", 9.5, I.noodles, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
         allergens: ["A", "G", "F", "C"]
       }),
-      item("m15", "M15 Knuspriges Huhn", "M15 Crispy chicken", 9.9, I.chicken, { isNew: true, allergens: ["A", "G", "F", "C"] })
+      item("m15", "M15 Knuspriges Huhn", "M15 Crispy chicken", 9.9, I.chicken, {
+        description: lunchMenuDescription,
+        lunchStarterChoice: LUNCH_STARTER_CHOICE,
+        isNew: true,
+        allergens: ["A", "G", "F", "C"]
+      })
     ]
   },
   {
@@ -390,20 +477,85 @@ export const menuCategories: MenuCategory[] = [
     id: "drinks",
     title: { en: "Drinks", de: "Getränke" },
     items: [
-      item("drink-soft", "Cola / Cola Zero / Almdudler / Fanta (0,33L)", "Cola / Cola Zero / Almdudler / Fanta (0.33L)", 2.0, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-eistee", "Rauch Eistee (0,5L)", "Rauch iced tea (0.5L)", 2.8, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-aloe", "Aloe Vera", "Aloe vera", 3.5, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-roemer", "Römerquelle", "Römerquelle mineral water", 2.6, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-mango-lychee", "Mango / Lychee Saft", "Mango / lychee juice", 3.5, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-apfel", "Apfelsaft 0,25L", "Apple juice 0.25L", 2.9, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-apfel-soda", "Apfelsaft mit Soda", "Apple juice with soda", 4.5, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-apfel-wasser", "Apfelsaft mit Wasser", "Apple juice with water", 3.9, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-redbull", "Red Bull", "Red Bull", 3.5, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-gruener-tee", "Grüner Tee", "Green tea", 3.9, I.drink, { vegan: true, vegetarian: true }),
-      item("drink-tsingtao", "Tsing Dao Bier", "Tsingtao beer", 3.5, I.drink, { vegetarian: true, allergens: ["A"] }),
-      item("drink-kirin", "Kirin Ichiban Bier", "Kirin Ichiban beer", 3.5, I.drink, { vegetarian: true, allergens: ["A"] }),
-      item("drink-stiegl", "Stiegl Bier", "Stiegl beer", 3.0, I.drink, { vegetarian: true, allergens: ["A"] }),
-      item("drink-ottakringer", "Ottakringer Bier", "Ottakringer beer", 2.8, I.drink, { vegetarian: true, allergens: ["A"] })
+      /** Einzeln bestellbar (keine Sammelposition ohne klare Wahl). Preise wie PDF. */
+      item("drink-cola", "Cola (0,33L)", "Cola (0.33L)", 2.0, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-cola-zero", "Cola Zero (0,33L)", "Cola Zero (0.33L)", 2.0, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-almdudler", "Almdudler (0,33L)", "Almdudler (0.33L)", 2.0, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-fanta", "Fanta (0,33L)", "Fanta (0.33L)", 2.0, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-eistee", "Rauch Eistee (0,5L)", "Rauch iced tea (0.5L)", 2.8, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-aloe", "Aloe Vera", "Aloe vera", 3.5, I.drink, { description: drinkDesc, vegan: true, vegetarian: true }),
+      item("drink-roemer", "Römerquelle", "Römerquelle mineral water", 2.6, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-mango-saft", "Mango Saft", "Mango juice", 3.5, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-lychee-saft", "Lychee Saft", "Lychee juice", 3.5, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-apfel", "Apfelsaft 0,25L", "Apple juice 0.25L", 2.9, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-apfel-soda", "Apfelsaft mit Soda", "Apple juice with soda", 4.5, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-apfel-wasser", "Apfelsaft mit Wasser", "Apple juice with water", 3.9, I.drink, {
+        description: drinkDesc,
+        vegan: true,
+        vegetarian: true
+      }),
+      item("drink-redbull", "Red Bull", "Red Bull", 3.5, I.drink, { description: drinkDesc, vegan: true, vegetarian: true }),
+      item("drink-gruener-tee", "Grüner Tee", "Green tea", 3.9, I.drink, { description: drinkDesc, vegan: true, vegetarian: true }),
+      item("drink-tsingtao", "Tsing Dao Bier", "Tsing Dao beer", 3.5, I.drink, {
+        description: drinkDesc,
+        vegetarian: true,
+        allergens: ["A"]
+      }),
+      item("drink-kirin", "Kirin Ichiban Bier", "Kirin Ichiban beer", 3.5, I.drink, {
+        description: drinkDesc,
+        vegetarian: true,
+        allergens: ["A"]
+      }),
+      item("drink-stiegl", "Stiegl Bier", "Stiegl beer", 3.0, I.drink, {
+        description: drinkDesc,
+        vegetarian: true,
+        allergens: ["A"]
+      }),
+      item("drink-ottakringer", "Ottakringer Bier", "Ottakringer beer", 2.8, I.drink, {
+        description: drinkDesc,
+        vegetarian: true,
+        allergens: ["A"]
+      })
     ]
   }
 ];
