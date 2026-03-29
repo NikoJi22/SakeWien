@@ -1,13 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 
+const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
+const DRAG_PAYLOAD_TYPE = "application/x-sake-menu-item";
+
 function cloneMenu(c: MenuCategory[]): MenuCategory[] {
   return JSON.parse(JSON.stringify(c)) as MenuCategory[];
+}
+
+/** Insert `fromIndex` before `beforeIndex` (0…n, where n = append at end). Indices refer to the array before the move. */
+function reorderItemsByBeforeIndex(items: MenuItem[], fromIndex: number, beforeIndex: number): MenuItem[] {
+  const n = items.length;
+  if (fromIndex < 0 || fromIndex >= n || beforeIndex < 0 || beforeIndex > n) return items;
+  if (beforeIndex === fromIndex) return items;
+  const copy = [...items];
+  const [removed] = copy.splice(fromIndex, 1);
+  let insertAt = beforeIndex;
+  if (fromIndex < beforeIndex) insertAt = beforeIndex - 1;
+  copy.splice(insertAt, 0, removed);
+  return copy;
 }
 
 function emptyDish(): MenuItem {
@@ -65,6 +81,27 @@ export function AdminDashboard() {
   const [search, setSearch] = useState("");
   /** Category id → expanded (default collapsed = less scrolling) */
   const [expandedCat, setExpandedCat] = useState<Record<string, boolean>>({});
+  /** New dishes: insert at top of category (stored locally in the browser). */
+  const [newDishAtTop, setNewDishAtTop] = useState(false);
+  const [dragging, setDragging] = useState<{ catIndex: number; itemIndex: number } | null>(null);
+  const [dragOverBefore, setDragOverBefore] = useState<{ catIndex: number; beforeIndex: number } | null>(null);
+
+  useEffect(() => {
+    try {
+      setNewDishAtTop(localStorage.getItem(LS_NEW_DISH_AT_TOP) === "1");
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const setNewDishAtTopPref = useCallback((atTop: boolean) => {
+    setNewDishAtTop(atTop);
+    try {
+      localStorage.setItem(LS_NEW_DISH_AT_TOP, atTop ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   const load = useCallback(async () => {
     setLoadError("");
@@ -216,7 +253,9 @@ export function AdminDashboard() {
   function addItem(catIndex: number) {
     setCategories((prev) => {
       const next = cloneMenu(prev);
-      next[catIndex].items.push(emptyDish());
+      const dish = emptyDish();
+      if (newDishAtTop) next[catIndex].items.unshift(dish);
+      else next[catIndex].items.push(dish);
       return next;
     });
     const id = categories[catIndex]?.id;
@@ -247,9 +286,43 @@ export function AdminDashboard() {
       const toIdx = next.findIndex((c) => c.id === toCatId);
       if (toIdx < 0 || toIdx === fromCat) return prev;
       next[fromCat].items.splice(itemIndex, 1);
-      next[toIdx].items.push(item);
+      if (newDishAtTop) next[toIdx].items.unshift(item);
+      else next[toIdx].items.push(item);
       return next;
     });
+  }
+
+  function reorderItemsInCategory(catIndex: number, fromIndex: number, beforeIndex: number) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const items = next[catIndex]?.items;
+      if (!items) return prev;
+      next[catIndex].items = reorderItemsByBeforeIndex(items, fromIndex, beforeIndex);
+      return next;
+    });
+  }
+
+  function moveItemUp(catIndex: number, itemIndex: number) {
+    if (itemIndex <= 0) return;
+    reorderItemsInCategory(catIndex, itemIndex, itemIndex - 1);
+  }
+
+  function moveItemDown(catIndex: number, itemIndex: number) {
+    const len = categories[catIndex]?.items.length ?? 0;
+    if (itemIndex >= len - 1) return;
+    reorderItemsInCategory(catIndex, itemIndex, itemIndex + 2);
+  }
+
+  function parseDragPayload(e: DragEvent): { catIndex: number; itemIndex: number } | null {
+    try {
+      const raw = e.dataTransfer.getData(DRAG_PAYLOAD_TYPE);
+      if (!raw) return null;
+      const o = JSON.parse(raw) as { catIndex?: unknown; itemIndex?: unknown };
+      if (typeof o.catIndex !== "number" || typeof o.itemIndex !== "number") return null;
+      return { catIndex: o.catIndex, itemIndex: o.itemIndex };
+    } catch {
+      return null;
+    }
   }
 
   function updateCategoryTitle(catIndex: number, lang: "de" | "en", value: string) {
@@ -417,8 +490,21 @@ export function AdminDashboard() {
             </button>
           </section>
 
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-serif text-xl text-neutral-900">Menu</h2>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+            <div className="space-y-2">
+              <h2 className="font-serif text-xl text-neutral-900">Menu</h2>
+              <label className="flex cursor-pointer items-start gap-2 text-xs text-neutral-600">
+                <input
+                  type="checkbox"
+                  checked={newDishAtTop}
+                  onChange={(e) => setNewDishAtTopPref(e.target.checked)}
+                  className="accent-gold mt-0.5 h-4 w-4 shrink-0"
+                />
+                <span>
+                  Neue Gerichte automatisch <strong className="font-medium text-neutral-800">oben</strong> in der Kategorie einfügen (sonst unten). Zum Sortieren weiterhin Drag &amp; Drop oder Pfeile nutzen.
+                </span>
+              </label>
+            </div>
             <div className="flex flex-wrap items-center gap-3">
               <button type="button" onClick={expandAll} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500 hover:text-neutral-900">
                 Expand all
@@ -473,6 +559,11 @@ export function AdminDashboard() {
 
                   {open && (
                     <div className="space-y-0 p-4 sm:p-5 sm:pt-2">
+                      {q && (
+                        <p className="mb-4 rounded-lg border border-amber-100 bg-amber-50/80 px-3 py-2 text-xs text-amber-950">
+                          Sortierung per Ziehen oder Pfeilen ist bei aktiver Suche ausgeschaltet — Suchfeld leeren, um die Reihenfolge zu ändern.
+                        </p>
+                      )}
                       <div className="mb-6 flex flex-col gap-4 border-b border-[#eeeeee] pb-6 sm:flex-row sm:items-end sm:justify-between">
                         <div className="grid flex-1 gap-3 sm:grid-cols-2">
                           <AdminField label="Category title (DE)">
@@ -520,10 +611,101 @@ export function AdminDashboard() {
                       </div>
 
                       <div className="space-y-8">
-                        {(q ? visibleItems : cat.items.map((item, ii) => ({ item, ii }))).map(({ item, ii }) => (
-                          <div key={item.id} className="rounded-xl border border-[#eeeeee] bg-neutral-50/80 p-4 sm:p-5">
+                        {(q ? visibleItems : cat.items.map((item, ii) => ({ item, ii }))).map(({ item, ii }) => {
+                          const canReorder = !q;
+                          const isDraggingHere = dragging?.catIndex === ci && dragging?.itemIndex === ii;
+                          const dropBeforeHere =
+                            canReorder && dragOverBefore?.catIndex === ci && dragOverBefore.beforeIndex === ii;
+                          const itemCount = cat.items.length;
+                          return (
+                          <div
+                            key={item.id}
+                            onDragOver={
+                              canReorder
+                                ? (e) => {
+                                    e.preventDefault();
+                                    e.dataTransfer.dropEffect = "move";
+                                    setDragOverBefore({ catIndex: ci, beforeIndex: ii });
+                                  }
+                                : undefined
+                            }
+                            onDragLeave={
+                              canReorder
+                                ? (e) => {
+                                    const related = e.relatedTarget as Node | null;
+                                    if (related && e.currentTarget.contains(related)) return;
+                                    setDragOverBefore(null);
+                                  }
+                                : undefined
+                            }
+                            onDrop={
+                              canReorder
+                                ? (e) => {
+                                    e.preventDefault();
+                                    const payload = parseDragPayload(e);
+                                    if (!payload || payload.catIndex !== ci) return;
+                                    reorderItemsInCategory(ci, payload.itemIndex, ii);
+                                    setDragging(null);
+                                    setDragOverBefore(null);
+                                  }
+                                : undefined
+                            }
+                            className={`rounded-xl border border-[#eeeeee] bg-neutral-50/80 p-4 sm:p-5 transition-shadow ${
+                              dropBeforeHere ? "ring-2 ring-gold/40 ring-offset-2 ring-offset-neutral-50" : ""
+                            } ${isDraggingHere ? "opacity-55" : ""}`}
+                          >
                             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                              <span className="font-medium text-neutral-800">{item.name.de || item.name.en || item.id}</span>
+                              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:gap-3">
+                                {canReorder && (
+                                  <div className="flex shrink-0 items-stretch gap-0.5 rounded-lg border border-[#e8e8e8] bg-white p-0.5 shadow-sm">
+                                    <span
+                                      draggable
+                                      onDragStart={(e) => {
+                                        e.dataTransfer.setData(
+                                          DRAG_PAYLOAD_TYPE,
+                                          JSON.stringify({ catIndex: ci, itemIndex: ii })
+                                        );
+                                        e.dataTransfer.effectAllowed = "move";
+                                        setDragging({ catIndex: ci, itemIndex: ii });
+                                      }}
+                                      onDragEnd={() => {
+                                        setDragging(null);
+                                        setDragOverBefore(null);
+                                      }}
+                                      className="flex cursor-grab touch-none flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-neutral-400 active:cursor-grabbing"
+                                      aria-label="Gericht ziehen, um die Reihenfolge zu ändern"
+                                      title="Ziehen zum Sortieren"
+                                    >
+                                      <span className="h-0.5 w-4 rounded-full bg-current" />
+                                      <span className="h-0.5 w-4 rounded-full bg-current" />
+                                      <span className="h-0.5 w-4 rounded-full bg-current" />
+                                    </span>
+                                    <button
+                                      type="button"
+                                      disabled={ii <= 0}
+                                      onClick={() => moveItemUp(ci, ii)}
+                                      className="min-w-[2rem] rounded-md px-1 py-1 text-sm text-neutral-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30"
+                                      aria-label="Gericht nach oben"
+                                      title="Nach oben"
+                                    >
+                                      ↑
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={ii >= itemCount - 1}
+                                      onClick={() => moveItemDown(ci, ii)}
+                                      className="min-w-[2rem] rounded-md px-1 py-1 text-sm text-neutral-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30"
+                                      aria-label="Gericht nach unten"
+                                      title="Nach unten"
+                                    >
+                                      ↓
+                                    </button>
+                                  </div>
+                                )}
+                                <span className="min-w-0 font-medium text-neutral-800">
+                                  {item.name.de || item.name.en || item.id}
+                                </span>
+                              </div>
                               <div className="flex flex-wrap items-center gap-3">
                                 <span className="text-[10px] text-neutral-400">{item.id}</span>
                                 <label className="flex items-center gap-2 text-xs text-neutral-600">
@@ -651,7 +833,37 @@ export function AdminDashboard() {
                               </div>
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
+                        {!q && cat.items.length > 0 && (
+                          <div
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.dataTransfer.dropEffect = "move";
+                              setDragOverBefore({ catIndex: ci, beforeIndex: cat.items.length });
+                            }}
+                            onDragLeave={(e) => {
+                              const related = e.relatedTarget as Node | null;
+                              if (related && e.currentTarget.contains(related)) return;
+                              setDragOverBefore(null);
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const payload = parseDragPayload(e);
+                              if (!payload || payload.catIndex !== ci) return;
+                              reorderItemsInCategory(ci, payload.itemIndex, cat.items.length);
+                              setDragging(null);
+                              setDragOverBefore(null);
+                            }}
+                            className={`flex min-h-[2.25rem] items-center justify-center rounded-lg border border-dashed px-3 text-center text-[10px] font-medium uppercase tracking-wider transition-colors ${
+                              dragOverBefore?.catIndex === ci && dragOverBefore.beforeIndex === cat.items.length
+                                ? "border-gold/50 bg-gold/10 text-gold"
+                                : "border-[#ddd] text-neutral-400"
+                            }`}
+                          >
+                            Ziel für „ganz unten“ — hier ablegen
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
