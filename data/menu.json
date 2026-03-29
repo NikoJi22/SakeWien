@@ -38,9 +38,9 @@
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
+          "C",
           "F",
-          "G",
-          "C"
+          "G"
         ],
         "spicy": true
       },
@@ -86,7 +86,7 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 4.5,
-        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "image": "/uploads/menu/starter-edamame.webp",
         "allergens": [
           "F"
         ],
@@ -107,9 +107,9 @@
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
+          "C",
           "F",
-          "G",
-          "C"
+          "G"
         ]
       },
       {
@@ -148,8 +148,8 @@
         "allergens": [
           "F",
           "G",
-          "P",
-          "N"
+          "N",
+          "P"
         ],
         "spicy": true
       },
@@ -197,10 +197,10 @@
         "priceEur": 4.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ]
       },
       {
@@ -216,10 +216,10 @@
         "priceEur": 5.2,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ]
       },
       {
@@ -236,10 +236,10 @@
         "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "B",
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ]
       },
       {
@@ -255,10 +255,10 @@
         "priceEur": 4.5,
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "C",
-          "G",
           "F",
-          "A"
+          "G"
         ],
         "vegetarian": true
       },
@@ -276,11 +276,11 @@
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
+          "B",
           "C",
-          "B"
+          "D",
+          "F",
+          "G"
         ],
         "isBestseller": true
       },
@@ -298,11 +298,11 @@
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
+          "B",
           "C",
-          "B"
+          "D",
+          "F",
+          "G"
         ]
       }
     ]
@@ -328,10 +328,10 @@
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ]
       },
       {
@@ -386,10 +386,10 @@
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ]
       },
       {
@@ -406,11 +406,11 @@
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
+          "B",
           "C",
-          "B"
+          "D",
+          "F",
+          "G"
         ],
         "isBestseller": true
       },
@@ -428,10 +428,10 @@
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
           "C",
+          "D",
+          "F",
+          "G",
           "O"
         ],
         "spicy": true
@@ -450,10 +450,10 @@
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
           "C",
+          "D",
+          "F",
+          "G",
           "P"
         ],
         "isNew": true
@@ -538,10 +538,10 @@
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "C",
-          "G",
           "F",
-          "A"
+          "G"
         ],
         "vegetarian": true
       },
@@ -587,10 +587,10 @@
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
-          "C"
+          "C",
+          "F",
+          "G"
         ],
         "isBestseller": true
       },
@@ -607,10 +607,10 @@
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
-          "C"
+          "C",
+          "F",
+          "G"
         ],
         "isBestseller": true
       },
@@ -627,10 +627,10 @@
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
           "C",
+          "F",
+          "G",
           "N"
         ],
         "spicy": true
@@ -648,10 +648,10 @@
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
-          "C"
+          "C",
+          "F",
+          "G"
         ],
         "spicy": true
       },
@@ -668,10 +668,10 @@
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
           "C",
+          "F",
+          "G",
           "P"
         ]
       },
@@ -688,10 +688,10 @@
         "priceEur": 13.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
           "C",
+          "F",
+          "G",
           "H"
         ]
       },
@@ -708,9 +708,9 @@
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ]
       },
       {
@@ -726,9 +726,9 @@
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ]
       },
       {
@@ -744,9 +744,9 @@
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ],
         "spicy": true
       },
@@ -763,9 +763,9 @@
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ]
       },
       {
@@ -781,9 +781,9 @@
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ],
         "spicy": true
       },
@@ -800,9 +800,9 @@
         "priceEur": 14.5,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ],
         "spicy": true
       },
@@ -819,10 +819,10 @@
         "priceEur": 14.9,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
-          "C"
+          "C",
+          "F",
+          "G"
         ],
         "isBestseller": true
       },
@@ -839,10 +839,10 @@
         "priceEur": 14.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ],
         "isBestseller": true
       },
@@ -861,8 +861,8 @@
         "allergens": [
           "B",
           "D",
-          "G",
-          "F"
+          "F",
+          "G"
         ],
         "spicy": true
       },
@@ -881,8 +881,8 @@
         "allergens": [
           "B",
           "D",
-          "G",
-          "F"
+          "F",
+          "G"
         ],
         "spicy": true
       }
@@ -909,11 +909,11 @@
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
+          "B",
           "C",
-          "B"
+          "D",
+          "F",
+          "G"
         ]
       },
       {
@@ -930,11 +930,11 @@
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
+          "B",
           "C",
-          "B"
+          "D",
+          "F",
+          "G"
         ],
         "isBestseller": true
       },
@@ -972,11 +972,11 @@
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
+          "B",
           "C",
-          "B"
+          "D",
+          "F",
+          "G"
         ]
       },
       {
@@ -993,9 +993,9 @@
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "G",
-          "F",
           "C",
+          "F",
+          "G",
           "P"
         ]
       },
@@ -1013,9 +1013,9 @@
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "G",
+          "C",
           "F",
-          "C"
+          "G"
         ]
       }
     ]
@@ -1040,9 +1040,9 @@
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "F",
-          "G",
-          "A"
+          "G"
         ],
         "vegetarian": true,
         "vegan": true
@@ -1060,9 +1060,9 @@
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "F",
-          "G",
-          "A"
+          "G"
         ],
         "vegetarian": true,
         "vegan": true,
@@ -1082,9 +1082,9 @@
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "F",
           "G",
-          "A",
           "H"
         ],
         "vegetarian": true,
@@ -1103,9 +1103,9 @@
         "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "F",
           "G",
-          "A",
           "N"
         ],
         "vegetarian": true,
@@ -1134,9 +1134,9 @@
         "priceEur": 8.9,
         "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "F",
-          "G",
-          "A"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1183,10 +1183,10 @@
         "priceEur": 8.9,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
-          "C"
+          "C",
+          "F",
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1231,9 +1231,9 @@
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1278,9 +1278,9 @@
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
+          "A",
           "F",
-          "A"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1325,10 +1325,10 @@
         "priceEur": 8.9,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "C",
-          "G",
           "F",
-          "A"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1374,9 +1374,9 @@
         "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "G",
+          "C",
           "F",
-          "C"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1421,11 +1421,11 @@
         "priceEur": 9.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "C",
           "D",
-          "G",
           "F",
-          "A"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1471,10 +1471,10 @@
         "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1519,10 +1519,10 @@
         "priceEur": 9.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1568,11 +1568,11 @@
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "D",
-          "G",
-          "F",
+          "B",
           "C",
-          "B"
+          "D",
+          "F",
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1618,10 +1618,10 @@
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "G",
-          "F",
           "A",
           "C",
+          "F",
+          "G",
           "N"
         ],
         "lunchStarterChoice": {
@@ -1669,10 +1669,10 @@
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
+          "C",
           "D",
-          "G",
           "F",
-          "C"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1718,10 +1718,10 @@
         "priceEur": 9.5,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "C",
-          "G",
           "F",
-          "A"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1767,9 +1767,9 @@
         "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "G",
+          "C",
           "F",
-          "C"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1815,9 +1815,9 @@
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "G",
+          "C",
           "F",
-          "C"
+          "G"
         ],
         "lunchStarterChoice": {
           "label": {
@@ -1890,10 +1890,10 @@
         "priceEur": 5,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
         "allergens": [
+          "A",
           "C",
-          "G",
           "F",
-          "A"
+          "G"
         ]
       },
       {
@@ -1947,8 +1947,8 @@
         "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "G",
-          "E"
+          "E",
+          "G"
         ],
         "vegetarian": true
       }

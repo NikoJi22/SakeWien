@@ -15,6 +15,8 @@
     "nodemailer": "^6.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-easy-crop": "^5.5.7",
+    "sharp": "^0.34.5",
     "twilio": "^5.13.1"
   },
   "devDependencies": {

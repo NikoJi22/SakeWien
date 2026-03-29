@@ -24,3 +24,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# uploaded dish images (keep folder via .gitkeep)
+/public/uploads/menu/*
+!/public/uploads/menu/.gitkeep

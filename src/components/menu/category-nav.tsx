@@ -35,12 +35,8 @@ export function CategoryNav({ categories, language, className = "", leadingItems
   const outerRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const suppressClickRef = useRef(false);
-  const dragRef = useRef<{
-    pointerId: number | null;
-    startX: number;
-    startScrollLeft: number;
-    dragging: boolean;
-  }>({ pointerId: null, startX: 0, startScrollLeft: 0, dragging: false });
+  /** Cleanup document listeners if pointer session ends or component unmounts */
+  const dragDocCleanupRef = useRef<(() => void) | null>(null);
   const [stripGrabbing, setStripGrabbing] = useState(false);
 
   useEffect(() => {
@@ -94,69 +90,89 @@ export function CategoryNav({ categories, language, className = "", leadingItems
     return () => window.removeEventListener("scroll", syncActive);
   }, [ids, syncActive]);
 
+  useEffect(() => {
+    return () => {
+      dragDocCleanupRef.current?.();
+      dragDocCleanupRef.current = null;
+    };
+  }, []);
+
   const goTo = (id: string) => {
     setActiveId(id);
     document.getElementById(menuSectionId(id))?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const resetDragState = useCallback(() => {
-    dragRef.current = { pointerId: null, startX: 0, startScrollLeft: 0, dragging: false };
-    setStripGrabbing(false);
-  }, []);
-
+  /**
+   * Avoid setPointerCapture on pointerdown: it retargets pointerup away from the tab button,
+   * so the browser never synthesizes a click. Only after horizontal movement exceeds the
+   * threshold do we capture and scroll. Document listeners track the gesture reliably.
+   * Touch is unchanged (native pan + tap).
+   */
   const onStripPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "touch") return;
     if (e.button !== 0) return;
     const el = scrollRef.current;
     if (!el) return;
-    dragRef.current = {
-      pointerId: e.pointerId,
-      startX: e.clientX,
-      startScrollLeft: el.scrollLeft,
-      dragging: false
+
+    dragDocCleanupRef.current?.();
+    dragDocCleanupRef.current = null;
+
+    const pointerId = e.pointerId;
+    const startX = e.clientX;
+    const startScrollLeft = el.scrollLeft;
+    let dragging = false;
+
+    const moveOpts: AddEventListenerOptions = { passive: false };
+    const cleanup = () => {
+      document.removeEventListener("pointermove", onMove, moveOpts);
+      document.removeEventListener("pointerup", onUp);
+      document.removeEventListener("pointercancel", onUp);
+      if (dragDocCleanupRef.current === cleanup) {
+        dragDocCleanupRef.current = null;
+      }
     };
-    try {
-      el.setPointerCapture(e.pointerId);
-    } catch {
-      /* already captured or unsupported */
-    }
-  }, []);
 
-  const onStripPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const d = dragRef.current;
-    if (d.pointerId !== e.pointerId) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    const dx = e.clientX - d.startX;
-    if (!d.dragging && Math.abs(dx) >= DRAG_THRESHOLD_PX) {
-      d.dragging = true;
-      setStripGrabbing(true);
-    }
-    if (d.dragging) {
-      el.scrollLeft = d.startScrollLeft - dx;
-      e.preventDefault();
-    }
-  }, []);
+    const onMove = (ev: PointerEvent) => {
+      if (ev.pointerId !== pointerId) return;
+      const dx = ev.clientX - startX;
+      if (!dragging && Math.abs(dx) >= DRAG_THRESHOLD_PX) {
+        dragging = true;
+        setStripGrabbing(true);
+        try {
+          el.setPointerCapture(pointerId);
+        } catch {
+          /* */
+        }
+      }
+      if (dragging) {
+        el.scrollLeft = startScrollLeft - dx;
+        ev.preventDefault();
+      }
+    };
 
-  const onStripPointerEnd = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const d = dragRef.current;
-    if (d.pointerId !== e.pointerId) return;
-    const hadDrag = d.dragging;
-    dragRef.current = { pointerId: null, startX: 0, startScrollLeft: 0, dragging: false };
-    setStripGrabbing(false);
-    if (hadDrag) {
-      suppressClickRef.current = true;
-    }
-    try {
-      scrollRef.current?.releasePointerCapture(e.pointerId);
-    } catch {
-      /* */
-    }
+    const onUp = (ev: PointerEvent) => {
+      if (ev.pointerId !== pointerId) return;
+      if (dragging) {
+        suppressClickRef.current = true;
+      }
+      setStripGrabbing(false);
+      try {
+        el.releasePointerCapture(pointerId);
+      } catch {
+        /* */
+      }
+      cleanup();
+    };
+
+    document.addEventListener("pointermove", onMove, moveOpts);
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("pointercancel", onUp);
+    dragDocCleanupRef.current = cleanup;
   }, []);
 
   const onStripLostPointerCapture = useCallback(() => {
-    resetDragState();
-  }, [resetDragState]);
+    setStripGrabbing(false);
+  }, []);
 
   const onStripClickCapture = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (suppressClickRef.current) {
@@ -179,9 +195,6 @@ export function CategoryNav({ categories, language, className = "", leadingItems
         <div
           ref={scrollRef}
           onPointerDown={onStripPointerDown}
-          onPointerMove={onStripPointerMove}
-          onPointerUp={onStripPointerEnd}
-          onPointerCancel={onStripPointerEnd}
           onLostPointerCapture={onStripLostPointerCapture}
           onClickCapture={onStripClickCapture}
           className={[

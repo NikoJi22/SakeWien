@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
+import { DEFAULT_DISH_PLACEHOLDER_IMAGE, isMenuUploadedImageUrl } from "@/lib/dish-image";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
+import { DishImageField } from "./dish-image-field";
 
 const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
 const DRAG_PAYLOAD_TYPE = "application/x-sake-menu-item";
@@ -33,7 +35,7 @@ function emptyDish(): MenuItem {
     name: { de: "Neues Gericht", en: "New dish" },
     description: { de: "", en: "" },
     priceEur: 0,
-    image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+    image: DEFAULT_DISH_PLACEHOLDER_IMAGE,
     allergens: [],
     isNew: false,
     isBestseller: false,
@@ -246,6 +248,11 @@ export function AdminDashboard() {
     if (!confirm("Delete this dish?")) return;
     setCategories((prev) => {
       const next = cloneMenu(prev);
+      const removed = next[catIndex].items[itemIndex];
+      const img = removed?.image?.split("?")[0] ?? "";
+      if (removed && isMenuUploadedImageUrl(img)) {
+        void fetch(`/api/admin/menu-item-image?url=${encodeURIComponent(img)}`, { method: "DELETE" });
+      }
       next[catIndex].items.splice(itemIndex, 1);
       return next;
     });
@@ -849,13 +856,11 @@ export function AdminDashboard() {
                                   className={adminInputClass}
                                 />
                               </AdminField>
-                              <AdminField label="Image URL" className="lg:col-span-2">
-                                <input
-                                  value={item.image}
-                                  onChange={(e) => setItemField(ci, ii, "image", e.target.value)}
-                                  className={adminInputClass}
-                                />
-                              </AdminField>
+                              <DishImageField
+                                itemId={item.id}
+                                imageUrl={item.image}
+                                onChange={(url) => setItemField(ci, ii, "image", url)}
+                              />
                               <div className="lg:col-span-2">
                                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Flags</p>
                                 <div className="flex flex-wrap gap-3 sm:gap-4">
