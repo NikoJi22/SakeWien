@@ -10,13 +10,13 @@ export type CartLine = {
   item: MenuItem;
   quantity: number;
   starterChoice?: LunchStarterOption;
+  sushiExtras?: { wasabi: boolean; ginger: boolean };
 };
 
 type CartContextValue = {
   quantities: Record<string, number>;
   setQuantity: (lineKey: string, quantity: number) => void;
-  /** For Mittagsmenü items with starter options, pass `starterOptionId`. */
-  addOne: (itemId: string, starterOptionId?: string | null) => void;
+  addOne: (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean }) => void;
   removeOne: (lineKey: string) => void;
   lines: CartLine[];
   itemCount: number;
@@ -43,13 +43,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addOne = useCallback(
-    (itemId: string, starterOptionId?: string | null) => {
+    (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean }) => {
       setQuantities((prev) => {
         const item = itemById[itemId];
         if (!item) return prev;
+        const starterOptionId = opts?.starterOptionId ?? null;
         const needStarter = itemRequiresLunchStarter(item);
         if (needStarter && !starterOptionId) return prev;
-        const key = cartLineKey(itemId, needStarter ? starterOptionId! : null);
+        const key = cartLineKey(itemId, needStarter ? starterOptionId! : null, {
+          wasabi: opts?.wasabi,
+          ginger: opts?.ginger
+        });
         return { ...prev, [key]: (prev[key] ?? 0) + 1 };
       });
     },
@@ -74,17 +78,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     let subtotalEur = 0;
     for (const [key, qty] of Object.entries(quantities)) {
       if (qty <= 0) continue;
-      const { itemId, starterOptionId } = parseCartLineKey(key);
+      const { itemId, starterOptionId, extras } = parseCartLineKey(key);
       const item = itemById[itemId];
       if (!item) continue;
       if (itemRequiresLunchStarter(item)) {
         if (!starterOptionId) continue;
         const opt = resolveStarterOption(item, starterOptionId);
         if (!opt) continue;
-        lines.push({ lineKey: key, item, quantity: qty, starterChoice: opt });
+        lines.push({ lineKey: key, item, quantity: qty, starterChoice: opt, sushiExtras: extras });
       } else {
         if (starterOptionId) continue;
-        lines.push({ lineKey: key, item, quantity: qty });
+        lines.push({ lineKey: key, item, quantity: qty, sushiExtras: extras });
       }
       itemCount += qty;
       subtotalEur += item.priceEur * qty;

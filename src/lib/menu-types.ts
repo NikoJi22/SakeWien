@@ -1,9 +1,13 @@
 export type MenuItemFlags = {
   isNew?: boolean;
   isBestseller?: boolean;
+  isSpecialDeal?: boolean;
+  specialDealLabel?: string;
+  isSoldOut?: boolean;
   vegetarian?: boolean;
   vegan?: boolean;
   spicy?: boolean;
+  spicyLevel?: 0 | 1 | 2;
 };
 
 export type LunchStarterOption = {
@@ -38,3 +42,5 @@ export type GiftConfig = {
   thresholdEur: number;
   message: { en: string; de: string };
 };
+
+export type OrderCutleryType = "chopsticks" | "wooden";

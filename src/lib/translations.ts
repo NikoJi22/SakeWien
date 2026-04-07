@@ -29,9 +29,11 @@ type TranslationSchema = {
     filterLabel: string;
     filterVegan: string;
     filterVegetarian: string;
-    filterSpicy: string;
+    filterSpicy1: string;
+    filterSpicy2: string;
     filterBestseller: string;
     filterNew: string;
+    filterSpecialDeals: string;
     clearFilters: string;
     allergensShort: string;
     allergenLegendTitle: string;
@@ -138,6 +140,16 @@ type TranslationSchema = {
     orderErrorGeneric: string;
     /** Mittagsmenü — explain starter choice */
     lunchStarterHint: string;
+    soldOut: string;
+    deliveryMinOrder: string;
+    pickupSameDayOnly: string;
+    sushiExtras: string;
+    wasabi: string;
+    ginger: string;
+    cutlery: string;
+    chopsticks: string;
+    woodenCutlery: string;
+    cutleryCount: string;
   };
 };
 
@@ -173,9 +185,11 @@ export const translations: Record<Language, TranslationSchema> = {
       filterLabel: "Filter",
       filterVegan: "Vegan",
       filterVegetarian: "Vegetarian",
-      filterSpicy: "Spicy",
+      filterSpicy1: "Spicy (1 chili)",
+      filterSpicy2: "Very spicy (2 chili)",
       filterBestseller: "Bestsellers",
       filterNew: "New",
+      filterSpecialDeals: "Special deals",
       clearFilters: "Clear all",
       allergensShort: "Allergens",
       allergenLegendTitle: "Allergen key",
@@ -282,7 +296,17 @@ export const translations: Record<Language, TranslationSchema> = {
       paymentPickupCardNote: "At the restaurant you can also pay by card (terminal).",
       paymentDeliveryCash: "Delivery is paid in cash to the driver. No online payment.",
       orderErrorGeneric: "Order could not be sent. Please try again.",
-      lunchStarterHint: "Included with this lunch menu — pick one."
+      lunchStarterHint: "Included with this lunch menu — pick one.",
+      soldOut: "Sold out",
+      deliveryMinOrder: "Minimum order for delivery: €15.00",
+      pickupSameDayOnly: "Pickup is only available for today.",
+      sushiExtras: "Sushi extras",
+      wasabi: "Wasabi",
+      ginger: "Ginger",
+      cutlery: "Cutlery",
+      chopsticks: "Chopsticks",
+      woodenCutlery: "Wooden cutlery",
+      cutleryCount: "Count"
     }
   },
   de: {
@@ -316,9 +340,11 @@ export const translations: Record<Language, TranslationSchema> = {
       filterLabel: "Filter",
       filterVegan: "Vegan",
       filterVegetarian: "Vegetarisch",
-      filterSpicy: "Scharf",
+      filterSpicy1: "Scharf (1 Chili)",
+      filterSpicy2: "Sehr scharf (2 Chili)",
       filterBestseller: "Bestseller",
       filterNew: "Neu",
+      filterSpecialDeals: "Aktionen",
       clearFilters: "Alle zurücksetzen",
       allergensShort: "Allergene",
       allergenLegendTitle: "Allergenkennzeichnung",
@@ -425,7 +451,17 @@ export const translations: Record<Language, TranslationSchema> = {
       paymentPickupCardNote: "Vor Ort können Sie zusätzlich mit Karte (Bankomat/Terminal) zahlen.",
       paymentDeliveryCash: "Lieferung wird bar beim Fahrer bezahlt. Keine Online-Zahlung.",
       orderErrorGeneric: "Bestellung konnte nicht gesendet werden. Bitte erneut versuchen.",
-      lunchStarterHint: "Im Mittagsmenü enthalten — bitte eine Option wählen."
+      lunchStarterHint: "Im Mittagsmenü enthalten — bitte eine Option wählen.",
+      soldOut: "Ausverkauft",
+      deliveryMinOrder: "Mindestbestellwert für Lieferung: 15,00 €",
+      pickupSameDayOnly: "Abholung ist nur am selben Tag möglich.",
+      sushiExtras: "Sushi Extras",
+      wasabi: "Wasabi",
+      ginger: "Ingwer",
+      cutlery: "Besteck",
+      chopsticks: "Stäbchen",
+      woodenCutlery: "Holzbesteck",
+      cutleryCount: "Anzahl"
     }
   }
 };

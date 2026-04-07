@@ -22,9 +22,11 @@ export function MenuAttributeFilters({ value, onChange }: Props) {
   const rows: [keyof MenuAttributeFilter, string][] = [
     ["vegan", t.menu.filterVegan],
     ["vegetarian", t.menu.filterVegetarian],
-    ["spicy", t.menu.filterSpicy],
+    ["spicy1", t.menu.filterSpicy1],
+    ["spicy2", t.menu.filterSpicy2],
     ["bestseller", t.menu.filterBestseller],
-    ["isNew", t.menu.filterNew]
+    ["isNew", t.menu.filterNew],
+    ["specialDeals", t.menu.filterSpecialDeals]
   ];
 
   return (
@@ -35,7 +37,7 @@ export function MenuAttributeFilters({ value, onChange }: Props) {
           <button
             type="button"
             onClick={() =>
-              onChange({ vegan: false, vegetarian: false, spicy: false, bestseller: false, isNew: false })
+              onChange({ vegan: false, vegetarian: false, spicy1: false, spicy2: false, bestseller: false, isNew: false, specialDeals: false })
             }
             className="self-start text-xs font-medium text-brand-accent underline-offset-2 hover:underline sm:self-auto"
           >

@@ -23,17 +23,21 @@ export function OrderMenuItem({
   item,
   spotlight = false,
   /** Unique scope so radio groups don’t clash when the same dish appears twice (e.g. bestseller + category). */
-  starterGroupId = "default"
+  starterGroupId = "default",
+  allowSushiExtras = false
 }: {
   item: MenuItem;
   spotlight?: boolean;
   starterGroupId?: string;
+  allowSushiExtras?: boolean;
 }) {
   const { language, t } = useLanguage();
   const { quantities, addOne, removeOne } = useCart();
   const L = labelMenuItem(item, language);
   const starterConfig = item.lunchStarterChoice;
   const needsStarter = itemRequiresLunchStarter(item);
+  const [wantWasabi, setWantWasabi] = useState(false);
+  const [wantGinger, setWantGinger] = useState(false);
   const firstStarterId = starterConfig?.options[0]?.id ?? "";
   const [starterId, setStarterId] = useState(firstStarterId);
 
@@ -47,11 +51,17 @@ export function OrderMenuItem({
   }, [item.id, item.lunchStarterChoice?.options]);
 
   const lineKey = useMemo(
-    () => cartLineKey(item.id, needsStarter ? starterId : null),
-    [item.id, needsStarter, starterId]
+    () =>
+      cartLineKey(item.id, needsStarter ? starterId : null, {
+        wasabi: allowSushiExtras ? wantWasabi : false,
+        ginger: allowSushiExtras ? wantGinger : false
+      }),
+    [item.id, needsStarter, starterId, allowSushiExtras, wantWasabi, wantGinger]
   );
 
   const qty = quantities[lineKey] ?? 0;
+  const isSoldOut = !!item.isSoldOut;
+  const spicyLevel = item.spicyLevel ?? (item.spicy ? 1 : 0);
   const [showAddedHint, setShowAddedHint] = useState(false);
   const addedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -63,7 +73,11 @@ export function OrderMenuItem({
 
   const onAdd = () => {
     if (needsStarter && !starterId) return;
-    addOne(item.id, needsStarter ? starterId : undefined);
+    addOne(item.id, {
+      starterOptionId: needsStarter ? starterId : undefined,
+      wasabi: allowSushiExtras ? wantWasabi : false,
+      ginger: allowSushiExtras ? wantGinger : false
+    });
     setShowAddedHint(true);
     if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
     addedTimerRef.current = setTimeout(() => {
@@ -74,9 +88,9 @@ export function OrderMenuItem({
 
   return (
     <article
-      className={`flex gap-4 rounded-2xl border bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition hover:border-[#dddddd] hover:shadow-[0_6px_20px_rgba(0,0,0,0.07)] sm:gap-5 sm:p-5 ${
+      className={`flex gap-4 rounded-2xl border bg-brand-card p-4 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition sm:gap-5 sm:p-5 ${
         spotlight ? "border-amber-300/50 ring-1 ring-amber-200/40" : "border-[#eeeeee]"
-      }`}
+      } ${isSoldOut ? "opacity-60" : "hover:border-[#dddddd] hover:shadow-[0_6px_20px_rgba(0,0,0,0.07)]"}`}
     >
       <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-xl sm:h-32 sm:w-32">
         <Image src={item.image} alt={L.name} fill className="object-cover" sizes="128px" />
@@ -94,6 +108,11 @@ export function OrderMenuItem({
                 {t.order.bestsellerBadge}
               </Badge>
             )}
+            {item.isSpecialDeal && (
+              <Badge className="border border-orange-200 bg-orange-50 text-orange-900">
+                {item.specialDealLabel?.trim() || "Aktion"}
+              </Badge>
+            )}
             {item.vegetarian && (
               <Badge className="border border-lime-200 bg-lime-50 text-lime-900">
                 {t.order.vegetarian}
@@ -104,14 +123,15 @@ export function OrderMenuItem({
                 {t.order.vegan}
               </Badge>
             )}
-            {item.spicy && (
+            {spicyLevel > 0 && (
               <Badge className="border border-red-200 bg-red-50 text-red-900">
-                {t.order.spicy}
+                {"🌶".repeat(spicyLevel)}
               </Badge>
             )}
+            {isSoldOut && <Badge className="border border-neutral-300 bg-neutral-100 text-neutral-700">{t.order.soldOut}</Badge>}
           </div>
-          <h3 className="font-serif text-base font-semibold leading-snug text-brand-ink">{L.name}</h3>
-          <p className="mt-1 line-clamp-2 text-sm text-brand-body">{L.description}</p>
+          <h3 className="font-serif text-lg font-semibold leading-snug text-brand-ink">{L.name}</h3>
+          <p className="mt-1 line-clamp-2 text-base text-brand-body">{L.description}</p>
           <MenuAllergenChips item={item} className="mt-2" />
           {needsStarter && starterConfig && (
             <div className="mt-3 rounded-xl border border-brand-line bg-brand-muted/40 px-3 py-2.5">
@@ -139,15 +159,40 @@ export function OrderMenuItem({
               </div>
             </div>
           )}
+          {allowSushiExtras && (
+            <div className="mt-3 rounded-xl border border-brand-line bg-brand-muted/40 px-3 py-2.5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-subtle">{t.order.sushiExtras}</p>
+              <div className="mt-2 flex flex-wrap gap-3">
+                <label className="flex items-center gap-2 text-sm text-brand-ink">
+                  <input
+                    type="checkbox"
+                    checked={wantWasabi}
+                    onChange={(e) => setWantWasabi(e.target.checked)}
+                    className="h-4 w-4 accent-brand-accent"
+                  />
+                  {t.order.wasabi}
+                </label>
+                <label className="flex items-center gap-2 text-sm text-brand-ink">
+                  <input
+                    type="checkbox"
+                    checked={wantGinger}
+                    onChange={(e) => setWantGinger(e.target.checked)}
+                    className="h-4 w-4 accent-brand-accent"
+                  />
+                  {t.order.ginger}
+                </label>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="font-bold text-lg tabular-nums text-brand-price">{L.price}</span>
+            <span className="font-bold text-xl tabular-nums text-brand-price">{L.price}</span>
             <div className="flex items-center gap-1 rounded-full border border-[#ccc] bg-neutral-50 p-1">
               <button
                 type="button"
                 onClick={() => removeOne(lineKey)}
-                disabled={qty <= 0}
+                disabled={qty <= 0 || isSoldOut}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-lg text-brand-ink-secondary transition hover:bg-white disabled:opacity-30"
                 aria-label="Decrease"
               >
@@ -157,7 +202,7 @@ export function OrderMenuItem({
               <button
                 type="button"
                 onClick={onAdd}
-                disabled={needsStarter && !starterId}
+                disabled={isSoldOut || (needsStarter && !starterId)}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-lg text-brand-ink-secondary transition hover:bg-white disabled:opacity-30"
                 aria-label="Increase"
               >

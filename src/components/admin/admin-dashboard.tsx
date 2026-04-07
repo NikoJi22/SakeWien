@@ -39,9 +39,11 @@ function emptyDish(): MenuItem {
     allergens: [],
     isNew: false,
     isBestseller: false,
+    isSpecialDeal: false,
+    isSoldOut: false,
     vegetarian: false,
     vegan: false,
-    spicy: false
+    spicyLevel: 0
   };
 }
 
@@ -868,9 +870,10 @@ export function AdminDashboard() {
                                     [
                                       ["isNew", "New"],
                                       ["isBestseller", "Bestseller"],
+                                      ["isSpecialDeal", "Special Deal"],
+                                      ["isSoldOut", "Temporär ausverkauft"],
                                       ["vegetarian", "Vegetarian"],
-                                      ["vegan", "Vegan"],
-                                      ["spicy", "Spicy"]
+                                      ["vegan", "Vegan"]
                                     ] as const
                                   ).map(([key, label]) => (
                                     <label
@@ -887,6 +890,30 @@ export function AdminDashboard() {
                                     </label>
                                   ))}
                                 </div>
+                                <div className="mt-3 flex items-center gap-3">
+                                  <label className="text-sm text-neutral-700">Schärfe-Level</label>
+                                  <select
+                                    value={item.spicyLevel ?? 0}
+                                    onChange={(e) => setItemField(ci, ii, "spicyLevel", Number(e.target.value) as 0 | 1 | 2)}
+                                    className={`${adminSelectClass} max-w-[160px] py-2 text-sm`}
+                                  >
+                                    <option value={0}>Keine</option>
+                                    <option value={1}>🌶</option>
+                                    <option value={2}>🌶🌶</option>
+                                  </select>
+                                </div>
+                                {!!item.isSpecialDeal && (
+                                  <div className="mt-3">
+                                    <AdminField label="Aktion Badge-Text (optional)">
+                                      <input
+                                        value={item.specialDealLabel ?? ""}
+                                        onChange={(e) => setItemField(ci, ii, "specialDealLabel", e.target.value)}
+                                        className={adminInputClass}
+                                        placeholder="z. B. -10% / Lunch Deal"
+                                      />
+                                    </AdminField>
+                                  </div>
+                                )}
                               </div>
                               <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
                                 <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">

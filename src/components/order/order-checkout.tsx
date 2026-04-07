@@ -6,6 +6,14 @@ import { useGiftConfig } from "@/context/gift-config-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
 import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
+import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
+
+function nowTimeValue() {
+  const d = new Date();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
 
 type OrderCheckoutProps = {
   variant?: "sidebar" | "drawer";
@@ -25,6 +33,13 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [smsError, setSmsError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [pickupClock, setPickupClock] = useState(nowTimeValue);
+  const [chopsticksCount, setChopsticksCount] = useState(0);
+  const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
+  const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
+  const totalEur = subtotalEur + cutleryFeeEur;
+  const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
+  const needsSmsVerification = fulfillment === "delivery";
 
   const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
   const giftMessage = giftConfig.message[language];
@@ -102,31 +117,66 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (lines.length === 0) return;
-    if (!phoneVerified) {
+    if (needsSmsVerification && !phoneVerified) {
       setSubmitError(t.order.errPhoneNotVerified);
+      return;
+    }
+    const fd = new FormData(e.currentTarget);
+    const pickupRaw = fulfillment === "pickup" ? String(fd.get("pickupTime") ?? "") : "";
+    const pickupTime = fulfillment === "pickup" && /^\d{2}:\d{2}$/.test(pickupRaw)
+      ? `${new Date().toISOString().slice(0, 10)}T${pickupRaw}:00`
+      : pickupRaw;
+    if (fulfillment === "pickup" && pickupTime) {
+      const d = new Date(pickupTime);
+      const now = new Date();
+      if (
+        d.getFullYear() !== now.getFullYear() ||
+        d.getMonth() !== now.getMonth() ||
+        d.getDate() !== now.getDate()
+      ) {
+        setStatus("idle");
+        setSubmitError(t.order.pickupSameDayOnly);
+        return;
+      }
+    }
+    if (!isDeliveryMinMet) {
+      setStatus("idle");
+      setSubmitError(t.order.deliveryMinOrder);
       return;
     }
     setSubmitError(null);
     setStatus("loading");
-    const fd = new FormData(e.currentTarget);
     const payload = {
       fulfillment,
       name: String(fd.get("name") ?? ""),
       phone: String(fd.get("phone") ?? ""),
       email: String(fd.get("email") ?? ""),
       address: fulfillment === "delivery" ? String(fd.get("address") ?? "") : "",
-      pickupTime: fulfillment === "pickup" ? String(fd.get("pickupTime") ?? "") : "",
+      pickupTime,
       deliveryTime: fulfillment === "delivery" ? String(fd.get("deliveryTime") ?? "") : "",
       comment: String(fd.get("comment") ?? ""),
       language,
-      subtotalEur,
+      subtotalEur: totalEur,
       giftEligible: giftUnlocked,
       giftMessage: giftUnlocked ? giftMessage : "",
-      lines: lines.map(({ lineKey, item, quantity, starterChoice }) => ({
+      cutlery:
+        chopsticksCount + woodenCutleryCount > 0
+          ? { chopsticksCount, woodenCutleryCount, unitPriceEur: 0.1, totalEur: cutleryFeeEur }
+          : null,
+      lines: lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => ({
         id: lineKey,
-        name: starterChoice
+        name: `${starterChoice
           ? `${item.name[language]} — ${item.lunchStarterChoice!.label[language]}: ${starterChoice.name[language]}`
-          : item.name[language],
+          : item.name[language]}${
+          sushiExtras?.wasabi || sushiExtras?.ginger
+            ? ` (${[
+                sushiExtras.wasabi ? t.order.wasabi : "",
+                sushiExtras.ginger ? t.order.ginger : ""
+              ]
+                .filter(Boolean)
+                .join(", ")})`
+            : ""
+        }`,
         quantity,
         unitPriceEur: item.priceEur,
         lineTotalEur: item.priceEur * quantity
@@ -149,6 +199,10 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
             ? t.order.errPhoneNotVerified
             : c === "phone_mismatch"
               ? t.order.errPhoneMismatch
+              : c === "delivery_min_order"
+                ? t.order.deliveryMinOrder
+                : c === "pickup_same_day_only"
+                  ? t.order.pickupSameDayOnly
               : c === "server_misconfigured"
                 ? t.order.errServerConfig
                 : t.order.orderErrorGeneric
@@ -176,12 +230,12 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
   const shell = isDrawer
     ? "flex flex-col rounded-b-2xl border-0 bg-transparent shadow-none"
-    : "flex flex-col rounded-2xl border border-[#eeeeee] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]";
+    : "flex flex-col rounded-2xl border border-[#f1d6b4] bg-brand-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]";
 
   const borderB = "border-b border-brand-line";
   const labelMuted = "text-xs font-medium text-brand-subtle";
   const sectionTitle = "font-serif text-2xl tracking-wide text-brand-ink";
-  const metaLine = "mt-1 text-sm text-brand-body";
+  const metaLine = "mt-1 text-base text-brand-body";
   const emptyCart = "text-sm text-brand-subtle";
   const lineName = "text-brand-ink";
   const lineQty = "text-brand-faint";
@@ -207,7 +261,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         <div className={`${borderB} p-5 sm:p-6`}>
           <h2 className={sectionTitle}>{t.order.yourOrder}</h2>
           <p className={metaLine}>
-            {itemCount} {t.order.itemsInCart} · {formatPriceEur(subtotalEur, language)}
+        {itemCount} {t.order.itemsInCart} · {formatPriceEur(totalEur, language)}
           </p>
         </div>
       )}
@@ -215,7 +269,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       {isDrawer && (
         <div className={`${borderB} px-1 pb-4 pt-1 sm:px-2`}>
           <p className={metaLine}>
-            {itemCount} {t.order.itemsInCart} · {formatPriceEur(subtotalEur, language)}
+            {itemCount} {t.order.itemsInCart} · {formatPriceEur(totalEur, language)}
           </p>
         </div>
       )}
@@ -225,15 +279,25 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <p className={emptyCart}>{t.order.emptyCart}</p>
         ) : (
           <ul className="space-y-4">
-            {lines.map(({ lineKey, item, quantity, starterChoice }) => {
+            {lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => {
               const L = labelMenuItem(item, language);
               return (
-                <li key={lineKey} className="flex justify-between gap-3 text-sm">
+                <li key={lineKey} className="flex justify-between gap-3 text-base">
                   <span className={lineName}>
-                    <span className="block font-medium">{L.name}</span>
+                    <span className="block text-lg font-medium">{L.name}</span>
                     {starterChoice && item.lunchStarterChoice && (
                       <span className="mt-0.5 block text-xs font-normal text-brand-body">
                         {item.lunchStarterChoice.label[language]}: {starterChoice.name[language]}
+                      </span>
+                    )}
+                    {(sushiExtras?.wasabi || sushiExtras?.ginger) && (
+                      <span className="mt-0.5 block text-xs font-normal text-brand-body">
+                        {t.order.sushiExtras}: {[
+                          sushiExtras.wasabi ? t.order.wasabi : "",
+                          sushiExtras.ginger ? t.order.ginger : ""
+                        ]
+                          .filter(Boolean)
+                          .join(", ")}
                       </span>
                     )}
                     <span className={lineQty}> × {quantity}</span>
@@ -247,9 +311,32 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       </div>
 
       <div className={subtotalBg}>
+        <div className="space-y-3 rounded-xl border border-brand-line bg-brand-canvas/50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">{t.order.cutlery}</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <span>{t.order.chopsticks}</span>
+              <input type="number" min={0} value={chopsticksCount} onChange={(e) => setChopsticksCount(Number(e.target.value) || 0)} className={inputClass} placeholder={t.order.cutleryCount} />
+            </label>
+            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <span>{t.order.woodenCutlery}</span>
+              <input type="number" min={0} value={woodenCutleryCount} onChange={(e) => setWoodenCutleryCount(Number(e.target.value) || 0)} className={inputClass} placeholder={t.order.cutleryCount} />
+            </label>
+          </div>
+        </div>
         <div className="flex items-center justify-between text-sm">
           <span className={subRowLabel}>{t.order.subtotal}</span>
           <span className={subRowVal}>{formatPriceEur(subtotalEur, language)}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className={subRowLabel}>
+            {t.order.cutlery} ({formatPriceEur(0.1, language)} / Stk.)
+          </span>
+          <span className={subRowVal}>{formatPriceEur(cutleryFeeEur, language)}</span>
+        </div>
+        <div className="flex items-center justify-between text-base font-semibold">
+          <span className="text-brand-ink">Gesamt</span>
+          <span className="tabular-nums text-brand-ink">{formatPriceEur(totalEur, language)}</span>
         </div>
         {giftUnlocked ? (
           <div className={giftBox}>
@@ -286,7 +373,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           </div>
         </div>
 
-        <div className="space-y-3 rounded-xl border border-brand-line bg-brand-canvas/50 p-4">
+        {needsSmsVerification && <div className="space-y-3 rounded-xl border border-brand-line bg-brand-canvas/50 p-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">
             {t.order.smsVerifyTitle}
           </p>
@@ -348,7 +435,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           {smsError && (
           <p className="text-sm text-brand-danger">{smsError}</p>
         )}
-        </div>
+        </div>}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
@@ -372,7 +459,15 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         {fulfillment === "pickup" ? (
           <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
             <span>{t.order.pickupTime}</span>
-            <input name="pickupTime" type="datetime-local" required className={inputClass} />
+            <input
+              name="pickupTime"
+              type="time"
+              required
+              value={pickupClock}
+              onChange={(e) => setPickupClock(e.target.value)}
+              className={inputClass}
+            />
+            <span className="text-xs text-brand-subtle">{t.order.pickupSameDayOnly}</span>
           </label>
         ) : (
           <>
@@ -392,9 +487,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <textarea name="comment" rows={3} className={inputClass} placeholder={t.order.commentPlaceholder} />
         </label>
 
+        {!isDeliveryMinMet && <p className="text-sm text-brand-danger">{t.order.deliveryMinOrder}</p>}
+
         <button
           type="submit"
-          disabled={lines.length === 0 || status === "loading" || !phoneVerified}
+          disabled={lines.length === 0 || status === "loading" || (needsSmsVerification && !phoneVerified) || !isDeliveryMinMet}
           className="rounded-full bg-brand-accent py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-white shadow-md shadow-brand-accent/12 transition hover:bg-brand-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
         >
           {status === "loading" ? t.form.sending : t.order.placeOrder}

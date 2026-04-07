@@ -25,6 +25,10 @@ export function OrderPageContent() {
     () => filterBestsellersAndNewSections(bestsellers, newDishes, filter),
     [bestsellers, newDishes, filter]
   );
+  const filteredDeals = useMemo(
+    () => categories.flatMap((c) => c.items).filter((i) => !!i.isSpecialDeal && itemMatchesMenuFilters(i, filter)),
+    [categories, filter]
+  );
 
   const withItems = useMemo(
     () =>
@@ -36,16 +40,24 @@ export function OrderPageContent() {
         .filter((c) => c.items.length > 0),
     [categories, filter]
   );
+  const sushiLikeIds = useMemo(() => {
+    const ids = new Set<string>();
+    categories
+      .filter((c) => c.id === "sushi" || c.id === "maki-cat")
+      .forEach((c) => c.items.forEach((i) => ids.add(i.id)));
+    return ids;
+  }, [categories]);
 
   const leadingNav = useMemo(() => {
     const items: { id: string; label: string }[] = [];
+    if (filteredDeals.length > 0) items.push({ id: "special-deals", label: "Aktionen" });
     if (filteredBestsellers.length > 0) items.push({ id: MENU_NAV_BESTSELLERS, label: t.sections.bestsellers });
     if (filteredNew.length > 0) items.push({ id: MENU_NAV_NEW, label: t.sections.newDishes });
     return items;
-  }, [filteredBestsellers, filteredNew, t.sections.bestsellers, t.sections.newDishes]);
+  }, [filteredBestsellers, filteredDeals.length, filteredNew, t.sections.bestsellers, t.sections.newDishes]);
 
   const anyMenu =
-    filteredBestsellers.length > 0 || filteredNew.length > 0 || withItems.some((c) => c.items.length > 0);
+    filteredDeals.length > 0 || filteredBestsellers.length > 0 || filteredNew.length > 0 || withItems.some((c) => c.items.length > 0);
 
   return (
     <div className="bg-brand-page pb-28 text-brand-ink lg:pb-12">
@@ -67,11 +79,32 @@ export function OrderPageContent() {
             )}
             {!loading && !error && anyMenu && (
               <>
+                {filteredDeals.length > 0 && (
+                  <MenuHighlightSection navId="special-deals" title="Aktionen" variant="emerald">
+                    <div className="space-y-6 sm:space-y-8">
+                      {filteredDeals.map((item) => (
+                        <OrderMenuItem
+                          key={`spotlight-deal-${item.id}`}
+                          item={item}
+                          spotlight
+                          starterGroupId="special-deals"
+                          allowSushiExtras={sushiLikeIds.has(item.id)}
+                        />
+                      ))}
+                    </div>
+                  </MenuHighlightSection>
+                )}
                 {filteredBestsellers.length > 0 && (
                   <MenuHighlightSection navId={MENU_NAV_BESTSELLERS} title={t.sections.bestsellers} variant="amber">
                     <div className="space-y-6 sm:space-y-8">
                       {filteredBestsellers.map((item) => (
-                        <OrderMenuItem key={`spotlight-bs-${item.id}`} item={item} spotlight starterGroupId="bestsellers" />
+                        <OrderMenuItem
+                          key={`spotlight-bs-${item.id}`}
+                          item={item}
+                          spotlight
+                          starterGroupId="bestsellers"
+                          allowSushiExtras={sushiLikeIds.has(item.id)}
+                        />
                       ))}
                     </div>
                   </MenuHighlightSection>
@@ -80,7 +113,13 @@ export function OrderPageContent() {
                   <MenuHighlightSection navId={MENU_NAV_NEW} title={t.sections.newDishes} variant="emerald">
                     <div className="space-y-6 sm:space-y-8">
                       {filteredNew.map((item) => (
-                        <OrderMenuItem key={`spotlight-nw-${item.id}`} item={item} spotlight starterGroupId="new-dishes" />
+                        <OrderMenuItem
+                          key={`spotlight-nw-${item.id}`}
+                          item={item}
+                          spotlight
+                          starterGroupId="new-dishes"
+                          allowSushiExtras={sushiLikeIds.has(item.id)}
+                        />
                       ))}
                     </div>
                   </MenuHighlightSection>
@@ -89,7 +128,12 @@ export function OrderPageContent() {
                   <MenuSection key={category.id} categoryId={category.id} title={category.title[language]}>
                     <div className="space-y-6 sm:space-y-8">
                       {category.items.map((item) => (
-                        <OrderMenuItem key={`${category.id}-${item.id}`} item={item} starterGroupId={category.id} />
+                        <OrderMenuItem
+                          key={`${category.id}-${item.id}`}
+                          item={item}
+                          starterGroupId={category.id}
+                          allowSushiExtras={category.id === "sushi" || category.id === "maki-cat"}
+                        />
                       ))}
                     </div>
                   </MenuSection>

@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 type EmailPayload = {
   subject: string;
   lines: string[];
+  attachments?: Array<{ filename: string; content: Buffer; contentType?: string }>;
 };
 
 export async function sendMail(payload: EmailPayload) {
@@ -27,6 +28,7 @@ export async function sendMail(payload: EmailPayload) {
     from: `"Sake Website" <${user}>`,
     to,
     subject: payload.subject,
-    text: payload.lines.join("\n")
+    text: payload.lines.join("\n"),
+    attachments: payload.attachments
   });
 }

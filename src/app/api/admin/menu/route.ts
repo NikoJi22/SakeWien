@@ -102,9 +102,16 @@ export async function POST(request: Request) {
       const mi = item as MenuItem;
       const allergens = mi.allergens?.length ? normalizeAllergenCodes(mi.allergens) : undefined;
       const lunchStarterChoice = sanitizeLunchStarterChoice(mi.lunchStarterChoice);
+      const spicyLevel =
+        mi.spicyLevel === 2 || mi.spicyLevel === 1 || mi.spicyLevel === 0
+          ? mi.spicyLevel
+          : mi.spicy
+            ? 1
+            : 0;
       return {
         ...mi,
         ...(allergens?.length ? { allergens } : { allergens: undefined }),
+        spicyLevel,
         lunchStarterChoice
       };
     })

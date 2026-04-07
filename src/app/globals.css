@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: light;
-  --brand-page: #f8f8f8;
+  --brand-page: #ffd39b;
   --brand-ink: #161412;
   --brand-accent: #5c4839;
   --input-border: #ccc;
@@ -13,7 +13,8 @@
 }
 
 body {
-  @apply bg-[#f8f8f8] text-neutral-900 antialiased;
+  @apply bg-[#FFD39B] text-neutral-900 antialiased;
+  font-size: 17px;
 }
 
 /*
