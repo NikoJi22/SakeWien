@@ -21,9 +21,11 @@ type Props = {
   itemId: string;
   imageUrl: string;
   onChange: (url: string) => void;
+  label?: string;
+  removeToUrl?: string;
 };
 
-export function DishImageField({ itemId, imageUrl, onChange }: Props) {
+export function DishImageField({ itemId, imageUrl, onChange, label = "Gerichtsbild", removeToUrl }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const cropPixelsRef = useRef<Area | null>(null);
 
@@ -160,7 +162,7 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
     if (!isMenuUploadedImageUrl(imageUrl.split("?")[0] || imageUrl)) return;
     if (!window.confirm("Eigenes Bild entfernen und wieder den Platzhalter nutzen?")) return;
     setError("");
-    onChange(DEFAULT_DISH_PLACEHOLDER_IMAGE);
+    onChange(removeToUrl ?? DEFAULT_DISH_PLACEHOLDER_IMAGE);
   }
 
   const hasCustomUpload = isMenuUploadedImageUrl(imageUrl.split("?")[0] || imageUrl);
@@ -185,7 +187,7 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
   }
 
   return (
-    <AdminField label="Gerichtsbild" className="lg:col-span-2">
+    <AdminField label={label} className="lg:col-span-2">
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFileSelected} />
 
       <div className="flex flex-col gap-4 rounded-xl border border-[#e5e5e5] bg-neutral-50/50 p-4">

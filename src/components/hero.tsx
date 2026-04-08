@@ -2,41 +2,38 @@
 
 import Image from "next/image";
 import { useLanguage } from "@/context/language-context";
+import { useSiteContent } from "@/context/site-content-context";
 import { HeroFloatingNav } from "./hero-floating-nav";
 import { HeroSideCard } from "./hero-side-card";
 import { HeroSocial } from "./hero-social";
 import { SiteLogo } from "./site-logo";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=2200&q=85";
-
-const SIDE_IMAGES = [
-  {
-    href: "/order-online",
-    key: "order",
-    imageSrc: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=85",
-    imageAlt: "Chef with sushi platter",
-    labelKey: "cardOrder"
-  },
-  {
-    href: "/reservation",
-    key: "book-table",
-    imageSrc:
-      "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=1600&q=85",
-    imageAlt: "Sashimi platter",
-    labelKey: "cardReservation"
-  },
-  {
-    href: "/about",
-    key: "about-us",
-    imageSrc: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=85",
-    imageAlt: "Restaurant interior",
-    labelKey: "cardAboutUs"
-  }
-] as const;
-
 export function Hero() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { siteContent } = useSiteContent();
+  const sideImages = [
+    {
+      href: "/order-online",
+      key: "order",
+      imageSrc: siteContent.cards.order.image,
+      imageAlt: "Order online card image",
+      label: siteContent.cards.order.label[language] || t.hero.cardOrder
+    },
+    {
+      href: "/reservation",
+      key: "book-table",
+      imageSrc: siteContent.cards.reservation.image,
+      imageAlt: "Reservation card image",
+      label: siteContent.cards.reservation.label[language] || t.hero.cardReservation
+    },
+    {
+      href: "/about",
+      key: "about-us",
+      imageSrc: siteContent.cards.about.image,
+      imageAlt: "About us card image",
+      label: siteContent.cards.about.label[language] || t.hero.cardAboutUs
+    }
+  ] as const;
 
   return (
     <section className="relative mx-auto w-full max-w-[min(100%,2000px)] px-2 pb-4 pt-3 sm:px-4 sm:pb-6 sm:pt-4 lg:px-6 lg:pb-8 lg:pt-6">
@@ -49,7 +46,7 @@ export function Hero() {
         {/* Main hero ~70% */}
         <div className="relative min-h-[440px] flex-[1.08] overflow-hidden rounded-[1.75rem] border border-white/[0.07] sm:min-h-[500px] sm:rounded-[2rem] lg:min-h-0">
           <Image
-            src={HERO_IMAGE}
+            src={siteContent.hero.mainImage}
             alt="Sashimi and sushi platter"
             fill
             className="object-cover object-center"
@@ -69,7 +66,7 @@ export function Hero() {
 
           <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col justify-end gap-8 p-6 sm:p-10 md:flex-row md:items-end md:justify-between md:p-12">
             <h1 className="max-w-[90%] font-serif text-[clamp(2.5rem,8vw,5.5rem)] font-light leading-[0.95] tracking-[0.06em] text-[#ebe3d6] sm:max-w-xl">
-              {t.hero.title.toUpperCase()}
+              {(siteContent.hero.title[language] || t.hero.title).toUpperCase()}
             </h1>
             <div className="shrink-0 self-end md:self-auto">
               <HeroSocial />
@@ -79,13 +76,13 @@ export function Hero() {
 
         {/* Side column ~30% */}
         <div className="flex min-h-[400px] flex-[0.36] flex-col gap-2.5 sm:min-h-[440px] sm:gap-3 lg:min-h-0 lg:max-w-none lg:flex-[0.34]">
-          {SIDE_IMAGES.map((item) => (
+          {sideImages.map((item) => (
             <HeroSideCard
               key={item.key}
               href={item.href}
               imageSrc={item.imageSrc}
               imageAlt={item.imageAlt}
-              label={t.hero[item.labelKey]}
+              label={item.label}
             />
           ))}
         </div>

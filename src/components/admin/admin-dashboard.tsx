@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
-import type { GiftConfig, MenuCategory, MenuItem } from "@/lib/menu-types";
+import type { GiftConfig, MenuCategory, MenuItem, SiteContentConfig } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
 import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
+import { defaultSiteContent } from "@/lib/site-content-default";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 import { DishImageField } from "./dish-image-field";
 
@@ -91,11 +92,14 @@ export function AdminDashboard() {
     thresholdEur: 45,
     message: { en: "", de: "" }
   });
+  const [siteContent, setSiteContent] = useState<SiteContentConfig>(defaultSiteContent);
   const [loadError, setLoadError] = useState("");
   const [menuStatus, setMenuStatus] = useState("");
   const [giftStatus, setGiftStatus] = useState("");
+  const [siteStatus, setSiteStatus] = useState("");
   const [savingMenu, setSavingMenu] = useState(false);
   const [savingGift, setSavingGift] = useState(false);
+  const [savingSite, setSavingSite] = useState(false);
   const [search, setSearch] = useState("");
   /** Category id → expanded (default collapsed = less scrolling) */
   const [expandedCat, setExpandedCat] = useState<Record<string, boolean>>({});
@@ -126,13 +130,21 @@ export function AdminDashboard() {
   const load = useCallback(async () => {
     setLoadError("");
     try {
-      const [menuRes, giftRes] = await Promise.all([fetch("/api/menu", { cache: "no-store" }), fetch("/api/gift", { cache: "no-store" })]);
+      const [menuRes, giftRes, siteRes] = await Promise.all([
+        fetch("/api/menu", { cache: "no-store" }),
+        fetch("/api/gift", { cache: "no-store" }),
+        fetch("/api/site-content", { cache: "no-store" })
+      ]);
       if (!menuRes.ok) throw new Error("Menu load failed");
       const menuData = (await menuRes.json()) as MenuCategory[];
       setCategories(cloneMenu(Array.isArray(menuData) ? menuData : []));
       if (giftRes.ok) {
         const g = (await giftRes.json()) as GiftConfig;
         setGift(g);
+      }
+      if (siteRes.ok) {
+        const s = (await siteRes.json()) as SiteContentConfig;
+        setSiteContent(s && typeof s === "object" ? s : defaultSiteContent);
       }
     } catch {
       setLoadError("Could not load data.");
@@ -169,6 +181,9 @@ export function AdminDashboard() {
 
   const goToGift = useCallback(() => {
     document.getElementById("admin-gift")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+  const goToSite = useCallback(() => {
+    document.getElementById("admin-site-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
   const goToCategory = useCallback((id: string) => {
@@ -228,6 +243,26 @@ export function AdminDashboard() {
       window.dispatchEvent(new Event("sake-gift-updated"));
     } finally {
       setSavingGift(false);
+    }
+  }
+
+  async function saveSiteContent() {
+    setSiteStatus("");
+    setSavingSite(true);
+    try {
+      const res = await fetch("/api/admin/site-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(siteContent)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setSiteStatus(typeof data.error === "string" ? data.error : "Save failed");
+        return;
+      }
+      setSiteStatus("Website content saved.");
+    } finally {
+      setSavingSite(false);
     }
   }
 
@@ -513,12 +548,14 @@ export function AdminDashboard() {
             value=""
             onChange={(e) => {
               const v = e.target.value;
-              if (v === "gift") goToGift();
+              if (v === "site") goToSite();
+              else if (v === "gift") goToGift();
               else if (v) goToCategory(v);
               e.target.value = "";
             }}
           >
             <option value="">Jump to…</option>
+            <option value="site">Website content</option>
             <option value="gift">Order gift</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
@@ -534,6 +571,13 @@ export function AdminDashboard() {
         <aside className="hidden lg:block">
           <nav className="sticky top-[7.5rem] space-y-1 rounded-xl border border-[#eeeeee] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">On this page</p>
+            <button
+              type="button"
+              onClick={goToSite}
+              className="w-full rounded-lg px-2 py-2 text-left text-sm text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900"
+            >
+              Website content
+            </button>
             <button
               type="button"
               onClick={goToGift}
@@ -565,6 +609,142 @@ export function AdminDashboard() {
         </aside>
 
         <div className="min-w-0 space-y-10">
+          <section id="admin-site-content" className="scroll-mt-28 space-y-4 rounded-2xl border border-[#eeeeee] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-serif text-xl text-neutral-900">Website content</h2>
+              <span className="text-[10px] uppercase tracking-wider text-neutral-400">Homepage</span>
+            </div>
+            <p className="text-xs text-neutral-500">Bilder und Texte auf der Startseite bearbeiten.</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <AdminField label="Hero title (DE)">
+                <input
+                  value={siteContent.hero.title.de}
+                  onChange={(e) =>
+                    setSiteContent((s) => ({ ...s, hero: { ...s.hero, title: { ...s.hero.title, de: e.target.value } } }))
+                  }
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <AdminField label="Hero title (EN)">
+                <input
+                  value={siteContent.hero.title.en}
+                  onChange={(e) =>
+                    setSiteContent((s) => ({ ...s, hero: { ...s.hero, title: { ...s.hero.title, en: e.target.value } } }))
+                  }
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <AdminField label="Hero main image URL" className="sm:col-span-2">
+                <input
+                  value={siteContent.hero.mainImage}
+                  onChange={(e) => setSiteContent((s) => ({ ...s, hero: { ...s.hero, mainImage: e.target.value } }))}
+                  className={adminInputClass}
+                  placeholder="https://... oder /hero-main.png"
+                />
+              </AdminField>
+              <DishImageField
+                itemId="site-hero-main"
+                label="Hero main image upload"
+                imageUrl={siteContent.hero.mainImage}
+                onChange={(url) => setSiteContent((s) => ({ ...s, hero: { ...s.hero, mainImage: url } }))}
+                removeToUrl={defaultSiteContent.hero.mainImage}
+              />
+              <AdminField label="Order card label (DE)">
+                <input
+                  value={siteContent.cards.order.label.de}
+                  onChange={(e) =>
+                    setSiteContent((s) => ({
+                      ...s,
+                      cards: { ...s.cards, order: { ...s.cards.order, label: { ...s.cards.order.label, de: e.target.value } } }
+                    }))
+                  }
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <AdminField label="Order card label (EN)">
+                <input
+                  value={siteContent.cards.order.label.en}
+                  onChange={(e) =>
+                    setSiteContent((s) => ({
+                      ...s,
+                      cards: { ...s.cards, order: { ...s.cards.order, label: { ...s.cards.order.label, en: e.target.value } } }
+                    }))
+                  }
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <AdminField label="Order card image URL" className="sm:col-span-2">
+                <input
+                  value={siteContent.cards.order.image}
+                  onChange={(e) =>
+                    setSiteContent((s) => ({ ...s, cards: { ...s.cards, order: { ...s.cards.order, image: e.target.value } } }))
+                  }
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <DishImageField
+                itemId="site-card-order"
+                label="Order card image upload"
+                imageUrl={siteContent.cards.order.image}
+                onChange={(url) =>
+                  setSiteContent((s) => ({ ...s, cards: { ...s.cards, order: { ...s.cards.order, image: url } } }))
+                }
+                removeToUrl={defaultSiteContent.cards.order.image}
+              />
+              <AdminField label="Reservation card image URL" className="sm:col-span-2">
+                <input
+                  value={siteContent.cards.reservation.image}
+                  onChange={(e) =>
+                    setSiteContent((s) => ({
+                      ...s,
+                      cards: { ...s.cards, reservation: { ...s.cards.reservation, image: e.target.value } }
+                    }))
+                  }
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <DishImageField
+                itemId="site-card-reservation"
+                label="Reservation card image upload"
+                imageUrl={siteContent.cards.reservation.image}
+                onChange={(url) =>
+                  setSiteContent((s) => ({
+                    ...s,
+                    cards: { ...s.cards, reservation: { ...s.cards.reservation, image: url } }
+                  }))
+                }
+                removeToUrl={defaultSiteContent.cards.reservation.image}
+              />
+              <AdminField label="About card image URL" className="sm:col-span-2">
+                <input
+                  value={siteContent.cards.about.image}
+                  onChange={(e) =>
+                    setSiteContent((s) => ({ ...s, cards: { ...s.cards, about: { ...s.cards.about, image: e.target.value } } }))
+                  }
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <DishImageField
+                itemId="site-card-about"
+                label="About card image upload"
+                imageUrl={siteContent.cards.about.image}
+                onChange={(url) =>
+                  setSiteContent((s) => ({ ...s, cards: { ...s.cards, about: { ...s.cards.about, image: url } } }))
+                }
+                removeToUrl={defaultSiteContent.cards.about.image}
+              />
+            </div>
+            {siteStatus && <p className="text-sm font-medium text-emerald-700">{siteStatus}</p>}
+            <button
+              type="button"
+              onClick={() => void saveSiteContent()}
+              disabled={savingSite}
+              className="rounded-full border border-[#ccc] bg-white px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
+            >
+              {savingSite ? "Saving…" : "Save website content"}
+            </button>
+          </section>
+
           <section id="admin-gift" className="scroll-mt-28 space-y-4 rounded-2xl border border-[#eeeeee] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="font-serif text-xl text-neutral-900">Order gift</h2>

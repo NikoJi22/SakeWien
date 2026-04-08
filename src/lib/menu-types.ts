@@ -43,4 +43,16 @@ export type GiftConfig = {
   message: { en: string; de: string };
 };
 
+export type SiteContentConfig = {
+  hero: {
+    title: { en: string; de: string };
+    mainImage: string;
+  };
+  cards: {
+    order: { label: { en: string; de: string }; image: string };
+    reservation: { label: { en: string; de: string }; image: string };
+    about: { label: { en: string; de: string }; image: string };
+  };
+};
+
 export type OrderCutleryType = "chopsticks" | "wooden";

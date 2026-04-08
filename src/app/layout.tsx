@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/context/language-context";
 import { GiftConfigProvider } from "@/context/gift-config-context";
 import { MenuDataProvider } from "@/context/menu-data-context";
 import { OrderCartDrawerProvider } from "@/context/order-cart-drawer-context";
+import { SiteContentProvider } from "@/context/site-content-context";
 import { ConditionalNav } from "@/components/conditional-nav";
 import { ConditionalFooter } from "@/components/conditional-footer";
 
@@ -38,9 +39,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <OrderCartDrawerProvider>
             <MenuDataProvider>
               <GiftConfigProvider>
-                <ConditionalNav />
-                <main className="min-h-screen">{children}</main>
-                <ConditionalFooter />
+                <SiteContentProvider>
+                  <ConditionalNav />
+                  <main className="min-h-screen">{children}</main>
+                  <ConditionalFooter />
+                </SiteContentProvider>
               </GiftConfigProvider>
             </MenuDataProvider>
           </OrderCartDrawerProvider>

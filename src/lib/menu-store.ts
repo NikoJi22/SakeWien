@@ -1,13 +1,15 @@
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { head, put } from "@vercel/blob";
-import type { GiftConfig, MenuCategory } from "./menu-types";
+import type { GiftConfig, MenuCategory, SiteContentConfig } from "./menu-types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const MENU_FILE = path.join(DATA_DIR, "menu.json");
 const GIFT_FILE = path.join(DATA_DIR, "gift-config.json");
+const SITE_CONTENT_FILE = path.join(DATA_DIR, "site-content.json");
 const MENU_BLOB_PATH = "sake-vienna/menu.json";
 const GIFT_BLOB_PATH = "sake-vienna/gift-config.json";
+const SITE_CONTENT_BLOB_PATH = "sake-vienna/site-content.json";
 
 function hasBlobStorage(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
@@ -82,4 +84,24 @@ export async function writeGiftToDisk(config: GiftConfig): Promise<void> {
   }
   await mkdir(DATA_DIR, { recursive: true });
   await writeFile(GIFT_FILE, JSON.stringify(config, null, 2), "utf-8");
+}
+
+export async function readSiteContentFromDisk(): Promise<SiteContentConfig> {
+  if (hasBlobStorage()) {
+    return await readJsonFromBlob<SiteContentConfig>(SITE_CONTENT_BLOB_PATH);
+  }
+  const raw = await readFile(SITE_CONTENT_FILE, "utf-8");
+  return JSON.parse(raw) as SiteContentConfig;
+}
+
+export async function writeSiteContentToDisk(config: SiteContentConfig): Promise<void> {
+  if (hasBlobStorage()) {
+    await writeJsonToBlob(SITE_CONTENT_BLOB_PATH, config);
+    return;
+  }
+  if (isProductionRuntime()) {
+    throw new Error("BLOB_READ_WRITE_TOKEN missing in production; refusing local filesystem write for site content");
+  }
+  await mkdir(DATA_DIR, { recursive: true });
+  await writeFile(SITE_CONTENT_FILE, JSON.stringify(config, null, 2), "utf-8");
 }
