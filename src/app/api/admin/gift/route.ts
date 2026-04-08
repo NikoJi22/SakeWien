@@ -39,7 +39,8 @@ export async function POST(request: Request) {
   let body: unknown;
   try {
     body = await request.json();
-  } catch {
+  } catch (error) {
+    console.error("[admin/gift] Invalid JSON payload", error);
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -47,6 +48,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid gift config" }, { status: 400 });
   }
 
-  await writeGiftToDisk(body);
-  return NextResponse.json({ ok: true });
+  try {
+    await writeGiftToDisk(body);
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[admin/gift] Failed to persist gift config", error);
+    return NextResponse.json(
+      { error: "Write failed while saving gift settings. Check server logs for details." },
+      { status: 500 }
+    );
+  }
 }
