@@ -5,17 +5,18 @@ import { useLanguage } from "@/context/language-context";
 import { HeroFloatingNav } from "./hero-floating-nav";
 import { HeroSideCard } from "./hero-side-card";
 import { HeroSocial } from "./hero-social";
+import { SiteLogo } from "./site-logo";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=2200&q=85";
 
 const SIDE_IMAGES = [
   {
-    href: "/menu",
-    key: "menu",
+    href: "/order-online",
+    key: "order",
     imageSrc: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=85",
     imageAlt: "Chef with sushi platter",
-    labelKey: "cardMenu"
+    labelKey: "cardOrder"
   },
   {
     href: "/reservation",
@@ -55,14 +56,18 @@ export function Hero() {
             priority
             sizes="(max-width: 1024px) 100vw, 72vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900/55 via-neutral-900/15 to-neutral-900/20" />
-          <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/35 via-transparent to-transparent" />
+          {/* Großflächiges Kunstlogo als dezentes Brand-Element (Lesbarkeit im Header bleibt getrennt) */}
+          <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none">
+            <SiteLogo variant="heroWatermark" lightUiTone="markWhite" />
+          </div>
+          <div className="absolute inset-0 z-[2] bg-gradient-to-t from-[rgba(31,35,38,0.28)] via-[rgba(70,95,107,0.1)] to-[rgba(70,95,107,0.14)]" />
+          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-[rgba(70,95,107,0.18)] via-transparent to-transparent" />
 
-          <div className="absolute left-0 right-0 top-3 z-20 flex justify-center px-3 sm:top-6 sm:px-8 md:top-8 md:px-10">
+          <div className="absolute left-0 right-0 top-3 z-30 flex justify-center px-3 sm:top-6 sm:px-8 md:top-8 md:px-10">
             <HeroFloatingNav />
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col justify-end gap-8 p-6 sm:p-10 md:flex-row md:items-end md:justify-between md:p-12">
+          <div className="absolute bottom-0 left-0 right-0 z-20 flex flex-col justify-end gap-8 p-6 sm:p-10 md:flex-row md:items-end md:justify-between md:p-12">
             <h1 className="max-w-[90%] font-serif text-[clamp(2.5rem,8vw,5.5rem)] font-light leading-[0.95] tracking-[0.06em] text-[#ebe3d6] sm:max-w-xl">
               {t.hero.title.toUpperCase()}
             </h1>

@@ -4,6 +4,7 @@ import { useLanguage } from "@/context/language-context";
 import { useCart } from "@/context/cart-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
 import { formatPriceEur } from "@/lib/menu-helpers";
+import { brandBtnPrimary } from "@/lib/brand-actions";
 
 export function OrderMobileBar() {
   const { language, t } = useLanguage();
@@ -11,7 +12,7 @@ export function OrderMobileBar() {
   const { open } = useOrderCartDrawer();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-brand-line bg-brand-card px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(22,20,18,0.08)] lg:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-brand-line bg-brand-card px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(70,95,107,0.06)] lg:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-between gap-4">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-subtle">{t.order.yourOrder}</p>
@@ -23,7 +24,7 @@ export function OrderMobileBar() {
         <button
           type="button"
           onClick={open}
-          className="shrink-0 rounded-full bg-brand-accent px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-md shadow-brand-accent/15 transition hover:bg-brand-accent-hover"
+          className={`shrink-0 rounded-full px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] shadow-md ${brandBtnPrimary} hover:shadow-lg`}
         >
           {t.order.openCart}
         </button>

@@ -20,7 +20,7 @@ export default function NewDishesPage() {
           <p className="text-sm text-brand-body">No new dishes at the moment.</p>
         )}
         {!loading && !error && newDishes.length > 0 && (
-          <div className="grid gap-7 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-9">
+          <div className="grid gap-9 md:grid-cols-2 md:gap-10 lg:grid-cols-3 lg:gap-11">
             {newDishes.map((dish) => (
               <DishCard key={dish.id} item={dish} />
             ))}

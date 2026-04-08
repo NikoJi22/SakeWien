@@ -187,7 +187,11 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
               fill
               className="object-cover"
               sizes="280px"
-              unoptimized={previewSrc.startsWith("blob:") || previewSrc.startsWith("data:")}
+              unoptimized={
+                previewSrc.startsWith("blob:") ||
+                previewSrc.startsWith("data:") ||
+                isMenuUploadedImageUrl(previewSrc.split("?")[0] || previewSrc)
+              }
             />
           </div>
           <div className="flex flex-1 flex-col gap-2">

@@ -8,14 +8,14 @@ type Props = {
   title: string;
   children: ReactNode;
   /** Distinct visual frame for spotlight blocks */
-  variant?: "amber" | "emerald";
+  variant?: "amber" | "warm";
 };
 
 export function MenuHighlightSection({ navId, title, children, variant = "amber" }: Props) {
   const ring =
-    variant === "emerald"
-      ? "border-emerald-400/35 bg-gradient-to-br from-emerald-50/90 via-brand-card to-brand-card shadow-[0_0_0_1px_rgba(16,185,129,0.12)]"
-      : "border-amber-400/35 bg-gradient-to-br from-amber-50/90 via-brand-card to-brand-card shadow-[0_0_0_1px_rgba(245,158,11,0.12)]";
+    variant === "warm"
+      ? "border-brand-line bg-gradient-to-br from-brand-muted/55 via-brand-card to-brand-card shadow-[0_0_0_1px_rgba(70,95,107,0.07)]"
+      : "border-brand-line-strong/80 bg-gradient-to-br from-brand-muted/75 via-brand-card to-brand-card shadow-[0_0_0_1px_rgba(70,95,107,0.09)]";
 
   return (
     <section id={menuSectionId(navId)} className="scroll-mt-[8.5rem] rounded-3xl border border-brand-line p-5 sm:p-7 lg:p-8">

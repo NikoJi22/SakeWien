@@ -11,11 +11,11 @@ export function PageHeader({ title, subtitle, eyebrow = "SAKE · Vienna", varian
     <header
       className={
         isLight
-          ? "border-b border-brand-line bg-brand-card shadow-[0_1px_0_rgba(22,20,18,0.04)]"
+          ? "border-b border-brand-primary/15 bg-brand-card shadow-[0_1px_0_rgba(70,95,107,0.06)]"
           : "border-b border-white/[0.06] bg-gradient-to-b from-black/40 to-transparent"
       }
     >
-      <div className="mx-auto max-w-[min(100%,1200px)] px-4 py-12 sm:px-8 sm:py-14 lg:px-10 lg:py-16">
+      <div className="mx-auto max-w-[min(100%,1520px)] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
         <p
           className={`mb-3 text-[10px] font-semibold uppercase tracking-[0.35em] ${isLight ? "text-brand-accent" : "text-gold/90"}`}
         >

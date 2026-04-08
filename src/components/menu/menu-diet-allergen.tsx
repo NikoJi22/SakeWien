@@ -20,12 +20,14 @@ export function MenuDietBadges({ item, className = "" }: { item: MenuItem; class
   return (
     <div className={`flex flex-wrap gap-1.5 ${className}`}>
       {item.vegan && (
-        <Pill className="border-emerald-400/50 bg-emerald-50/90 text-emerald-950">{t.order.vegan}</Pill>
+        <Pill className="border-brand-line bg-brand-muted/50 text-brand-primary">{t.order.vegan}</Pill>
       )}
       {item.vegetarian && !item.vegan && (
-        <Pill className="border-lime-400/50 bg-lime-50/90 text-lime-950">{t.order.vegetarian}</Pill>
+        <Pill className="border-brand-line bg-brand-canvas text-brand-primary">{t.order.vegetarian}</Pill>
       )}
-      {item.spicy && <Pill className="border-rose-400/45 bg-rose-50/90 text-rose-950">{t.order.spicy}</Pill>}
+      {item.spicy && (
+        <Pill className="border-brand-line bg-brand-canvas text-brand-primary">{t.order.spicy}</Pill>
+      )}
     </div>
   );
 }
@@ -42,7 +44,7 @@ export function MenuAllergenChips({ item, className = "" }: { item: MenuItem; cl
         <span
           key={code}
           title={`Allergen ${code}`}
-          className="inline-flex h-6 min-w-[1.35rem] items-center justify-center rounded border border-brand-line bg-brand-muted/60 px-1.5 font-mono text-[10px] font-semibold tabular-nums text-brand-ink-secondary"
+          className="inline-flex h-6 min-w-[1.35rem] items-center justify-center rounded border border-brand-line bg-brand-canvas px-1.5 font-mono text-[10px] font-semibold tabular-nums text-brand-primary"
         >
           {code}
         </span>

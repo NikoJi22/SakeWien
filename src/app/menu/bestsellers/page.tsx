@@ -20,7 +20,7 @@ export default function BestsellersPage() {
           <p className="text-sm text-brand-body">No bestsellers listed.</p>
         )}
         {!loading && !error && bestsellers.length > 0 && (
-          <div className="grid gap-7 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-9">
+          <div className="grid gap-9 md:grid-cols-2 md:gap-10 lg:grid-cols-3 lg:gap-11">
             {bestsellers.map((dish) => (
               <DishCard key={dish.id} item={dish} />
             ))}

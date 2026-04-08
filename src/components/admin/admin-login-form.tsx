@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { brandBtnPrimary } from "@/lib/brand-actions";
 import { AdminField, adminInputClass } from "./admin-field";
 
 export function AdminLoginForm() {
@@ -51,7 +52,7 @@ export function AdminLoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-brand-accent py-3 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-brand-accent/15 transition hover:bg-brand-accent-hover disabled:opacity-50"
+          className={`w-full rounded-full py-3 text-xs font-semibold uppercase tracking-[0.2em] shadow-md ${brandBtnPrimary} hover:shadow-lg disabled:opacity-50`}
         >
           {loading ? "…" : "Sign in"}
         </button>

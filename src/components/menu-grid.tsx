@@ -44,10 +44,10 @@ export function MenuGrid({ categories, filter }: Props) {
   }
 
   return (
-    <div className="space-y-14 sm:space-y-16">
+    <div className="space-y-16 sm:space-y-[4.5rem]">
       {filteredBestsellers.length > 0 && (
         <MenuHighlightSection navId={MENU_NAV_BESTSELLERS} title={t.sections.bestsellers} variant="amber">
-          <div className="grid gap-6 md:grid-cols-2 md:gap-8">
+          <div className="grid gap-8 md:grid-cols-2 md:gap-10">
             {filteredBestsellers.map((item) => (
               <MenuItemCard key={item.id} item={item} variant="spotlight" />
             ))}
@@ -55,8 +55,8 @@ export function MenuGrid({ categories, filter }: Props) {
         </MenuHighlightSection>
       )}
       {filteredNew.length > 0 && (
-        <MenuHighlightSection navId={MENU_NAV_NEW} title={t.sections.newDishes} variant="emerald">
-          <div className="grid gap-6 md:grid-cols-2 md:gap-8">
+        <MenuHighlightSection navId={MENU_NAV_NEW} title={t.sections.newDishes} variant="warm">
+          <div className="grid gap-8 md:grid-cols-2 md:gap-10">
             {filteredNew.map((item) => (
               <MenuItemCard key={item.id} item={item} variant="spotlight" />
             ))}
@@ -65,7 +65,7 @@ export function MenuGrid({ categories, filter }: Props) {
       )}
       {filteredCategories.map((category) => (
         <MenuSection key={category.id} categoryId={category.id} title={category.title[language]}>
-          <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+          <div className="grid gap-9 md:grid-cols-2 md:gap-11">
             {category.items.map((item) => (
               <MenuItemCard key={item.id} item={item} />
             ))}

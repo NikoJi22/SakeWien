@@ -2,18 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Kunstlogo: kein Hintergrund-Container, kein Filter-„Recolor“ der ganzen Bitmap (bei PNG mit schwarzer Fläche → sonst einfarbiger Block). */
+@layer components {
+  /**
+   * Auf hellem Navbar-/Card-Hintergrund: schwarze Pixel wirken wie transparent (Screen),
+   * Linien und Schrift bleiben sichtbar. Bei echtem PNG mit Alpha weiterhin unkritisch.
+   */
+  .sake-logo-on-light {
+    mix-blend-mode: screen;
+  }
+  /** Wasserzeichen auf Fotos — weich, ohne invert-Filter-Block */
+  .sake-logo-hero-watermark {
+    mix-blend-mode: screen;
+  }
+}
+
 :root {
   color-scheme: light;
-  --brand-page: #ffd39b;
-  --brand-ink: #161412;
-  --brand-accent: #5c4839;
-  --input-border: #ccc;
-  --input-focus-border: #888;
+  --brand-page: #f6f0e7;
+  --brand-ink: #1f2326;
+  --brand-accent: #c9a46c;
+  --brand-primary: #465f6b;
+  --input-border: #d8e1e5;
+  --input-focus-border: #465f6b;
   --input-radius: 8px;
 }
 
 body {
-  @apply bg-[#FFD39B] text-neutral-900 antialiased;
+  @apply bg-brand-page text-brand-ink antialiased;
   font-size: 17px;
 }
 
@@ -32,17 +48,17 @@ html {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="hidden"]),
   textarea {
     cursor: auto;
-    color: #111;
-    caret-color: #111;
-    background-color: #fff;
+    color: var(--brand-ink);
+    caret-color: var(--brand-ink);
+    background-color: #fffdfc;
     border: 1px solid var(--input-border);
     border-radius: var(--input-radius);
   }
 
   select {
     cursor: pointer;
-    color: #111;
-    background-color: #fff;
+    color: var(--brand-ink);
+    background-color: #fffdfc;
     border: 1px solid var(--input-border);
     border-radius: var(--input-radius);
   }
@@ -59,12 +75,12 @@ html {
   select:focus {
     outline: none;
     border-color: var(--input-focus-border);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 0 0 3px rgba(70, 95, 107, 0.12);
   }
 
   input::placeholder,
   textarea::placeholder {
-    color: #666;
+    color: #8a8f94;
     opacity: 1;
   }
 
@@ -78,8 +94,8 @@ html {
   select:-webkit-autofill,
   select:-webkit-autofill:hover,
   select:-webkit-autofill:focus {
-    -webkit-text-fill-color: #111;
-    caret-color: #111;
+    -webkit-text-fill-color: var(--brand-ink);
+    caret-color: var(--brand-ink);
   }
 
   input:disabled,
@@ -103,7 +119,7 @@ html {
 }
 
 .gold-gradient {
-  background: linear-gradient(120deg, #f3e3c1 0%, #b6915f 45%, #7d5c34 100%);
+  background: linear-gradient(120deg, #e9d8bd 0%, #c9a46c 45%, #7a5a2d 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -117,8 +133,8 @@ html {
   width: 100% !important;
   height: 100% !important;
   min-height: 100dvh;
-  background: rgba(55, 65, 81, 0.35) !important;
-  background-color: rgba(55, 65, 81, 0.35) !important;
+  background: rgba(70, 95, 107, 0.22) !important;
+  background-color: rgba(70, 95, 107, 0.22) !important;
   opacity: 1 !important;
   z-index: 9999 !important;
   pointer-events: auto;
@@ -141,9 +157,9 @@ html {
 }
 
 .mobile-menu-fullscreen-overlay__panel {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  border-left: 1px solid #eeeeee !important;
+  background: #fffdfc !important;
+  background-color: #fffdfc !important;
+  border-left: 1px solid #d8e1e5 !important;
   opacity: 1 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -164,7 +180,7 @@ html {
 
 @media (max-width: 767.98px) {
   .hero-nav-overlay-root {
-    background: rgba(55, 65, 81, 0.35) !important;
+    background: rgba(70, 95, 107, 0.22) !important;
     opacity: 1 !important;
     z-index: 9999 !important;
     backdrop-filter: none !important;
@@ -205,7 +221,7 @@ html {
 @media (min-width: 768px) {
   .hero-nav-overlay-backdrop {
     /* No backdrop-filter: triggers Chromium/Windows GPU bug (mouse cursor turns white over page). */
-    background: rgba(55, 65, 81, 0.45);
+    background: rgba(70, 95, 107, 0.28);
   }
 }
 
@@ -227,9 +243,9 @@ html {
 
 @media (max-width: 767.98px) {
   .hero-nav-overlay-panel {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    border-right: 1px solid #eeeeee !important;
+    background: #fffdfc !important;
+    background-color: #fffdfc !important;
+    border-right: 1px solid #d8e1e5 !important;
     opacity: 1 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -241,7 +257,7 @@ html {
 @media (min-width: 768px) {
   .hero-nav-overlay-panel {
     background: rgba(255, 255, 255, 0.98);
-    border-right: 1px solid #eeeeee;
+    border-right: 1px solid #d8e1e5;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
   }
 }

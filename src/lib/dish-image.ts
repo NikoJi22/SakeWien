@@ -11,7 +11,8 @@ export const DISH_IMAGE_MAX_WIDTH = 1200;
 const UPLOAD_URL_PREFIX = "/uploads/menu/";
 
 export function isMenuUploadedImageUrl(url: string): boolean {
-  return url.startsWith(UPLOAD_URL_PREFIX);
+  const pathOnly = url.split("?")[0] || url;
+  return pathOnly.startsWith(UPLOAD_URL_PREFIX);
 }
 
 /** True when the URL is the built-in placeholder (ignores query string). */

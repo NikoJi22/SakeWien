@@ -24,7 +24,10 @@ const fontSans = Montserrat({
 
 export const metadata: Metadata = {
   title: "Sake Vienna",
-  description: "Modern Japanese restaurant website for Sake in Vienna."
+  description: "Modern Japanese restaurant website for Sake in Vienna.",
+  icons: {
+    icon: "/sake-logo.png"
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

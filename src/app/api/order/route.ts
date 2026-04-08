@@ -43,14 +43,14 @@ export async function POST(request: Request) {
     const store = await cookies();
     const proof = store.get(ORDER_PHONE_COOKIE)?.value;
     const verified = parseVerifiedPhoneCookie(proof);
-    if (body.fulfillment === "delivery") {
-      if (!verified) return NextResponse.json({ error: "phone_not_verified" }, { status: 403 });
-      if (!orderPhone || orderPhone !== verified.phoneE164) {
-        return NextResponse.json({ error: "phone_mismatch" }, { status: 403 });
-      }
-      if (Number(body.subtotalEur || 0) < DELIVERY_MIN_ORDER_EUR) {
-        return NextResponse.json({ error: "delivery_min_order" }, { status: 400 });
-      }
+    if (!verified) {
+      return NextResponse.json({ error: "phone_not_verified" }, { status: 403 });
+    }
+    if (!orderPhone || orderPhone !== verified.phoneE164) {
+      return NextResponse.json({ error: "phone_mismatch" }, { status: 403 });
+    }
+    if (body.fulfillment === "delivery" && Number(body.subtotalEur || 0) < DELIVERY_MIN_ORDER_EUR) {
+      return NextResponse.json({ error: "delivery_min_order" }, { status: 400 });
     }
     if (body.fulfillment === "pickup" && body.pickupTime) {
       const d = new Date(body.pickupTime);

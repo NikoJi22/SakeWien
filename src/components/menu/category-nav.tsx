@@ -4,8 +4,9 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { MenuCategory } from "@/lib/menu-types";
 import { menuSectionId } from "@/lib/menu-scroll";
 import type { Language } from "@/lib/translations";
+import { brandChipActive, brandChipInactive } from "@/lib/brand-actions";
 
-const HEADER_FALLBACK_PX = 72;
+const HEADER_FALLBACK_PX = 56;
 /** Horizontal movement (px) before treating pointer interaction as drag-scroll instead of click. */
 const DRAG_THRESHOLD_PX = 8;
 
@@ -188,10 +189,10 @@ export function CategoryNav({ categories, language, className = "", leadingItems
     <nav
       ref={outerRef}
       aria-label={language === "de" ? "Kategorien" : "Categories"}
-      className={`sticky z-30 border-b border-brand-line bg-brand-canvas shadow-[0_1px_0_rgba(22,20,18,0.04)] ${className}`}
+      className={`sticky z-30 border-b border-brand-line bg-brand-canvas shadow-[0_1px_0_rgba(70,95,107,0.04)] ${className}`}
       style={{ top: stickyTopPx }}
     >
-      <div className="mx-auto min-w-0 max-w-[min(100%,1200px)] px-4 sm:px-8 lg:px-10">
+      <div className="mx-auto min-w-0 w-full max-w-[min(100%,1520px)] px-4 sm:px-6 lg:px-8">
         <div
           ref={scrollRef}
           onPointerDown={onStripPointerDown}
@@ -201,7 +202,7 @@ export function CategoryNav({ categories, language, className = "", leadingItems
             "min-w-0 cursor-grab overflow-x-auto overflow-y-hidden overscroll-x-contain py-2.5 select-none",
             stripGrabbing ? "cursor-grabbing" : "",
             "touch-pan-x [-webkit-overflow-scrolling:touch]",
-            "[scrollbar-width:thin] [scrollbar-color:rgb(181,170,154)_transparent]",
+            "[scrollbar-width:thin] [scrollbar-color:#CED8DC_transparent]",
             "[&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent",
             "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-brand-line-strong/50",
             "[&::-webkit-scrollbar-thumb]:hover:bg-brand-line-strong/70"
@@ -217,10 +218,8 @@ export function CategoryNav({ categories, language, className = "", leadingItems
                   role="tab"
                   aria-selected={active}
                   onClick={() => goTo(l.id)}
-                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition active:cursor-grabbing ${
-                    active
-                      ? "border-brand-accent bg-brand-accent text-white shadow-md shadow-brand-accent/15"
-                      : "border-brand-line bg-brand-card text-brand-ink-secondary hover:border-brand-line-strong hover:bg-brand-muted hover:text-brand-ink"
+                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full px-4 py-2 text-sm transition-colors duration-200 ease-out active:cursor-grabbing ${
+                    active ? brandChipActive : brandChipInactive
                   }`}
                 >
                   {l.label}
@@ -238,10 +237,8 @@ export function CategoryNav({ categories, language, className = "", leadingItems
                   role="tab"
                   aria-selected={active}
                   onClick={() => goTo(cat.id)}
-                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition active:cursor-grabbing ${
-                    active
-                      ? "border-brand-accent bg-brand-accent text-white shadow-md shadow-brand-accent/15"
-                      : "border-brand-line bg-brand-card text-brand-ink-secondary hover:border-brand-line-strong hover:bg-brand-muted hover:text-brand-ink"
+                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full px-4 py-2 text-sm transition-colors duration-200 ease-out active:cursor-grabbing ${
+                    active ? brandChipActive : brandChipInactive
                   }`}
                 >
                   {label}

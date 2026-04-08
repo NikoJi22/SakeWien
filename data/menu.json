@@ -7,6 +7,25 @@
     },
     "items": [
       {
+        "id": "soup-miso",
+        "name": {
+          "de": "Miso Suppe",
+          "en": "Miso soup"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.9,
+        "image": "/uploads/menu/soup-miso.webp",
+        "allergens": [
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true,
+        "spicyLevel": 0
+      },
+      {
         "id": "soup-hot-sour",
         "name": {
           "de": "Peking-Sauer-Suppe",
@@ -25,7 +44,7 @@
           "G"
         ],
         "spicy": true,
-        "spicyLevel": 2
+        "spicyLevel": 1
       },
       {
         "id": "soup-tom-yam",
@@ -49,32 +68,6 @@
         "spicy": true,
         "isBestseller": true,
         "spicyLevel": 1
-      },
-      {
-        "id": "dish-497f9ca8-f",
-        "name": {
-          "de": "fgfgfggf",
-          "en": "fgfgfgfg"
-        },
-        "description": {
-          "de": "Test",
-          "en": "test"
-        },
-        "priceEur": 3332.9,
-        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "D",
-          "E",
-          "F",
-          "H"
-        ],
-        "isNew": false,
-        "isBestseller": true,
-        "isSpecialDeal": true,
-        "isSoldOut": true,
-        "vegetarian": false,
-        "vegan": false,
-        "spicyLevel": 2
       }
     ]
   },
@@ -96,7 +89,7 @@
           "en": "Signature dish from our menu."
         },
         "priceEur": 4.5,
-        "image": "/uploads/menu/starter-edamame.webp",
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "F"
         ],

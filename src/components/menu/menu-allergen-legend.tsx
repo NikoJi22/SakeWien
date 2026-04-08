@@ -10,7 +10,7 @@ export function MenuAllergenLegend() {
   const entries = allergenLegendEntries(language);
 
   return (
-    <div className="rounded-2xl border border-brand-line bg-brand-card/80 px-4 py-3 sm:px-5 sm:py-4">
+    <div className="rounded-2xl border border-brand-primary/10 bg-brand-card/80 px-4 py-3 sm:px-5 sm:py-4">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

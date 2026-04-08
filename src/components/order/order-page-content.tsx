@@ -16,6 +16,10 @@ import { OrderCartDrawer } from "./order-cart-drawer";
 import { emptyMenuAttributeFilter, filterBestsellersAndNewSections, itemMatchesMenuFilters } from "@/lib/menu-filter";
 import { MENU_NAV_BESTSELLERS, MENU_NAV_NEW } from "@/lib/menu-scroll";
 
+/** Desktop: 2 Karten pro Zeile, gleiche Zeilenhöhe · Mobile/Tablet: 1 Spalte */
+const orderMenuGridClass =
+  "grid grid-cols-1 gap-6 md:gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-6 xl:gap-8";
+
 export function OrderPageContent() {
   const { language, t } = useLanguage();
   const { categories, loading, error, bestsellers, newDishes } = useMenuData();
@@ -43,7 +47,7 @@ export function OrderPageContent() {
   const sushiLikeIds = useMemo(() => {
     const ids = new Set<string>();
     categories
-      .filter((c) => c.id === "sushi" || c.id === "maki-cat")
+      .filter((c) => c.id === "sushi" || c.id === "maki-cat" || c.id === "sashimi")
       .forEach((c) => c.items.forEach((i) => ids.add(i.id)));
     return ids;
   }, [categories]);
@@ -63,15 +67,15 @@ export function OrderPageContent() {
     <div className="bg-brand-page pb-28 text-brand-ink lg:pb-12">
       <PageHeader variant="light" title={t.page.orderTitle} subtitle={t.page.orderText} />
 
-      <div className="mx-auto w-full max-w-[min(100%,1200px)] px-4 sm:px-8 lg:px-10">
+      <div className="mx-auto w-full max-w-[min(100%,1520px)] px-4 sm:px-6 lg:px-8">
         <div className="space-y-4 py-4 sm:py-5">
           <MenuAttributeFilters value={filter} onChange={setFilter} />
           <MenuAllergenLegend />
         </div>
         <CategoryNav categories={withItems} language={language} leadingItems={leadingNav} />
 
-        <div className="lg:grid lg:grid-cols-[1fr_min(400px,36%)] lg:items-start lg:gap-12 lg:py-10">
-          <div className="min-w-0 space-y-14 py-8 sm:space-y-16 sm:py-10 lg:py-0">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:gap-10 lg:py-10">
+          <div className="min-w-0 flex-1 space-y-14 py-8 sm:space-y-16 sm:py-10 lg:space-y-16 lg:py-0">
             {loading && <p className="text-sm text-brand-subtle">…</p>}
             {error && <p className="text-sm text-brand-danger">{error}</p>}
             {!loading && !error && !anyMenu && (
@@ -80,8 +84,8 @@ export function OrderPageContent() {
             {!loading && !error && anyMenu && (
               <>
                 {filteredDeals.length > 0 && (
-                  <MenuHighlightSection navId="special-deals" title="Aktionen" variant="emerald">
-                    <div className="space-y-6 sm:space-y-8">
+                  <MenuHighlightSection navId="special-deals" title="Aktionen" variant="warm">
+                    <div className={orderMenuGridClass}>
                       {filteredDeals.map((item) => (
                         <OrderMenuItem
                           key={`spotlight-deal-${item.id}`}
@@ -96,7 +100,7 @@ export function OrderPageContent() {
                 )}
                 {filteredBestsellers.length > 0 && (
                   <MenuHighlightSection navId={MENU_NAV_BESTSELLERS} title={t.sections.bestsellers} variant="amber">
-                    <div className="space-y-6 sm:space-y-8">
+                    <div className={orderMenuGridClass}>
                       {filteredBestsellers.map((item) => (
                         <OrderMenuItem
                           key={`spotlight-bs-${item.id}`}
@@ -110,8 +114,8 @@ export function OrderPageContent() {
                   </MenuHighlightSection>
                 )}
                 {filteredNew.length > 0 && (
-                  <MenuHighlightSection navId={MENU_NAV_NEW} title={t.sections.newDishes} variant="emerald">
-                    <div className="space-y-6 sm:space-y-8">
+                  <MenuHighlightSection navId={MENU_NAV_NEW} title={t.sections.newDishes} variant="warm">
+                    <div className={orderMenuGridClass}>
                       {filteredNew.map((item) => (
                         <OrderMenuItem
                           key={`spotlight-nw-${item.id}`}
@@ -126,13 +130,15 @@ export function OrderPageContent() {
                 )}
                 {withItems.map((category) => (
                   <MenuSection key={category.id} categoryId={category.id} title={category.title[language]}>
-                    <div className="space-y-6 sm:space-y-8">
+                    <div className={orderMenuGridClass}>
                       {category.items.map((item) => (
                         <OrderMenuItem
                           key={`${category.id}-${item.id}`}
                           item={item}
                           starterGroupId={category.id}
-                          allowSushiExtras={category.id === "sushi" || category.id === "maki-cat"}
+                          allowSushiExtras={
+                            category.id === "sushi" || category.id === "maki-cat" || category.id === "sashimi"
+                          }
                         />
                       ))}
                     </div>
@@ -142,7 +148,7 @@ export function OrderPageContent() {
             )}
           </div>
 
-          <aside className="hidden min-h-0 lg:sticky lg:top-28 lg:block lg:max-h-[calc(100vh-7rem)] lg:w-full lg:overflow-y-auto lg:overscroll-contain lg:self-start lg:pt-10">
+          <aside className="hidden min-h-0 w-full shrink-0 lg:sticky lg:top-24 lg:block lg:w-[400px] lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:overscroll-contain lg:self-start lg:border-l lg:border-brand-line lg:bg-brand-canvas/55 lg:pl-6 xl:w-[420px] xl:pl-8 lg:pt-10">
             <OrderCheckout variant="sidebar" />
           </aside>
         </div>

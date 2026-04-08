@@ -25,24 +25,24 @@ export function OrderCartDrawer() {
     <div className="fixed inset-0 z-[110] lg:hidden" role="presentation">
       <button
         type="button"
-        className="absolute inset-0 bg-neutral-600/35"
+        className="absolute inset-0 bg-[rgba(70,95,107,0.22)]"
         aria-label="Close"
         onClick={close}
       />
       <div
-        className="absolute bottom-0 left-0 right-0 flex max-h-[min(92dvh,920px)] flex-col rounded-t-[1.25rem] border border-brand-line border-b-0 bg-brand-card shadow-[0_-12px_48px_rgba(22,20,18,0.12)]"
+        className="absolute bottom-0 left-0 right-0 flex max-h-[min(92dvh,920px)] flex-col rounded-t-[1.25rem] border border-brand-line border-b-0 bg-brand-card shadow-[0_-12px_48px_rgba(31,35,38,0.08)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-brand-line bg-brand-canvas/40 px-4 py-3 pt-4 sm:px-6">
-          <p id={titleId} className="font-serif text-lg font-medium tracking-wide text-brand-ink">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-brand-line bg-brand-canvas/70 px-4 py-4 pt-5 sm:px-6">
+          <h2 id={titleId} className="font-serif text-xl font-bold tracking-wide text-brand-ink sm:text-2xl">
             {t.order.yourOrder}
-          </p>
+          </h2>
           <button
             type="button"
             onClick={close}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-line bg-brand-card text-brand-body transition hover:border-brand-line-strong hover:bg-brand-muted hover:text-brand-ink"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-line bg-brand-card text-brand-primary transition hover:border-brand-line hover:bg-brand-surface-hover hover:text-brand-primary-dark"
             aria-label="Close"
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">

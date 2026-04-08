@@ -12,9 +12,9 @@ import { useMenuData } from "@/context/menu-data-context";
 import { useLanguage } from "@/context/language-context";
 import { emptyMenuAttributeFilter, filterBestsellersAndNewSections, itemMatchesMenuFilters } from "@/lib/menu-filter";
 import { MENU_NAV_BESTSELLERS, MENU_NAV_NEW } from "@/lib/menu-scroll";
+import { brandBtnSecondary } from "@/lib/brand-actions";
 
-const pillClass =
-  "inline-flex items-center justify-center rounded-full border border-brand-line bg-brand-card px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-ink-secondary shadow-sm transition hover:border-brand-accent hover:bg-brand-muted hover:text-brand-ink";
+const pillClass = `inline-flex items-center justify-center rounded-full px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] ${brandBtnSecondary}`;
 
 export default function MenuPage() {
   const { t, language } = useLanguage();

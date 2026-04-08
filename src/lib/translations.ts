@@ -19,6 +19,8 @@ type TranslationSchema = {
     ctaPrimary: string;
     ctaSecondary: string;
     cardMenu: string;
+    /** Hero side tile — direct order (replaces separate menu page) */
+    cardOrder: string;
     cardReservation: string;
     cardRestaurant: string;
     cardNewDishes: string;
@@ -119,7 +121,12 @@ type TranslationSchema = {
     itemsInCart: string;
     emailOptional: string;
     smsVerifyTitle: string;
+    /** Shown before any SMS was sent: code is requested via “Place order” */
+    smsVerifyHintSubmit: string;
+    /** After SMS was sent successfully */
+    codeSentInfo: string;
     sendCode: string;
+    resendCode: string;
     enterCode: string;
     confirmCode: string;
     codeSending: string;
@@ -170,8 +177,9 @@ export const translations: Record<Language, TranslationSchema> = {
       title: "Sushi Sensation",
       subtitle: "Japanese fine dining in Vienna. Dark elegance, precise craft, unforgettable taste.",
       ctaPrimary: "Book a table",
-      ctaSecondary: "View menu",
+      ctaSecondary: "Order online",
       cardMenu: "Menu",
+      cardOrder: "Order now",
       cardReservation: "Reservation",
       cardRestaurant: "Our restaurant",
       cardNewDishes: "New dishes",
@@ -249,7 +257,7 @@ export const translations: Record<Language, TranslationSchema> = {
       ctaLabel: "Contact & directions"
     },
     order: {
-      browseMenu: "Menu",
+      browseMenu: "Browse & order",
       yourOrder: "Your order",
       emptyCart: "Your cart is empty. Add dishes from the menu.",
       subtotal: "Subtotal",
@@ -277,7 +285,10 @@ export const translations: Record<Language, TranslationSchema> = {
       itemsInCart: "items",
       emailOptional: "Email (optional)",
       smsVerifyTitle: "Verify your phone",
+      smsVerifyHintSubmit: "Tap “Send order” first — we’ll text you a code (pickup and delivery).",
+      codeSentInfo: "We’ve sent a code. Enter it below and tap Confirm.",
       sendCode: "Send code",
+      resendCode: "Resend code",
       enterCode: "SMS code",
       confirmCode: "Confirm",
       codeSending: "Sending…",
@@ -325,8 +336,9 @@ export const translations: Record<Language, TranslationSchema> = {
       title: "Sushi Sensation",
       subtitle: "Japanisches Fine Dining in Wien. Dunkle Eleganz, präzise Handwerkskunst, unvergesslicher Geschmack.",
       ctaPrimary: "Tisch reservieren",
-      ctaSecondary: "Speisekarte ansehen",
+      ctaSecondary: "Online bestellen",
       cardMenu: "Speisekarte",
+      cardOrder: "Jetzt bestellen",
       cardReservation: "Reservierung",
       cardRestaurant: "Unser Restaurant",
       cardNewDishes: "Neue Gerichte",
@@ -404,7 +416,7 @@ export const translations: Record<Language, TranslationSchema> = {
       ctaLabel: "Kontakt & Anfahrt"
     },
     order: {
-      browseMenu: "Speisekarte",
+      browseMenu: "Bestellen",
       yourOrder: "Ihre Bestellung",
       emptyCart: "Ihr Warenkorb ist leer. Wählen Sie Gerichte aus der Karte.",
       subtotal: "Zwischensumme",
@@ -432,7 +444,11 @@ export const translations: Record<Language, TranslationSchema> = {
       itemsInCart: "Artikel",
       emailOptional: "E-Mail (optional)",
       smsVerifyTitle: "Handy-Verifizierung",
+      smsVerifyHintSubmit:
+        "Tippen Sie zuerst auf „Bestellung senden“ — wir schicken Ihnen dann einen SMS-Code (Abholung und Lieferung).",
+      codeSentInfo: "Wir haben einen Code gesendet. Geben Sie ihn unten ein und tippen Sie auf Bestätigen.",
       sendCode: "Code senden",
+      resendCode: "Code erneut senden",
       enterCode: "SMS-Code",
       confirmCode: "Bestätigen",
       codeSending: "Wird gesendet…",

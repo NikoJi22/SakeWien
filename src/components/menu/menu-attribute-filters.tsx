@@ -3,9 +3,9 @@
 import type { MenuAttributeFilter } from "@/lib/menu-filter";
 import { menuFilterIsActive } from "@/lib/menu-filter";
 import { useLanguage } from "@/context/language-context";
+import { brandChipActive, brandChipInactive } from "@/lib/brand-actions";
 
-const btnBase =
-  "rounded-full border px-3.5 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm";
+const btnBase = "rounded-full px-3.5 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm";
 
 type Props = {
   value: MenuAttributeFilter;
@@ -30,7 +30,7 @@ export function MenuAttributeFilters({ value, onChange }: Props) {
   ];
 
   return (
-    <div className="rounded-2xl border border-brand-line bg-brand-card/60 p-4 sm:p-5">
+    <div className="rounded-2xl border border-brand-line bg-brand-canvas p-4 sm:p-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-subtle">{t.menu.filterLabel}</span>
         {menuFilterIsActive(value) && (
@@ -39,7 +39,7 @@ export function MenuAttributeFilters({ value, onChange }: Props) {
             onClick={() =>
               onChange({ vegan: false, vegetarian: false, spicy1: false, spicy2: false, bestseller: false, isNew: false, specialDeals: false })
             }
-            className="self-start text-xs font-medium text-brand-accent underline-offset-2 hover:underline sm:self-auto"
+            className="self-start text-xs font-medium text-brand-primary underline-offset-2 hover:underline sm:self-auto"
           >
             {t.menu.clearFilters}
           </button>
@@ -53,11 +53,7 @@ export function MenuAttributeFilters({ value, onChange }: Props) {
               key={key}
               type="button"
               onClick={() => toggle(key)}
-              className={`${btnBase} ${
-                on
-                  ? "border-brand-accent bg-brand-accent text-white shadow-sm shadow-brand-accent/20"
-                  : "border-brand-line bg-brand-canvas text-brand-ink-secondary hover:border-brand-line-strong hover:bg-brand-muted hover:text-brand-ink"
-              }`}
+              className={`${btnBase} ${on ? brandChipActive : brandChipInactive}`}
             >
               {label}
             </button>

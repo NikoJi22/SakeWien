@@ -15,8 +15,9 @@ async function requireAdmin() {
 }
 
 function resolveStoredFileFromPublicUrl(publicPath: string): string | null {
-  if (!isMenuUploadedImageUrl(publicPath)) return null;
-  const relative = publicPath.slice("/uploads/menu/".length);
+  const pathOnly = publicPath.split("?")[0] || publicPath;
+  if (!isMenuUploadedImageUrl(pathOnly)) return null;
+  const relative = pathOnly.slice("/uploads/menu/".length);
   if (!relative || relative !== path.posix.basename(relative)) return null;
   if (!/^[a-zA-Z0-9_.-]+\.webp$/.test(relative)) return null;
   const abs = path.join(UPLOAD_DIR, relative);
@@ -71,7 +72,8 @@ export async function POST(request: Request) {
   const outPath = path.join(UPLOAD_DIR, filename);
   await writeFile(outPath, webpBuffer);
 
-  const url = `/uploads/menu/${filename}`;
+  /** Gleicher Pfad bei jedem Upload — Cache-Buster damit Browser & Next/Image die neue Datei laden */
+  const url = `/uploads/menu/${filename}?v=${Date.now()}`;
   return NextResponse.json({ url });
 }
 

@@ -1,5 +1,5 @@
 const fieldInputClass =
-  "w-full rounded-lg border border-[#ccc] bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-500 focus:border-[#888] focus:shadow-[0_0_0_3px_rgba(0,0,0,0.06)]";
+  "w-full rounded-lg border border-brand-line bg-brand-card px-4 py-3 text-sm text-brand-ink outline-none transition placeholder:text-brand-subtle focus:border-brand-primary focus:shadow-[0_0_0_3px_rgba(70,95,107,0.12)]";
 
 export function Input({
   label,

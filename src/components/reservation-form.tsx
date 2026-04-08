@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useLanguage } from "@/context/language-context";
+import { brandBtnPrimary } from "@/lib/brand-actions";
 import { Input, TextArea } from "./form-fields";
 
 export function ReservationForm() {
@@ -27,7 +28,7 @@ export function ReservationForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 rounded-2xl border border-[#eeeeee] bg-white p-7 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-9"
+      className="space-y-6 rounded-2xl border border-brand-line bg-brand-card p-7 shadow-[0_1px_3px_rgba(31,35,38,0.05)] sm:p-9"
     >
       <div className="grid gap-5 md:grid-cols-2">
         <Input label={t.form.fullName} name="name" />
@@ -46,7 +47,7 @@ export function ReservationForm() {
       <TextArea label={t.form.message} name="notes" />
       <button
         type="submit"
-        className="rounded-full bg-brand-accent px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white shadow-md shadow-brand-accent/15 transition hover:bg-brand-accent-hover"
+        className={`rounded-full px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.2em] shadow-md ${brandBtnPrimary} hover:shadow-lg`}
       >
         {status === "loading" ? t.form.sending : t.form.submit}
       </button>

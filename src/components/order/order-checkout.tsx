@@ -1,12 +1,13 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useCart } from "@/context/cart-context";
 import { useGiftConfig } from "@/context/gift-config-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
 import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
+import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
 
 function nowTimeValue() {
   const d = new Date();
@@ -36,14 +37,27 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [pickupClock, setPickupClock] = useState(nowTimeValue);
   const [chopsticksCount, setChopsticksCount] = useState(0);
   const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
+  const [codeSent, setCodeSent] = useState(false);
+  const [smsInfo, setSmsInfo] = useState<string | null>(null);
   const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
-  const needsSmsVerification = fulfillment === "delivery";
+  /** SMS required for pickup and delivery */
+  const needsSmsVerification = lines.length > 0;
 
   const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
   const giftMessage = giftConfig.message[language];
   const isDrawer = variant === "drawer";
+
+  useEffect(() => {
+    if (lines.length > 0) return;
+    setPhoneVerified(false);
+    setPhone("");
+    setOtp("");
+    setCodeSent(false);
+    setSmsInfo(null);
+    setSmsError(null);
+  }, [lines.length]);
 
   function onPhoneInput(v: string) {
     setPhone(v);
@@ -51,9 +65,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     setOtp("");
     setSmsError(null);
     setSubmitError(null);
+    setCodeSent(false);
+    setSmsInfo(null);
   }
 
-  async function handleSendCode() {
+  async function requestSmsCode(): Promise<boolean> {
     setSmsError(null);
     setSendLoading(true);
     try {
@@ -76,12 +92,22 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                   ? t.order.errServerConfig
                   : t.order.errSendCode
         );
-        return;
+        return false;
       }
+      return true;
     } catch {
       setSmsError(t.order.errSendCode);
+      return false;
     } finally {
       setSendLoading(false);
+    }
+  }
+
+  async function handleResendCode() {
+    const ok = await requestSmsCode();
+    if (ok) {
+      setCodeSent(true);
+      setSmsInfo(t.order.codeSentInfo);
     }
   }
 
@@ -106,6 +132,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       }
       setPhoneVerified(true);
       setSmsError(null);
+      setSmsInfo(null);
     } catch {
       setSmsError(t.order.errVerifyCode);
       setPhoneVerified(false);
@@ -117,10 +144,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (lines.length === 0) return;
-    if (needsSmsVerification && !phoneVerified) {
-      setSubmitError(t.order.errPhoneNotVerified);
-      return;
-    }
+
     const fd = new FormData(e.currentTarget);
     const pickupRaw = fulfillment === "pickup" ? String(fd.get("pickupTime") ?? "") : "";
     const pickupTime = fulfillment === "pickup" && /^\d{2}:\d{2}$/.test(pickupRaw)
@@ -144,7 +168,29 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       setSubmitError(t.order.deliveryMinOrder);
       return;
     }
+
+    if (needsSmsVerification && !phoneVerified) {
+      const phoneTrim = phone.trim();
+      if (!phoneTrim) {
+        setSubmitError(t.order.errInvalidPhone);
+        return;
+      }
+      if (!codeSent) {
+        const ok = await requestSmsCode();
+        if (ok) {
+          setCodeSent(true);
+          setSmsInfo(t.order.codeSentInfo);
+          setSubmitError(null);
+        }
+        return;
+      }
+      setSubmitError(t.order.errPhoneNotVerified);
+      setSmsInfo(null);
+      return;
+    }
+
     setSubmitError(null);
+    setSmsInfo(null);
     setStatus("loading");
     const payload = {
       fulfillment,
@@ -214,6 +260,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       setPhoneVerified(false);
       setPhone("");
       setOtp("");
+      setCodeSent(false);
+      setSmsInfo(null);
       e.currentTarget.reset();
       if (variant === "drawer") closeCartDrawer();
     } catch {
@@ -223,62 +271,68 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   }
 
   const inputClass =
-    "w-full rounded-lg border border-[#ccc] bg-white px-4 py-3 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-500 focus:border-[#888] focus:shadow-[0_0_0_3px_rgba(0,0,0,0.06)]";
+    "w-full rounded-lg border border-brand-line bg-brand-card px-4 py-3 text-sm text-brand-ink outline-none transition placeholder:text-brand-subtle focus:border-brand-primary focus:shadow-[0_0_0_3px_rgba(70,95,107,0.12)]";
 
-  const btnOutline =
-    "rounded-full border border-brand-line bg-white px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-brand-ink-secondary transition hover:border-brand-line-strong hover:bg-brand-muted disabled:opacity-40";
+  const btnOutline = `rounded-full ${brandBtnSecondary} px-4 py-2.5 text-xs font-bold uppercase tracking-wider`;
+
+  const btnPrimary = `rounded-full ${brandBtnPrimary} font-bold uppercase shadow-md hover:shadow-lg`;
 
   const shell = isDrawer
     ? "flex flex-col rounded-b-2xl border-0 bg-transparent shadow-none"
-    : "flex flex-col rounded-2xl border border-[#f1d6b4] bg-brand-card shadow-[0_1px_3px_rgba(0,0,0,0.06)]";
+    : "flex w-full min-w-0 flex-col rounded-2xl border border-brand-line bg-brand-card shadow-[0_1px_3px_rgba(31,35,38,0.05)]";
 
   const borderB = "border-b border-brand-line";
   const labelMuted = "text-xs font-medium text-brand-subtle";
-  const sectionTitle = "font-serif text-2xl tracking-wide text-brand-ink";
-  const metaLine = "mt-1 text-base text-brand-body";
+  const sectionTitle =
+    "font-serif text-[1.65rem] font-bold leading-tight tracking-wide text-brand-ink sm:text-[1.85rem]";
+  const metaLine = "mt-2 text-sm font-medium text-brand-body sm:text-base";
   const emptyCart = "text-sm text-brand-subtle";
   const lineName = "text-brand-ink";
   const lineQty = "text-brand-faint";
   const linePrice = "shrink-0 tabular-nums font-bold text-brand-price";
   const subRowLabel = "text-brand-body";
   const subRowVal = "font-semibold tabular-nums text-brand-ink";
-  const giftBox = "rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-sm text-brand-ink-secondary";
+  const giftBox = "rounded-xl border border-brand-line bg-brand-muted/45 px-4 py-3 text-sm text-brand-ink-secondary";
   const giftTitle = "font-semibold uppercase tracking-wide text-brand-accent";
   const giftText = "mt-1 text-brand-body";
   const giftHint = "text-xs text-brand-subtle";
-  const subtotalBg = "space-y-2 border-b border-brand-line bg-brand-muted/60 px-5 py-4 sm:px-6";
-  const fulfillLabel = "mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand-subtle";
-  const toggleWrap = "grid grid-cols-2 gap-2 rounded-xl border border-brand-line bg-brand-muted p-1";
-  const toggleInactive = "rounded-lg text-brand-body transition hover:bg-white hover:text-brand-ink";
-  const toggleActive = "rounded-lg bg-brand-accent text-white shadow-sm shadow-brand-accent/15";
-  const infoBox = "rounded-xl border border-brand-line bg-brand-canvas/80 px-4 py-3 text-sm text-brand-body";
+  const subtotalBg =
+    "space-y-5 border-b border-brand-line bg-brand-canvas/90 px-5 py-6 sm:space-y-6 sm:px-6 sm:py-7";
+  const fulfillLabel = "mb-3 text-xs font-bold uppercase tracking-[0.22em] text-brand-primary";
+  const toggleWrap =
+    "grid grid-cols-2 gap-1.5 rounded-xl border border-brand-line bg-brand-canvas p-1.5 sm:gap-2 sm:p-2";
+  const toggleInactive =
+    "rounded-lg bg-transparent px-2 py-3 text-xs font-semibold uppercase tracking-wider text-brand-ink-secondary transition-all duration-200 hover:bg-brand-surface-hover hover:text-brand-primary sm:text-sm";
+  const toggleActive =
+    "rounded-lg bg-brand-primary px-2 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-brand-primary/25 ring-2 ring-brand-primary/30 ring-offset-2 ring-offset-brand-canvas sm:text-sm";
+  const infoBox = "rounded-xl border border-brand-line bg-brand-canvas/90 px-4 py-3 text-sm text-brand-body";
   const successMsg = "text-center text-sm font-medium text-brand-success";
   const errorMsg = "text-center text-sm font-medium text-brand-danger";
 
   return (
     <div id={isDrawer ? undefined : "order-checkout"} className={shell}>
       {!isDrawer && (
-        <div className={`${borderB} p-5 sm:p-6`}>
+        <div className={`${borderB} px-5 pb-7 pt-6 sm:px-7 sm:pb-8 sm:pt-7`}>
           <h2 className={sectionTitle}>{t.order.yourOrder}</h2>
-          <p className={metaLine}>
-        {itemCount} {t.order.itemsInCart} · {formatPriceEur(totalEur, language)}
-          </p>
-        </div>
-      )}
-
-      {isDrawer && (
-        <div className={`${borderB} px-1 pb-4 pt-1 sm:px-2`}>
           <p className={metaLine}>
             {itemCount} {t.order.itemsInCart} · {formatPriceEur(totalEur, language)}
           </p>
         </div>
       )}
 
-      <div className={`${borderB} p-5 sm:p-6`}>
+      {isDrawer && (
+        <div className={`${borderB} px-1 pb-5 pt-2 sm:px-2 sm:pb-6`}>
+          <p className={`${metaLine} mt-0`}>
+            {itemCount} {t.order.itemsInCart} · {formatPriceEur(totalEur, language)}
+          </p>
+        </div>
+      )}
+
+      <div className={`${borderB} px-5 py-6 sm:px-7 sm:py-8`}>
         {lines.length === 0 ? (
           <p className={emptyCart}>{t.order.emptyCart}</p>
         ) : (
-          <ul className="space-y-4">
+          <ul className="space-y-5 sm:space-y-6">
             {lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => {
               const L = labelMenuItem(item, language);
               return (
@@ -311,7 +365,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       </div>
 
       <div className={subtotalBg}>
-        <div className="space-y-3 rounded-xl border border-brand-line bg-brand-canvas/50 p-4">
+        <div className="space-y-4 rounded-xl border border-brand-primary/10 bg-brand-canvas/50 p-4 sm:p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">{t.order.cutlery}</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
@@ -348,96 +402,98 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         )}
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-1 flex-col gap-5 p-5 sm:p-6">
-        <div>
+      <form onSubmit={onSubmit} className="flex flex-1 flex-col gap-8 p-5 sm:gap-9 sm:px-7 sm:py-8">
+        <div className="space-y-3">
           <p className={fulfillLabel}>{t.order.fulfillment}</p>
           <div className={toggleWrap}>
             <button
               type="button"
               onClick={() => setFulfillment("pickup")}
-              className={`py-2.5 text-xs font-semibold uppercase tracking-wider transition sm:text-sm ${
-                fulfillment === "pickup" ? toggleActive : toggleInactive
-              }`}
+              className={fulfillment === "pickup" ? toggleActive : toggleInactive}
             >
               {t.form.pickup}
             </button>
             <button
               type="button"
               onClick={() => setFulfillment("delivery")}
-              className={`py-2.5 text-xs font-semibold uppercase tracking-wider transition sm:text-sm ${
-                fulfillment === "delivery" ? toggleActive : toggleInactive
-              }`}
+              className={fulfillment === "delivery" ? toggleActive : toggleInactive}
             >
               {t.form.delivery}
             </button>
           </div>
         </div>
 
-        {needsSmsVerification && <div className="space-y-3 rounded-xl border border-brand-line bg-brand-canvas/50 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">
-            {t.order.smsVerifyTitle}
-          </p>
-          <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
-            <span>{t.form.phone}</span>
-            <input
-              name="phone"
-              type="tel"
-              required
-              autoComplete="tel"
-              inputMode="tel"
-              placeholder={t.form.phonePlaceholder}
-              value={phone}
-              onChange={(e) => onPhoneInput(e.target.value)}
-              className={inputClass}
-              disabled={phoneVerified}
-            />
-            {!phoneVerified && <p className="text-xs leading-relaxed text-brand-subtle">{t.form.phoneHint}</p>}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => void handleSendCode()}
-              disabled={sendLoading || !phone.trim() || phoneVerified}
-              className={btnOutline}
-            >
-              {sendLoading ? t.order.codeSending : t.order.sendCode}
-            </button>
+        {needsSmsVerification && (
+          <div className="space-y-4 rounded-xl border border-brand-primary/10 bg-brand-canvas/50 p-4 sm:space-y-5 sm:p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">
+              {t.order.smsVerifyTitle}
+            </p>
+            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <span>{t.form.phone}</span>
+              <input
+                name="phone"
+                type="tel"
+                required
+                autoComplete="tel"
+                inputMode="tel"
+                placeholder={t.form.phonePlaceholder}
+                value={phone}
+                onChange={(e) => onPhoneInput(e.target.value)}
+                className={inputClass}
+                disabled={phoneVerified}
+              />
+              {!phoneVerified && <p className="text-xs leading-relaxed text-brand-subtle">{t.form.phoneHint}</p>}
+            </label>
+            {!phoneVerified && !codeSent && (
+              <p className="text-sm leading-relaxed text-brand-body">{t.order.smsVerifyHintSubmit}</p>
+            )}
+            {smsInfo && !phoneVerified && (
+              <p className="text-sm font-medium text-brand-primary">{smsInfo}</p>
+            )}
+            {!phoneVerified && codeSent && (
+              <>
+                <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+                  <span>{t.order.enterCode}</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className={inputClass}
+                    placeholder="000000"
+                  />
+                </label>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void handleVerifyCode()}
+                    disabled={verifyLoading || !otp.trim()}
+                    className={`${btnPrimary} py-2.5 text-xs tracking-wider sm:px-8`}
+                  >
+                    {verifyLoading ? t.order.codeVerifying : t.order.confirmCode}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleResendCode()}
+                    disabled={sendLoading || !phone.trim()}
+                    className={btnOutline}
+                  >
+                    {sendLoading ? t.order.codeSending : t.order.resendCode}
+                  </button>
+                </div>
+              </>
+            )}
             {phoneVerified && (
               <span className="inline-flex items-center text-sm font-medium text-brand-success">
                 ✓ {t.order.verifiedPhone}
               </span>
             )}
+            {smsError && <p className="text-sm text-brand-danger">{smsError}</p>}
           </div>
-          {!phoneVerified && (
-            <>
-              <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
-                <span>{t.order.enterCode}</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  className={inputClass}
-                  placeholder="000000"
-                />
-              </label>
-              <button
-                type="button"
-                onClick={() => void handleVerifyCode()}
-                disabled={verifyLoading || !otp.trim()}
-                className="w-full rounded-full bg-brand-accent py-2.5 text-xs font-semibold uppercase tracking-wider text-white shadow-sm shadow-brand-accent/15 transition hover:bg-brand-accent-hover disabled:opacity-40 sm:w-auto sm:px-8"
-              >
-                {verifyLoading ? t.order.codeVerifying : t.order.confirmCode}
-              </button>
-            </>
-          )}
-          {smsError && (
-          <p className="text-sm text-brand-danger">{smsError}</p>
         )}
-        </div>}
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
           <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
             <span>{t.form.fullName}</span>
             <input name="name" required className={inputClass} autoComplete="name" />
@@ -448,7 +504,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           </label>
         </div>
 
-        <div className={infoBox}>
+        <div className={`${infoBox} sm:px-5 sm:py-4`}>
           <p className="font-semibold text-current">{t.order.paymentHeading}</p>
           <p className="mt-2">
             {fulfillment === "pickup" ? t.order.paymentPickupCash : t.order.paymentDeliveryCash}
@@ -491,8 +547,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
         <button
           type="submit"
-          disabled={lines.length === 0 || status === "loading" || (needsSmsVerification && !phoneVerified) || !isDeliveryMinMet}
-          className="rounded-full bg-brand-accent py-3.5 text-sm font-semibold uppercase tracking-[0.15em] text-white shadow-md shadow-brand-accent/12 transition hover:bg-brand-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+          disabled={lines.length === 0 || status === "loading" || sendLoading || !isDeliveryMinMet}
+          className={`${btnPrimary} py-3.5 text-sm tracking-[0.15em]`}
         >
           {status === "loading" ? t.form.sending : t.order.placeOrder}
         </button>
