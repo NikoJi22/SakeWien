@@ -4,7 +4,8 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MenuItem } from "@/lib/menu-types";
 import { cartLineKey, itemRequiresLunchStarter } from "@/lib/cart-line-key";
-import { labelMenuItem } from "@/lib/menu-helpers";
+import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
+import { getDiscountedPriceEur } from "@/lib/menu-pricing";
 import { useCart } from "@/context/cart-context";
 import { useLanguage } from "@/context/language-context";
 import { MenuAllergenChips } from "@/components/menu/menu-diet-allergen";
@@ -38,6 +39,7 @@ export function OrderMenuItem({
   const { language, t } = useLanguage();
   const { quantities, addOne, removeOne } = useCart();
   const L = labelMenuItem(item, language);
+  const discountedPrice = getDiscountedPriceEur(item);
   const starterConfig = item.lunchStarterChoice;
   const needsStarter = itemRequiresLunchStarter(item);
   const [wantWasabi, setWantWasabi] = useState(false);
@@ -188,7 +190,18 @@ export function OrderMenuItem({
 
         <div className="mt-auto border-t border-brand-line pt-4">
           <div className="flex items-center justify-between gap-3">
-            <span className="shrink-0 text-xl font-bold tabular-nums text-brand-price">{L.price}</span>
+            <span className="shrink-0">
+              {discountedPrice !== null ? (
+                <span className="flex flex-col items-start">
+                  <span className="text-sm tabular-nums text-brand-subtle line-through">{L.price}</span>
+                  <span className="text-xl font-bold tabular-nums text-brand-price">
+                    {formatPriceEur(discountedPrice, language)}
+                  </span>
+                </span>
+              ) : (
+                <span className="text-xl font-bold tabular-nums text-brand-price">{L.price}</span>
+              )}
+            </span>
             <div className="flex shrink-0 items-center gap-0.5 rounded-full border-2 border-brand-line bg-brand-canvas p-0.5">
               <button
                 type="button"

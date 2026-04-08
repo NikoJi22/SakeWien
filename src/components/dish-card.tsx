@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import type { MenuItem } from "@/lib/menu-types";
-import { labelMenuItem } from "@/lib/menu-helpers";
+import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { useLanguage } from "@/context/language-context";
 import { MenuAllergenChips, MenuDietBadges } from "@/components/menu/menu-diet-allergen";
 import { isMenuUploadedImageUrl } from "@/lib/dish-image";
+import { getDiscountedPriceEur } from "@/lib/menu-pricing";
 
 function Badge({ children, className }: { children: React.ReactNode; className: string }) {
   return <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] ${className}`}>{children}</span>;
@@ -14,6 +15,7 @@ function Badge({ children, className }: { children: React.ReactNode; className: 
 export function DishCard({ item }: { item: MenuItem }) {
   const { language, t } = useLanguage();
   const L = labelMenuItem(item, language);
+  const discountedPrice = getDiscountedPriceEur(item);
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-brand-primary/[0.07] bg-brand-card shadow-[0_2px_12px_rgba(70,95,107,0.055),0_1px_3px_rgba(70,95,107,0.04)] transition-shadow duration-300 hover:border-brand-primary/12 hover:shadow-[0_10px_28px_rgba(70,95,107,0.09),0_2px_8px_rgba(70,95,107,0.045)]">
@@ -37,7 +39,18 @@ export function DishCard({ item }: { item: MenuItem }) {
       <div className="space-y-2.5 p-6 sm:p-7">
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-serif text-lg font-bold tracking-wide text-brand-ink">{L.name}</h3>
-          <span className="shrink-0 pt-0.5 text-lg font-bold tabular-nums leading-none text-brand-price sm:text-xl">{L.price}</span>
+          <span className="shrink-0 pt-0.5 tabular-nums leading-none">
+            {discountedPrice !== null ? (
+              <span className="flex flex-col items-end">
+                <span className="text-xs text-brand-subtle line-through">{L.price}</span>
+                <span className="text-lg font-bold text-brand-price sm:text-xl">
+                  {formatPriceEur(discountedPrice, language)}
+                </span>
+              </span>
+            ) : (
+              <span className="text-lg font-bold text-brand-price sm:text-xl">{L.price}</span>
+            )}
+          </span>
         </div>
         <MenuDietBadges item={item} />
         <p className="text-sm leading-relaxed text-brand-body">{L.description}</p>

@@ -41,13 +41,15 @@ export async function POST(request: Request) {
     const body = (await request.json()) as OrderBody;
     const orderPhone = normalizeToE164(String(body.phone ?? ""));
     const store = await cookies();
-    const proof = store.get(ORDER_PHONE_COOKIE)?.value;
-    const verified = parseVerifiedPhoneCookie(proof);
-    if (!verified) {
-      return NextResponse.json({ error: "phone_not_verified" }, { status: 403 });
-    }
-    if (!orderPhone || orderPhone !== verified.phoneE164) {
-      return NextResponse.json({ error: "phone_mismatch" }, { status: 403 });
+    if (body.fulfillment === "delivery") {
+      const proof = store.get(ORDER_PHONE_COOKIE)?.value;
+      const verified = parseVerifiedPhoneCookie(proof);
+      if (!verified) {
+        return NextResponse.json({ error: "phone_not_verified" }, { status: 403 });
+      }
+      if (!orderPhone || orderPhone !== verified.phoneE164) {
+        return NextResponse.json({ error: "phone_mismatch" }, { status: 403 });
+      }
     }
     if (body.fulfillment === "delivery" && Number(body.subtotalEur || 0) < DELIVERY_MIN_ORDER_EUR) {
       return NextResponse.json({ error: "delivery_min_order" }, { status: 400 });
@@ -76,7 +78,7 @@ export async function POST(request: Request) {
     const extra: string[] = [
       `Fulfillment: ${body.fulfillment}`,
       `Name: ${body.name || ""}`,
-      `Phone (SMS verified): ${orderPhone}`,
+      `Phone: ${orderPhone || "-"}`,
       `Email: ${body.email || ""}`,
       paymentLine
     ];

@@ -3,8 +3,9 @@ import { v2 as cloudinary } from "cloudinary";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
 import { cookies } from "next/headers";
 
-const MAX_BYTES = 12 * 1024 * 1024;
 export const runtime = "nodejs";
+const UPLOAD_FOLDER = "sake-menu";
+const UPLOAD_TRANSFORMATION = "c_fill,g_auto,w_1200,h_900,q_auto,f_auto";
 
 async function requireAdmin() {
   const store = await cookies();
@@ -31,65 +32,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Cloudinary error: configuration missing" }, { status: 500 });
   }
 
-  let form: FormData;
   try {
-    form = await request.formData();
-  } catch (error) {
-    console.error("[upload] Invalid form data", error);
-    return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
-  }
+    const timestamp = Math.floor(Date.now() / 1000);
+    const paramsToSign = {
+      folder: UPLOAD_FOLDER,
+      timestamp,
+      transformation: UPLOAD_TRANSFORMATION
+    };
+    const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
 
-  const file = form.get("file");
-  if (!(file instanceof Blob) || file.size === 0) {
-    return NextResponse.json({ error: "Missing file" }, { status: 400 });
-  }
-
-  if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: "Datei zu groß (max. 12 MB)." }, { status: 413 });
-  }
-
-  if (!(file.type || "").startsWith("image/")) {
-    return NextResponse.json({ error: "File must be an image" }, { status: 400 });
-  }
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret
-  });
-
-  try {
-    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder: "sake-menu",
-          resource_type: "image",
-          transformation: [
-            {
-              width: 1200,
-              height: 900,
-              crop: "fill",
-              gravity: "auto",
-              quality: "auto",
-              fetch_format: "auto"
-            }
-          ]
-        },
-        (error, uploadResult) => {
-          if (error) return reject(error);
-          if (!uploadResult?.secure_url) return reject(new Error("Missing secure_url from Cloudinary"));
-          resolve({ secure_url: uploadResult.secure_url });
-        }
-      );
-
-      stream.on("error", reject);
-      stream.end(buffer);
+    return NextResponse.json({
+      cloudName,
+      apiKey,
+      timestamp,
+      folder: UPLOAD_FOLDER,
+      transformation: UPLOAD_TRANSFORMATION,
+      signature
     });
-
-    return NextResponse.json({ secure_url: result.secure_url });
   } catch (error) {
-    console.error("[upload] Cloudinary upload failed", error);
-    return NextResponse.json({ error: "Cloudinary Fehler: Upload fehlgeschlagen." }, { status: 502 });
+    console.error("[upload] Failed to create Cloudinary signature", error);
+    return NextResponse.json({ error: "Cloudinary Fehler: Signatur konnte nicht erstellt werden." }, { status: 500 });
   }
 }

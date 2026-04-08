@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useMenuData } from "@/context/menu-data-context";
 import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey, resolveStarterOption } from "@/lib/cart-line-key";
+import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import type { LunchStarterOption, MenuItem } from "@/lib/menu-types";
 
 export type CartLine = {
@@ -91,7 +92,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         lines.push({ lineKey: key, item, quantity: qty, sushiExtras: extras });
       }
       itemCount += qty;
-      subtotalEur += item.priceEur * qty;
+      subtotalEur += getEffectivePriceEur(item) * qty;
     }
     return { lines, itemCount, subtotalEur };
   }, [quantities, itemById]);

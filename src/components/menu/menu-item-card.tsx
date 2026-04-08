@@ -3,9 +3,10 @@
 import Image from "next/image";
 import type { MenuItem } from "@/lib/menu-types";
 import { itemRequiresLunchStarter } from "@/lib/cart-line-key";
-import { labelMenuItem } from "@/lib/menu-helpers";
+import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { useLanguage } from "@/context/language-context";
 import { isMenuUploadedImageUrl } from "@/lib/dish-image";
+import { getDiscountedPriceEur } from "@/lib/menu-pricing";
 import { MenuAllergenChips, MenuDietBadges } from "./menu-diet-allergen";
 
 function Badge({ children, className }: { children: React.ReactNode; className: string }) {
@@ -21,6 +22,7 @@ type Props = {
 export function MenuItemCard({ item, variant = "default" }: Props) {
   const { language, t } = useLanguage();
   const L = labelMenuItem(item, language);
+  const discountedPrice = getDiscountedPriceEur(item);
   const spotlight = variant === "spotlight";
 
   return (
@@ -48,7 +50,16 @@ export function MenuItemCard({ item, variant = "default" }: Props) {
       <div className="space-y-3 p-6 sm:p-7">
         <div className="flex items-start justify-between gap-4">
           <h3 className="font-serif text-lg font-bold leading-snug tracking-wide text-brand-ink">{L.name}</h3>
-          <span className="shrink-0 pt-0.5 text-lg font-bold tabular-nums leading-none text-brand-price sm:text-xl">{L.price}</span>
+          <span className="shrink-0 pt-0.5 tabular-nums leading-none">
+            {discountedPrice !== null ? (
+              <span className="flex flex-col items-end">
+                <span className="text-xs text-brand-subtle line-through">{L.price}</span>
+                <span className="text-lg font-bold text-brand-price sm:text-xl">{formatPriceEur(discountedPrice, language)}</span>
+              </span>
+            ) : (
+              <span className="text-lg font-bold text-brand-price sm:text-xl">{L.price}</span>
+            )}
+          </span>
         </div>
         <MenuDietBadges item={item} />
         <p className="text-sm leading-relaxed text-brand-body">{L.description}</p>

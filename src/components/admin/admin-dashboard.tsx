@@ -1034,8 +1034,9 @@ export function AdminDashboard() {
                                         value={item.specialDealLabel ?? ""}
                                         onChange={(e) => setItemField(ci, ii, "specialDealLabel", e.target.value)}
                                         className={adminInputClass}
-                                        placeholder="z. B. -10% / Lunch Deal"
+                                        placeholder="z. B. -10% oder -1€"
                                       />
+                                      <p className="mt-1 text-[11px] text-neutral-500">Unterstützt: -10% oder -1€</p>
                                     </AdminField>
                                   </div>
                                 )}

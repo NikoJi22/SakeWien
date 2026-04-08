@@ -58,10 +58,6 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
       setError("Bitte eine Bilddatei wählen (z. B. JPG oder PNG).");
       return;
     }
-    if (file.size > 12 * 1024 * 1024) {
-      setError("Die Datei ist zu groß (max. 12 MB).");
-      return;
-    }
     if (sourceUrl?.startsWith("blob:")) URL.revokeObjectURL(sourceUrl);
     const url = URL.createObjectURL(file);
     setSourceUrl(url);
@@ -104,28 +100,54 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
     setError("");
     try {
       const blob = await getCroppedImageBlob(sourceUrl, pixels);
-      const form = new FormData();
-      form.set("file", blob, `${itemId || "dish"}-crop.png`);
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const data = (await res.json().catch(() => ({}))) as { secure_url?: string; error?: string };
-      if (!res.ok) {
-        if (res.status === 413) {
-          setError("Datei zu groß (max. 12 MB).");
-        } else if (typeof data.error === "string" && data.error.toLowerCase().includes("cloudinary")) {
-          setError(data.error);
-        } else {
-          setError(typeof data.error === "string" ? data.error : "Upload fehlgeschlagen.");
-        }
+      const sigRes = await fetch("/api/upload", { method: "POST" });
+      const sigData = (await sigRes.json().catch(() => ({}))) as {
+        cloudName?: string;
+        apiKey?: string;
+        timestamp?: number;
+        folder?: string;
+        transformation?: string;
+        signature?: string;
+        error?: string;
+      };
+      if (!sigRes.ok) {
+        setError(typeof sigData.error === "string" ? sigData.error : "Cloudinary Fehler: Upload fehlgeschlagen.");
         return;
       }
-      if (typeof data.secure_url !== "string") {
-        setError("Unerwartete Antwort vom Server.");
+      const { cloudName, apiKey, timestamp, folder, transformation, signature } = sigData;
+      if (!cloudName || !apiKey || !timestamp || !folder || !transformation || !signature) {
+        setError("Cloudinary Fehler: ungültige Signaturdaten.");
+        return;
+      }
+
+      const uploadForm = new FormData();
+      uploadForm.set("file", blob, `${itemId || "dish"}-crop.png`);
+      uploadForm.set("api_key", apiKey);
+      uploadForm.set("timestamp", String(timestamp));
+      uploadForm.set("folder", folder);
+      uploadForm.set("transformation", transformation);
+      uploadForm.set("signature", signature);
+
+      const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: uploadForm
+      });
+      const uploadData = (await uploadRes.json().catch(() => ({}))) as {
+        secure_url?: string;
+        error?: { message?: string };
+      };
+      if (!uploadRes.ok) {
+        setError(uploadData.error?.message ? `Cloudinary Fehler: ${uploadData.error.message}` : "Upload fehlgeschlagen.");
+        return;
+      }
+      if (typeof uploadData.secure_url !== "string") {
+        setError("Unerwartete Antwort von Cloudinary.");
         return;
       }
       if (sourceUrl.startsWith("blob:")) URL.revokeObjectURL(sourceUrl);
       setSourceUrl(null);
       setEditorOpen(false);
-      onChange(data.secure_url);
+      onChange(uploadData.secure_url);
       setPreviewNonce((n) => n + 1);
     } catch {
       setError("Netzwerkfehler beim Upload. Bitte erneut versuchen.");

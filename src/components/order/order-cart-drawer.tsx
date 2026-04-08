@@ -22,7 +22,7 @@ export function OrderCartDrawer() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[110] lg:hidden" role="presentation">
+    <div className="fixed inset-0 z-[110] overflow-x-hidden touch-pan-y lg:hidden" role="presentation">
       <button
         type="button"
         className="absolute inset-0 bg-[rgba(70,95,107,0.22)]"
@@ -30,7 +30,7 @@ export function OrderCartDrawer() {
         onClick={close}
       />
       <div
-        className="absolute bottom-0 left-0 right-0 flex max-h-[min(92dvh,920px)] flex-col rounded-t-[1.25rem] border border-brand-line border-b-0 bg-brand-card shadow-[0_-12px_48px_rgba(31,35,38,0.08)]"
+        className="absolute bottom-0 left-0 right-0 flex max-h-[min(92dvh,920px)] flex-col overflow-x-hidden rounded-t-[1.25rem] border border-brand-line border-b-0 bg-brand-card shadow-[0_-12px_48px_rgba(31,35,38,0.08)] touch-pan-y"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -50,7 +50,7 @@ export function OrderCartDrawer() {
             </svg>
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 sm:px-5">
+        <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 touch-pan-y sm:px-5">
           <OrderCheckout variant="drawer" />
         </div>
       </div>

@@ -6,6 +6,7 @@ import { useGiftConfig } from "@/context/gift-config-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
 import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
+import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
 
@@ -42,8 +43,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
-  /** SMS required for pickup and delivery */
-  const needsSmsVerification = lines.length > 0;
+  /** SMS required only for delivery */
+  const needsSmsVerification = fulfillment === "delivery";
 
   const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
   const giftMessage = giftConfig.message[language];
@@ -175,15 +176,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         setSubmitError(t.order.errInvalidPhone);
         return;
       }
-      if (!codeSent) {
-        const ok = await requestSmsCode();
-        if (ok) {
-          setCodeSent(true);
-          setSmsInfo(t.order.codeSentInfo);
-          setSubmitError(null);
-        }
-        return;
-      }
       setSubmitError(t.order.errPhoneNotVerified);
       setSmsInfo(null);
       return;
@@ -224,8 +216,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
             : ""
         }`,
         quantity,
-        unitPriceEur: item.priceEur,
-        lineTotalEur: item.priceEur * quantity
+        unitPriceEur: getEffectivePriceEur(item),
+        lineTotalEur: getEffectivePriceEur(item) * quantity
       }))
     };
 
@@ -356,7 +348,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                     )}
                     <span className={lineQty}> × {quantity}</span>
                   </span>
-                  <span className={linePrice}>{formatPriceEur(item.priceEur * quantity, language)}</span>
+                  <span className={linePrice}>{formatPriceEur(getEffectivePriceEur(item) * quantity, language)}</span>
                 </li>
               );
             })}
@@ -445,7 +437,19 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
               {!phoneVerified && <p className="text-xs leading-relaxed text-brand-subtle">{t.form.phoneHint}</p>}
             </label>
             {!phoneVerified && !codeSent && (
-              <p className="text-sm leading-relaxed text-brand-body">{t.order.smsVerifyHintSubmit}</p>
+              <>
+                <p className="text-sm leading-relaxed text-brand-body">{t.order.smsVerifyHintSubmit}</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void handleResendCode()}
+                    disabled={sendLoading || !phone.trim()}
+                    className={`${btnPrimary} py-2.5 text-xs tracking-wider sm:px-8`}
+                  >
+                    {sendLoading ? t.order.codeSending : t.order.sendCode}
+                  </button>
+                </div>
+              </>
             )}
             {smsInfo && !phoneVerified && (
               <p className="text-sm font-medium text-brand-primary">{smsInfo}</p>
@@ -547,12 +551,21 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
         <button
           type="submit"
-          disabled={lines.length === 0 || status === "loading" || sendLoading || !isDeliveryMinMet}
+          disabled={
+            lines.length === 0 ||
+            status === "loading" ||
+            sendLoading ||
+            !isDeliveryMinMet ||
+            (needsSmsVerification && !phoneVerified)
+          }
           className={`${btnPrimary} py-3.5 text-sm tracking-[0.15em]`}
         >
           {status === "loading" ? t.form.sending : t.order.placeOrder}
         </button>
 
+        {needsSmsVerification && !phoneVerified && (
+          <p className="text-sm text-brand-subtle">Bitte zuerst Telefonnummer per SMS-Code verifizieren.</p>
+        )}
         {submitError && <p className={errorMsg}>{submitError}</p>}
         {status === "success" && <p className={successMsg}>{t.form.success}</p>}
       </form>
