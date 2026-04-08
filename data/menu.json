@@ -36,7 +36,7 @@
           "en": "Lightly spicy, aromatic."
         },
         "priceEur": 4.5,
-        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "image": "https://res.cloudinary.com/dlats4nsx/image/upload/v1775646836/sake-menu/rlvxee3ykkl5pq44djv0.jpg",
         "allergens": [
           "A",
           "C",
@@ -1574,6 +1574,759 @@
           "A"
         ],
         "vegetarian": true,
+        "spicyLevel": 0
+      }
+    ]
+  },
+  {
+    "id": "lunch",
+    "title": {
+      "en": "Lunch menu (Mon–Fri 11:00–15:00)\n(Starter: miso soup / sweet & sour soup / mini spring rolls)",
+      "de": "Mittagsmenü (Mo–Fr 11:00–15:00)\n(Vorspeise: Miso Suppe / Süßsauer Suppe / Mini Frühlingsrollen)"
+    },
+    "items": [
+      {
+        "id": "m1",
+        "name": {
+          "de": "M1 Wok Gemüse mit Reis",
+          "en": "M1 Wok vegetables with rice"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "vegetarian": true,
+        "vegan": true,
+        "spicyLevel": 0
+      },
+      {
+        "id": "m2",
+        "name": {
+          "de": "M2 Wok Chicken mit Reis",
+          "en": "M2 Wok chicken with rice"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m3",
+        "name": {
+          "de": "M3 Wok Rindfleisch mit Reis",
+          "en": "M3 Wok beef with rice"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m4",
+        "name": {
+          "de": "M4 Wok Ente mit Teriyaki und Reis",
+          "en": "M4 Wok duck with teriyaki and rice"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m5",
+        "name": {
+          "de": "M5 Eierreis mit Hühnerfleisch",
+          "en": "M5 Egg fried rice with chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m6",
+        "name": {
+          "de": "M6 Gebratene Nudeln mit Hühnerfleisch",
+          "en": "M6 Fried noodles with chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m7",
+        "name": {
+          "de": "M7 Eierreis mit Lachs",
+          "en": "M7 Egg fried rice with salmon"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m8",
+        "name": {
+          "de": "M8 Gebratene Nudeln mit Lachs",
+          "en": "M8 Fried noodles with salmon"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m9",
+        "name": {
+          "de": "M9 Lachs Teriyaki mit Gemüse",
+          "en": "M9 Salmon teriyaki with vegetables"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m10",
+        "name": {
+          "de": "M10 Sushi Set klein (6 Nigiri, 3 Maki)",
+          "en": "M10 Small sushi set (6 nigiri, 3 maki)"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "isBestseller": true,
+        "spicyLevel": 0
+      },
+      {
+        "id": "m11",
+        "name": {
+          "de": "M11 Vietn. Basilikum Chicken",
+          "en": "M11 Vietnamese basil chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G",
+          "N"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicy": true,
+        "spicyLevel": 1
+      },
+      {
+        "id": "m12",
+        "name": {
+          "de": "M12 Maki Mix",
+          "en": "M12 Maki mix"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "isNew": true,
+        "spicyLevel": 0
+      },
+      {
+        "id": "m13",
+        "name": {
+          "de": "M13 Eierreis mit Gemüse & knusprigem Huhn",
+          "en": "M13 Egg fried rice with vegetables & crispy chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m14",
+        "name": {
+          "de": "M14 Nudeln mit Gemüse & knusprigem Huhn",
+          "en": "M14 Noodles with vegetables & crispy chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicyLevel": 0
+      },
+      {
+        "id": "m15",
+        "name": {
+          "de": "M15 Knuspriges Huhn",
+          "en": "M15 Crispy chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "F",
+          "G"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "isNew": true,
         "spicyLevel": 0
       }
     ]

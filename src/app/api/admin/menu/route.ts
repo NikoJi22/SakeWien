@@ -69,7 +69,8 @@ export async function POST(request: Request) {
   let body: unknown;
   try {
     body = await request.json();
-  } catch {
+  } catch (error) {
+    console.error("[admin/menu] Invalid JSON payload", error);
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -93,30 +94,41 @@ export async function POST(request: Request) {
           return NextResponse.json({ error: `Invalid allergens for item ${item.id}` }, { status: 400 });
         }
       }
+      if (typeof item.image !== "string" || !/^https?:\/\//i.test(item.image)) {
+        return NextResponse.json({ error: `Invalid image URL for item ${item.id}` }, { status: 400 });
+      }
     }
   }
 
-  const sanitized = body.map((cat) => ({
-    ...cat,
-    items: cat.items.map((item) => {
-      const mi = item as MenuItem;
-      const allergens = mi.allergens?.length ? normalizeAllergenCodes(mi.allergens) : undefined;
-      const lunchStarterChoice = sanitizeLunchStarterChoice(mi.lunchStarterChoice);
-      const spicyLevel =
-        mi.spicyLevel === 2 || mi.spicyLevel === 1 || mi.spicyLevel === 0
-          ? mi.spicyLevel
-          : mi.spicy
-            ? 1
-            : 0;
-      return {
-        ...mi,
-        ...(allergens?.length ? { allergens } : { allergens: undefined }),
-        spicyLevel,
-        lunchStarterChoice
-      };
-    })
-  }));
+  try {
+    const sanitized = body.map((cat) => ({
+      ...cat,
+      items: cat.items.map((item) => {
+        const mi = item as MenuItem;
+        const allergens = mi.allergens?.length ? normalizeAllergenCodes(mi.allergens) : undefined;
+        const lunchStarterChoice = sanitizeLunchStarterChoice(mi.lunchStarterChoice);
+        const spicyLevel =
+          mi.spicyLevel === 2 || mi.spicyLevel === 1 || mi.spicyLevel === 0
+            ? mi.spicyLevel
+            : mi.spicy
+              ? 1
+              : 0;
+        return {
+          ...mi,
+          ...(allergens?.length ? { allergens } : { allergens: undefined }),
+          spicyLevel,
+          lunchStarterChoice
+        };
+      })
+    }));
 
-  await writeMenuToDisk(sanitized);
-  return NextResponse.json({ ok: true });
+    await writeMenuToDisk(sanitized);
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[admin/menu] Failed to persist menu", error);
+    return NextResponse.json(
+      { error: "Write failed while saving menu. Check server logs for details." },
+      { status: 500 }
+    );
+  }
 }

@@ -11,6 +11,7 @@ import { DishImageField } from "./dish-image-field";
 
 const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
 const DRAG_PAYLOAD_TYPE = "application/x-sake-menu-item";
+const CATEGORY_DRAG_PAYLOAD_TYPE = "application/x-sake-menu-category";
 
 function cloneMenu(c: MenuCategory[]): MenuCategory[] {
   return JSON.parse(JSON.stringify(c)) as MenuCategory[];
@@ -22,6 +23,18 @@ function reorderItemsByBeforeIndex(items: MenuItem[], fromIndex: number, beforeI
   if (fromIndex < 0 || fromIndex >= n || beforeIndex < 0 || beforeIndex > n) return items;
   if (beforeIndex === fromIndex) return items;
   const copy = [...items];
+  const [removed] = copy.splice(fromIndex, 1);
+  let insertAt = beforeIndex;
+  if (fromIndex < beforeIndex) insertAt = beforeIndex - 1;
+  copy.splice(insertAt, 0, removed);
+  return copy;
+}
+
+function reorderCategoriesByBeforeIndex(list: MenuCategory[], fromIndex: number, beforeIndex: number): MenuCategory[] {
+  const n = list.length;
+  if (fromIndex < 0 || fromIndex >= n || beforeIndex < 0 || beforeIndex > n) return list;
+  if (beforeIndex === fromIndex) return list;
+  const copy = [...list];
   const [removed] = copy.splice(fromIndex, 1);
   let insertAt = beforeIndex;
   if (fromIndex < beforeIndex) insertAt = beforeIndex - 1;
@@ -90,6 +103,8 @@ export function AdminDashboard() {
   const [newDishAtTop, setNewDishAtTop] = useState(false);
   const [dragging, setDragging] = useState<{ catIndex: number; itemIndex: number } | null>(null);
   const [dragOverBefore, setDragOverBefore] = useState<{ catIndex: number; beforeIndex: number } | null>(null);
+  const [draggingCategoryIndex, setDraggingCategoryIndex] = useState<number | null>(null);
+  const [dragOverCategoryBeforeIndex, setDragOverCategoryBeforeIndex] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -174,11 +189,22 @@ export function AdminDashboard() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setMenuStatus(typeof data.error === "string" ? data.error : "Save failed");
+        if (res.status === 400) {
+          setMenuStatus(typeof data.error === "string" ? `Validierungsfehler: ${data.error}` : "Validierungsfehler.");
+        } else if (res.status === 401) {
+          setMenuStatus("Nicht autorisiert. Bitte neu einloggen.");
+        } else if (res.status >= 500) {
+          setMenuStatus(typeof data.error === "string" ? `Schreibfehler: ${data.error}` : "Schreibfehler auf dem Server.");
+        } else {
+          setMenuStatus(typeof data.error === "string" ? data.error : "Save failed");
+        }
         return;
       }
       setMenuStatus("Menu saved.");
       window.dispatchEvent(new Event("sake-menu-updated"));
+    } catch (error) {
+      console.error("[admin] Save menu network error", error);
+      setMenuStatus("Netzwerkfehler beim Speichern.");
     } finally {
       setSavingMenu(false);
     }
@@ -305,6 +331,20 @@ export function AdminDashboard() {
       next[catIndex].items = reorderItemsByBeforeIndex(items, fromIndex, beforeIndex);
       return next;
     });
+  }
+
+  function reorderCategories(fromIndex: number, beforeIndex: number) {
+    setCategories((prev) => reorderCategoriesByBeforeIndex(prev, fromIndex, beforeIndex));
+  }
+
+  function moveCategoryUp(catIndex: number) {
+    if (catIndex <= 0) return;
+    reorderCategories(catIndex, catIndex - 1);
+  }
+
+  function moveCategoryDown(catIndex: number) {
+    if (catIndex >= categories.length - 1) return;
+    reorderCategories(catIndex, catIndex + 2);
   }
 
   function moveItemUp(catIndex: number, itemIndex: number) {
@@ -617,13 +657,103 @@ export function AdminDashboard() {
                 <section
                   key={cat.id}
                   id={`admin-cat-${cat.id}`}
-                  className="scroll-mt-28 overflow-hidden rounded-2xl border border-[#eeeeee] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                  onDragOver={
+                    !q
+                      ? (e) => {
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = "move";
+                          setDragOverCategoryBeforeIndex(ci);
+                        }
+                      : undefined
+                  }
+                  onDragLeave={
+                    !q
+                      ? (e) => {
+                          const related = e.relatedTarget as Node | null;
+                          if (related && e.currentTarget.contains(related)) return;
+                          setDragOverCategoryBeforeIndex(null);
+                        }
+                      : undefined
+                  }
+                  onDrop={
+                    !q
+                      ? (e) => {
+                          e.preventDefault();
+                          const raw = e.dataTransfer.getData(CATEGORY_DRAG_PAYLOAD_TYPE);
+                          if (!raw) return;
+                          try {
+                            const payload = JSON.parse(raw) as { categoryIndex?: number };
+                            if (typeof payload.categoryIndex !== "number") return;
+                            reorderCategories(payload.categoryIndex, ci);
+                            setDraggingCategoryIndex(null);
+                            setDragOverCategoryBeforeIndex(null);
+                          } catch {
+                            /* ignore invalid payload */
+                          }
+                        }
+                      : undefined
+                  }
+                  className={`scroll-mt-28 overflow-hidden rounded-2xl border border-[#eeeeee] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] ${
+                    !q && dragOverCategoryBeforeIndex === ci ? "ring-2 ring-gold/40 ring-offset-2 ring-offset-neutral-50" : ""
+                  } ${draggingCategoryIndex === ci ? "opacity-70" : ""}`}
                 >
                   <button
                     type="button"
                     onClick={() => toggleCat(cat.id)}
                     className="flex w-full items-center gap-3 border-b border-[#eeeeee] bg-neutral-50/80 px-4 py-4 text-left transition hover:bg-neutral-100 sm:px-5"
                   >
+                    {!q && (
+                      <span className="flex shrink-0 items-stretch gap-0.5 rounded-lg border border-[#e8e8e8] bg-white p-0.5 shadow-sm">
+                        <span
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData(CATEGORY_DRAG_PAYLOAD_TYPE, JSON.stringify({ categoryIndex: ci }));
+                            e.dataTransfer.effectAllowed = "move";
+                            setDraggingCategoryIndex(ci);
+                          }}
+                          onDragEnd={() => {
+                            setDraggingCategoryIndex(null);
+                            setDragOverCategoryBeforeIndex(null);
+                          }}
+                          onClick={(e) => e.preventDefault()}
+                          className="flex cursor-grab touch-none flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-neutral-400 active:cursor-grabbing"
+                          aria-label="Kategorie ziehen, um die Reihenfolge zu ändern"
+                          title="Kategorie ziehen"
+                        >
+                          <span className="h-0.5 w-4 rounded-full bg-current" />
+                          <span className="h-0.5 w-4 rounded-full bg-current" />
+                          <span className="h-0.5 w-4 rounded-full bg-current" />
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            moveCategoryUp(ci);
+                          }}
+                          disabled={ci <= 0}
+                          className="min-w-[2rem] rounded-md px-1 py-1 text-sm text-neutral-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30"
+                          aria-label="Kategorie nach oben"
+                          title="Kategorie nach oben"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            moveCategoryDown(ci);
+                          }}
+                          disabled={ci >= categories.length - 1}
+                          className="min-w-[2rem] rounded-md px-1 py-1 text-sm text-neutral-600 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-30"
+                          aria-label="Kategorie nach unten"
+                          title="Kategorie nach unten"
+                        >
+                          ↓
+                        </button>
+                      </span>
+                    )}
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#ccc] text-amber-800">
                       {open ? "−" : "+"}
                     </span>
@@ -1057,6 +1187,41 @@ export function AdminDashboard() {
                 </section>
               );
             })}
+            {!search.trim() && categories.length > 0 && (
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = "move";
+                  setDragOverCategoryBeforeIndex(categories.length);
+                }}
+                onDragLeave={(e) => {
+                  const related = e.relatedTarget as Node | null;
+                  if (related && e.currentTarget.contains(related)) return;
+                  setDragOverCategoryBeforeIndex(null);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const raw = e.dataTransfer.getData(CATEGORY_DRAG_PAYLOAD_TYPE);
+                  if (!raw) return;
+                  try {
+                    const payload = JSON.parse(raw) as { categoryIndex?: number };
+                    if (typeof payload.categoryIndex !== "number") return;
+                    reorderCategories(payload.categoryIndex, categories.length);
+                    setDraggingCategoryIndex(null);
+                    setDragOverCategoryBeforeIndex(null);
+                  } catch {
+                    /* ignore invalid payload */
+                  }
+                }}
+                className={`flex min-h-[2.25rem] items-center justify-center rounded-lg border border-dashed px-3 text-center text-[10px] font-medium uppercase tracking-wider transition-colors ${
+                  dragOverCategoryBeforeIndex === categories.length
+                    ? "border-gold/50 bg-gold/10 text-gold"
+                    : "border-[#ddd] text-neutral-400"
+                } ${draggingCategoryIndex !== null ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+              >
+                Ziel für Kategorie „ganz unten“
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center border-t border-[#eeeeee] pt-8">
