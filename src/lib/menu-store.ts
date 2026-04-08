@@ -34,6 +34,7 @@ async function writeJsonToBlob(pathname: string, data: unknown): Promise<void> {
   await put(pathname, JSON.stringify(data, null, 2), {
     token: getBlobToken(),
     access: "public",
+    allowOverwrite: true,
     addRandomSuffix: false,
     contentType: "application/json"
   });
