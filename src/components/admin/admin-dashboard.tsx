@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
-import { DEFAULT_DISH_PLACEHOLDER_IMAGE, isMenuUploadedImageUrl } from "@/lib/dish-image";
+import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 import { DishImageField } from "./dish-image-field";
 
@@ -250,11 +250,6 @@ export function AdminDashboard() {
     if (!confirm("Delete this dish?")) return;
     setCategories((prev) => {
       const next = cloneMenu(prev);
-      const removed = next[catIndex].items[itemIndex];
-      const img = removed?.image?.split("?")[0] ?? "";
-      if (removed && isMenuUploadedImageUrl(img)) {
-        void fetch(`/api/admin/menu-item-image?url=${encodeURIComponent(img)}`, { method: "DELETE" });
-      }
       next[catIndex].items.splice(itemIndex, 1);
       return next;
     });

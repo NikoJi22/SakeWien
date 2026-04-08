@@ -37,6 +37,7 @@ type TranslationSchema = {
     filterNew: string;
     filterSpecialDeals: string;
     clearFilters: string;
+    lunchHoursHint: string;
     allergensShort: string;
     allergenLegendTitle: string;
     allergenLegendHint: string;
@@ -199,6 +200,7 @@ export const translations: Record<Language, TranslationSchema> = {
       filterNew: "New",
       filterSpecialDeals: "Special deals",
       clearFilters: "Clear all",
+      lunchHoursHint: "Lunch menu daily 11:00-15:00 (Vienna time).",
       allergensShort: "Allergens",
       allergenLegendTitle: "Allergen key",
       allergenLegendHint: "According to EU regulation — codes on dishes refer to the following allergens.",
@@ -358,6 +360,7 @@ export const translations: Record<Language, TranslationSchema> = {
       filterNew: "Neu",
       filterSpecialDeals: "Aktionen",
       clearFilters: "Alle zurücksetzen",
+      lunchHoursHint: "Mittagsmenü täglich 11:00-15:00 Uhr (Wiener Zeit).",
       allergensShort: "Allergene",
       allergenLegendTitle: "Allergenkennzeichnung",
       allergenLegendHint: "Gemäß EU-Verordnung — die Codes bei den Gerichten beziehen sich auf folgende Allergene.",

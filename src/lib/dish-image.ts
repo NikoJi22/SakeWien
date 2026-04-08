@@ -8,11 +8,18 @@ export const DISH_IMAGE_ASPECT = 4 / 3;
 /** Max width after processing on the server (height follows aspect). */
 export const DISH_IMAGE_MAX_WIDTH = 1200;
 
-const UPLOAD_URL_PREFIX = "/uploads/menu/";
+const LOCAL_UPLOAD_URL_PREFIX = "/uploads/menu/";
+const CLOUDINARY_HOST = "res.cloudinary.com";
 
 export function isMenuUploadedImageUrl(url: string): boolean {
   const pathOnly = url.split("?")[0] || url;
-  return pathOnly.startsWith(UPLOAD_URL_PREFIX);
+  if (pathOnly.startsWith(LOCAL_UPLOAD_URL_PREFIX)) return true;
+  try {
+    const parsed = new URL(pathOnly);
+    return parsed.hostname === CLOUDINARY_HOST;
+  } catch {
+    return false;
+  }
 }
 
 /** True when the URL is the built-in placeholder (ignores query string). */
@@ -22,7 +29,3 @@ export function isDefaultDishPlaceholderUrl(url: string): boolean {
   return u === d;
 }
 
-/** Safe filename stem from menu item id (no path segments). */
-export function dishImageFileStem(itemId: string): string {
-  return itemId.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 120) || "dish";
-}

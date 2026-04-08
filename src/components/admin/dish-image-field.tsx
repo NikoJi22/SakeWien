@@ -105,25 +105,30 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
     try {
       const blob = await getCroppedImageBlob(sourceUrl, pixels);
       const form = new FormData();
-      form.set("itemId", itemId);
-      form.set("image", blob, "dish-crop.png");
-      const res = await fetch("/api/admin/menu-item-image", { method: "POST", body: form });
-      const data = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+      form.set("file", blob, `${itemId || "dish"}-crop.png`);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = (await res.json().catch(() => ({}))) as { secure_url?: string; error?: string };
       if (!res.ok) {
-        setError(typeof data.error === "string" ? data.error : "Upload fehlgeschlagen.");
+        if (res.status === 413) {
+          setError("Datei zu groß (max. 12 MB).");
+        } else if (typeof data.error === "string" && data.error.toLowerCase().includes("cloudinary")) {
+          setError(data.error);
+        } else {
+          setError(typeof data.error === "string" ? data.error : "Upload fehlgeschlagen.");
+        }
         return;
       }
-      if (typeof data.url !== "string") {
+      if (typeof data.secure_url !== "string") {
         setError("Unerwartete Antwort vom Server.");
         return;
       }
       if (sourceUrl.startsWith("blob:")) URL.revokeObjectURL(sourceUrl);
       setSourceUrl(null);
       setEditorOpen(false);
-      onChange(data.url);
+      onChange(data.secure_url);
       setPreviewNonce((n) => n + 1);
     } catch {
-      setError("Upload fehlgeschlagen. Bitte erneut versuchen.");
+      setError("Netzwerkfehler beim Upload. Bitte erneut versuchen.");
     } finally {
       setBusy(false);
     }
@@ -133,18 +138,7 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
     if (!isMenuUploadedImageUrl(imageUrl.split("?")[0] || imageUrl)) return;
     if (!window.confirm("Eigenes Bild entfernen und wieder den Platzhalter nutzen?")) return;
     setError("");
-    const base = imageUrl.split("?")[0] || imageUrl;
-    try {
-      const res = await fetch(`/api/admin/menu-item-image?url=${encodeURIComponent(base)}`, { method: "DELETE" });
-      if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as { error?: string };
-        setError(typeof data.error === "string" ? data.error : "Löschen fehlgeschlagen.");
-        return;
-      }
-      onChange(DEFAULT_DISH_PLACEHOLDER_IMAGE);
-    } catch {
-      setError("Löschen fehlgeschlagen.");
-    }
+    onChange(DEFAULT_DISH_PLACEHOLDER_IMAGE);
   }
 
   const hasCustomUpload = isMenuUploadedImageUrl(imageUrl.split("?")[0] || imageUrl);
@@ -211,8 +205,8 @@ export function DishImageField({ itemId, imageUrl, onChange }: Props) {
               ) : null}
             </div>
             <p className="text-[11px] text-neutral-500">
-              Nach dem Speichern des Menüs bleibt das Bild dauerhaft erhalten. JPG/PNG/WebP werden automatisch als optimiertes WebP
-              gespeichert.
+              Nach dem Speichern des Menüs bleibt das Bild dauerhaft erhalten. Uploads werden automatisch auf 1200x900 (4:3)
+              vereinheitlicht.
             </p>
             {error ? <p className="text-xs text-red-600">{error}</p> : null}
           </div>

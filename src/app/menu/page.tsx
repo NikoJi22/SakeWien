@@ -46,6 +46,7 @@ export default function MenuPage() {
             {t.page.bestsellersTitle}
           </Link>
         </div>
+        <p className="mb-6 text-xs text-brand-subtle sm:mb-8">{t.menu.lunchHoursHint}</p>
         <div className="mb-6 space-y-4 sm:mb-8">
           <MenuAttributeFilters value={filter} onChange={setFilter} />
           <MenuAllergenLegend />
