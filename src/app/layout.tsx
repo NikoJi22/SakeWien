@@ -8,6 +8,7 @@ import { OrderCartDrawerProvider } from "@/context/order-cart-drawer-context";
 import { SiteContentProvider } from "@/context/site-content-context";
 import { ConditionalNav } from "@/components/conditional-nav";
 import { ConditionalFooter } from "@/components/conditional-footer";
+import { MobileLanguageSwitcher } from "@/components/mobile-language-switcher";
 
 const fontSerif = Cormorant_Garamond({
   subsets: ["latin"],
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <ConditionalNav />
                   <main className="min-h-screen">{children}</main>
                   <ConditionalFooter />
+                  <MobileLanguageSwitcher />
                 </SiteContentProvider>
               </GiftConfigProvider>
             </MenuDataProvider>

@@ -17,7 +17,7 @@ export function PageHeader({ title, subtitle, eyebrow = "SAKE · Vienna", varian
     >
       <div className="mx-auto max-w-[min(100%,1520px)] px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
         <p
-          className={`mb-3 text-[10px] font-semibold uppercase tracking-[0.35em] ${isLight ? "text-brand-accent" : "text-gold/90"}`}
+          className={`mb-3 text-[10px] font-semibold uppercase tracking-[0.35em] ${isLight ? "text-brand-accent" : "text-brand-primary"}`}
         >
           {eyebrow}
         </p>

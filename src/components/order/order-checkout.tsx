@@ -17,6 +17,13 @@ function nowTimeValue() {
   return `${hh}:${mm}`;
 }
 
+function parseNonNegativeCount(raw: string): number {
+  if (!raw.trim()) return 0;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.floor(n);
+}
+
 type OrderCheckoutProps = {
   variant?: "sidebar" | "drawer";
 };
@@ -36,11 +43,13 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [smsError, setSmsError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pickupClock, setPickupClock] = useState(nowTimeValue);
-  const [chopsticksCount, setChopsticksCount] = useState(0);
-  const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
+  const [chopsticksCount, setChopsticksCount] = useState("0");
+  const [woodenCutleryCount, setWoodenCutleryCount] = useState("0");
   const [codeSent, setCodeSent] = useState(false);
   const [smsInfo, setSmsInfo] = useState<string | null>(null);
-  const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
+  const chopsticksCountNum = parseNonNegativeCount(chopsticksCount);
+  const woodenCutleryCountNum = parseNonNegativeCount(woodenCutleryCount);
+  const cutleryFeeEur = (chopsticksCountNum + woodenCutleryCountNum) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
   /** SMS required only for delivery */
@@ -198,8 +207,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       giftEligible: giftUnlocked,
       giftMessage: giftUnlocked ? giftMessage : "",
       cutlery:
-        chopsticksCount + woodenCutleryCount > 0
-          ? { chopsticksCount, woodenCutleryCount, unitPriceEur: 0.1, totalEur: cutleryFeeEur }
+        chopsticksCountNum + woodenCutleryCountNum > 0
+          ? { chopsticksCount: chopsticksCountNum, woodenCutleryCount: woodenCutleryCountNum, unitPriceEur: 0.1, totalEur: cutleryFeeEur }
           : null,
       lines: lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => ({
         id: lineKey,
@@ -362,11 +371,25 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <div className="grid gap-3 sm:grid-cols-2">
             <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
               <span>{t.order.chopsticks}</span>
-              <input type="number" min={0} value={chopsticksCount} onChange={(e) => setChopsticksCount(Number(e.target.value) || 0)} className={inputClass} placeholder={t.order.cutleryCount} />
+              <input
+                type="number"
+                min={0}
+                value={chopsticksCount}
+                onChange={(e) => setChopsticksCount(e.target.value)}
+                className={inputClass}
+                placeholder={t.order.cutleryCount}
+              />
             </label>
             <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
               <span>{t.order.woodenCutlery}</span>
-              <input type="number" min={0} value={woodenCutleryCount} onChange={(e) => setWoodenCutleryCount(Number(e.target.value) || 0)} className={inputClass} placeholder={t.order.cutleryCount} />
+              <input
+                type="number"
+                min={0}
+                value={woodenCutleryCount}
+                onChange={(e) => setWoodenCutleryCount(e.target.value)}
+                className={inputClass}
+                placeholder={t.order.cutleryCount}
+              />
             </label>
           </div>
         </div>

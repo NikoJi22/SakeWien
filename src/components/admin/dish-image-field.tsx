@@ -277,7 +277,7 @@ export function DishImageField({ itemId, imageUrl, onChange, label = "Gerichtsbi
                   step={0.02}
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
-                  className="accent-gold h-2 w-full cursor-pointer"
+                  className="accent-brand-primary h-2 w-full cursor-pointer"
                 />
               </div>
               <div className="flex flex-wrap gap-2">

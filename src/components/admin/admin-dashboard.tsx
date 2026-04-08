@@ -492,7 +492,7 @@ export function AdminDashboard() {
     return (
       <div className="px-4 py-16 text-center">
         <p className="text-red-600">{loadError}</p>
-        <button type="button" onClick={() => void load()} className="mt-4 text-sm text-gold underline">
+        <button type="button" onClick={() => void load()} className="mt-4 text-sm text-brand-primary underline">
           Retry
         </button>
       </div>
@@ -524,7 +524,7 @@ export function AdminDashboard() {
               type="button"
               onClick={() => void saveMenu()}
               disabled={savingMenu}
-              className="rounded-full border border-gold/80 bg-gold/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold hover:bg-gold/25 disabled:opacity-50"
+              className="rounded-full border border-brand-primary/80 bg-brand-primary/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-primary hover:bg-brand-primary/25 disabled:opacity-50"
             >
               {savingMenu ? "…" : "Save menu"}
             </button>
@@ -598,7 +598,7 @@ export function AdminDashboard() {
               </button>
             ))}
             <div className="mt-3 border-t border-[#eeeeee] pt-3">
-              <button type="button" onClick={expandAll} className="w-full py-1.5 text-left text-[11px] text-gold/90 hover:underline">
+              <button type="button" onClick={expandAll} className="w-full py-1.5 text-left text-[11px] text-brand-primary hover:underline">
                 Expand all categories
               </button>
               <button type="button" onClick={collapseAll} className="w-full py-1.5 text-left text-[11px] text-neutral-500 hover:underline">
@@ -798,7 +798,7 @@ export function AdminDashboard() {
                   type="checkbox"
                   checked={newDishAtTop}
                   onChange={(e) => setNewDishAtTopPref(e.target.checked)}
-                  className="accent-gold mt-0.5 h-4 w-4 shrink-0"
+                  className="accent-brand-primary mt-0.5 h-4 w-4 shrink-0"
                 />
                 <span>
                   Neue Gerichte automatisch <strong className="font-medium text-neutral-800">oben</strong> in der Kategorie einfügen (sonst unten). Zum Sortieren weiterhin Drag &amp; Drop oder Pfeile nutzen.
@@ -816,7 +816,7 @@ export function AdminDashboard() {
               <button
                 type="button"
                 onClick={addCategory}
-                className="rounded-full border border-gold/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-gold hover:bg-gold/10"
+                className="rounded-full border border-brand-primary/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-primary hover:bg-brand-primary/10"
               >
                 + Category
               </button>
@@ -874,7 +874,7 @@ export function AdminDashboard() {
                       : undefined
                   }
                   className={`scroll-mt-28 overflow-hidden rounded-2xl border border-[#eeeeee] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] ${
-                    !q && dragOverCategoryBeforeIndex === ci ? "ring-2 ring-gold/40 ring-offset-2 ring-offset-neutral-50" : ""
+                    !q && dragOverCategoryBeforeIndex === ci ? "ring-2 ring-brand-primary/40 ring-offset-2 ring-offset-neutral-50" : ""
                   } ${draggingCategoryIndex === ci ? "opacity-70" : ""}`}
                 >
                   <button
@@ -934,7 +934,7 @@ export function AdminDashboard() {
                         </button>
                       </span>
                     )}
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#ccc] text-amber-800">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#ccc] text-brand-primary">
                       {open ? "−" : "+"}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -950,7 +950,7 @@ export function AdminDashboard() {
                   {open && (
                     <div className="space-y-0 p-4 sm:p-5 sm:pt-2">
                       {q && (
-                        <p className="mb-4 rounded-lg border border-amber-100 bg-amber-50/80 px-3 py-2 text-xs text-amber-950">
+                        <p className="mb-4 rounded-lg border border-brand-primary/20 bg-brand-primary/10 px-3 py-2 text-xs text-brand-primary-dark">
                           Sortierung per Ziehen oder Pfeilen ist bei aktiver Suche ausgeschaltet — Suchfeld leeren, um die Reihenfolge zu ändern.
                         </p>
                       )}
@@ -976,7 +976,7 @@ export function AdminDashboard() {
                             type="button"
                             onClick={() => void saveMenu()}
                             disabled={savingMenu}
-                            className="rounded-full border border-gold/80 bg-gold/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-gold hover:bg-gold/25 disabled:opacity-50"
+                            className="rounded-full border border-brand-primary/80 bg-brand-primary/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-primary hover:bg-brand-primary/25 disabled:opacity-50"
                           >
                             {savingMenu ? "Saving…" : "Save"}
                           </button>
@@ -985,7 +985,7 @@ export function AdminDashboard() {
                             <button
                               type="button"
                               onClick={() => addItem(ci)}
-                              className="text-[10px] font-semibold uppercase text-gold hover:underline"
+                              className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
                             >
                               + Dish
                             </button>
@@ -1041,7 +1041,7 @@ export function AdminDashboard() {
                                 : undefined
                             }
                             className={`rounded-xl border border-[#eeeeee] bg-neutral-50/80 p-4 sm:p-5 transition-shadow ${
-                              dropBeforeHere ? "ring-2 ring-gold/40 ring-offset-2 ring-offset-neutral-50" : ""
+                              dropBeforeHere ? "ring-2 ring-brand-primary/40 ring-offset-2 ring-offset-neutral-50" : ""
                             } ${isDraggingHere ? "opacity-55" : ""}`}
                           >
                             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -1189,7 +1189,7 @@ export function AdminDashboard() {
                                         type="checkbox"
                                         checked={!!item[key]}
                                         onChange={(e) => setItemField(ci, ii, key, e.target.checked)}
-                                        className="accent-gold h-4 w-4"
+                                        className="accent-brand-primary h-4 w-4"
                                       />
                                       {label}
                                     </label>
@@ -1231,7 +1231,7 @@ export function AdminDashboard() {
                                 <label className="flex cursor-pointer items-center gap-2 text-sm text-neutral-800">
                                   <input
                                     type="checkbox"
-                                    className="accent-gold h-4 w-4"
+                                    className="accent-brand-primary h-4 w-4"
                                     checked={!!item.lunchStarterChoice?.options?.length}
                                     onChange={(e) => setLunchStarterEnabled(ci, ii, e.target.checked)}
                                   />
@@ -1298,7 +1298,7 @@ export function AdminDashboard() {
                                     <button
                                       type="button"
                                       onClick={() => addLunchStarterOptionRow(ci, ii)}
-                                      className="text-[10px] font-semibold uppercase text-gold hover:underline"
+                                      className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
                                     >
                                       + Option
                                     </button>
@@ -1319,7 +1319,7 @@ export function AdminDashboard() {
                                         onClick={() => toggleItemAllergen(ci, ii, code)}
                                         className={`min-w-[2rem] rounded-md border px-2 py-1.5 font-mono text-xs font-semibold transition ${
                                           active
-                                            ? "border-amber-600/80 bg-amber-50 text-amber-950"
+                                            ? "border-brand-primary/80 bg-brand-primary/10 text-brand-primary-dark"
                                             : "border-[#ddd] bg-neutral-50 text-neutral-500 hover:border-neutral-400"
                                         }`}
                                       >
@@ -1355,7 +1355,7 @@ export function AdminDashboard() {
                             }}
                             className={`flex min-h-[2.25rem] items-center justify-center rounded-lg border border-dashed px-3 text-center text-[10px] font-medium uppercase tracking-wider transition-colors ${
                               dragOverBefore?.catIndex === ci && dragOverBefore.beforeIndex === cat.items.length
-                                ? "border-gold/50 bg-gold/10 text-gold"
+                                ? "border-brand-primary/50 bg-brand-primary/10 text-brand-primary"
                                 : "border-[#ddd] text-neutral-400"
                             }`}
                           >
@@ -1396,7 +1396,7 @@ export function AdminDashboard() {
                 }}
                 className={`flex min-h-[2.25rem] items-center justify-center rounded-lg border border-dashed px-3 text-center text-[10px] font-medium uppercase tracking-wider transition-colors ${
                   dragOverCategoryBeforeIndex === categories.length
-                    ? "border-gold/50 bg-gold/10 text-gold"
+                    ? "border-brand-primary/50 bg-brand-primary/10 text-brand-primary"
                     : "border-[#ddd] text-neutral-400"
                 } ${draggingCategoryIndex !== null ? "opacity-100" : "opacity-0 pointer-events-none"}`}
               >
@@ -1410,7 +1410,7 @@ export function AdminDashboard() {
               type="button"
               onClick={() => void saveMenu()}
               disabled={savingMenu}
-              className="rounded-full border border-gold/80 bg-gold/15 px-8 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold hover:bg-gold/25 disabled:opacity-50"
+              className="rounded-full border border-brand-primary/80 bg-brand-primary/15 px-8 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-primary hover:bg-brand-primary/25 disabled:opacity-50"
             >
               {savingMenu ? "Saving…" : "Save entire menu"}
             </button>

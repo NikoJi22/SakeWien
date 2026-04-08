@@ -3,20 +3,20 @@ import type { SiteContentConfig } from "./menu-types";
 export const defaultSiteContent: SiteContentConfig = {
   hero: {
     title: { de: "Sushi Sensation", en: "Sushi Sensation" },
-    mainImage: "/hero-main.png"
+    mainImage: "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=2200&q=85"
   },
   cards: {
     order: {
       label: { de: "Jetzt bestellen", en: "Order now" },
-      image: "/order-now-hero.png"
+      image: "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1200&q=85"
     },
     reservation: {
       label: { de: "Reservierung", en: "Reservation" },
-      image: "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=1600&q=85"
+      image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=85"
     },
     about: {
       label: { de: "Über uns", en: "About us" },
-      image: "/about-us-hero.png"
+      image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=85"
     }
   }
 };

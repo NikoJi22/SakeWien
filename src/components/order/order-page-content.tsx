@@ -18,7 +18,7 @@ import { MENU_NAV_BESTSELLERS, MENU_NAV_NEW } from "@/lib/menu-scroll";
 
 /** Desktop: 2 Karten pro Zeile, gleiche Zeilenhöhe · Mobile/Tablet: 1 Spalte */
 const orderMenuGridClass =
-  "grid grid-cols-1 gap-6 md:gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-6 xl:gap-8";
+  "grid grid-cols-1 gap-3 sm:gap-5 md:gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-6 xl:gap-8";
 
 export function OrderPageContent() {
   const { language, t } = useLanguage();
@@ -75,7 +75,7 @@ export function OrderPageContent() {
         <CategoryNav categories={withItems} language={language} leadingItems={leadingNav} />
 
         <div className="flex flex-col lg:flex-row lg:items-start lg:gap-10 lg:py-10">
-          <div className="min-w-0 flex-1 space-y-14 py-8 sm:space-y-16 sm:py-10 lg:space-y-16 lg:py-0">
+          <div className="min-w-0 flex-1 space-y-10 py-6 sm:space-y-16 sm:py-10 lg:space-y-16 lg:py-0">
             {loading && <p className="text-sm text-brand-subtle">…</p>}
             {error && <p className="text-sm text-brand-danger">{error}</p>}
             {!loading && !error && !anyMenu && (

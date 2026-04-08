@@ -104,7 +104,7 @@ export function OrderMenuItem({
           : "hover:border-brand-primary/18 hover:shadow-[0_10px_28px_rgba(70,95,107,0.08),0_2px_8px_rgba(70,95,107,0.04)]"
       }`}
     >
-      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-brand-canvas">
+      <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-brand-canvas sm:aspect-[4/3]">
         <Image
           src={item.image}
           alt={L.name}
@@ -115,8 +115,8 @@ export function OrderMenuItem({
         />
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
-        <div className="flex flex-wrap gap-1.5">
+      <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-5">
+        <div className="flex flex-wrap gap-1">
           {item.isNew && <Badge className={tagPromo}>{t.order.newBadge}</Badge>}
           {item.isBestseller && <Badge className={tagPromo}>{t.order.bestsellerBadge}</Badge>}
           {item.isSpecialDeal && (
@@ -132,20 +132,20 @@ export function OrderMenuItem({
           {isSoldOut && <Badge className="border border-brand-line bg-brand-canvas text-brand-subtle">{t.order.soldOut}</Badge>}
         </div>
 
-        <h3 className="mt-2 font-serif text-lg font-bold leading-snug tracking-wide text-brand-ink">{L.name}</h3>
-        <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-brand-body lg:line-clamp-3">{L.description}</p>
+        <h3 className="mt-1.5 font-serif text-base font-bold leading-snug tracking-wide text-brand-ink sm:mt-2 sm:text-lg">{L.name}</h3>
+        <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-brand-body sm:mt-1 sm:text-sm lg:line-clamp-3">{L.description}</p>
 
-        <MenuAllergenChips item={item} className="mt-2 min-h-[1.25rem]" />
+        <MenuAllergenChips item={item} className="mt-1.5 min-h-[1rem] sm:mt-2 sm:min-h-[1.25rem]" />
 
         {needsStarter && starterConfig && (
-          <div className="mt-3 rounded-xl border border-brand-line bg-brand-canvas/80 px-3 py-2.5">
+          <div className="mt-2 rounded-xl border border-brand-line bg-brand-canvas/80 px-2.5 py-2 sm:mt-3 sm:px-3 sm:py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-subtle">{starterConfig.label[language]}</p>
-            <p className="mt-1 text-xs text-brand-body">{t.order.lunchStarterHint}</p>
-            <div className="mt-2 flex flex-col gap-2" role="radiogroup" aria-label={starterConfig.label[language]}>
+            <p className="mt-0.5 text-[11px] text-brand-body sm:mt-1 sm:text-xs">{t.order.lunchStarterHint}</p>
+            <div className="mt-1.5 flex flex-col gap-1.5 sm:mt-2 sm:gap-2" role="radiogroup" aria-label={starterConfig.label[language]}>
               {starterConfig.options.map((opt) => (
                 <label
                   key={opt.id}
-                  className="flex cursor-pointer items-start gap-2 rounded-lg border border-brand-line bg-brand-card px-2 py-1.5 text-sm text-brand-ink transition hover:bg-brand-surface-hover has-[:checked]:border-brand-primary has-[:checked]:bg-brand-surface-hover"
+                  className="flex cursor-pointer items-start gap-2 rounded-lg border border-brand-line bg-brand-card px-2 py-1 text-xs text-brand-ink transition hover:bg-brand-surface-hover has-[:checked]:border-brand-primary has-[:checked]:bg-brand-surface-hover sm:py-1.5 sm:text-sm"
                 >
                   <input
                     type="radio"
@@ -163,10 +163,10 @@ export function OrderMenuItem({
         )}
 
         {allowSushiExtras && (
-          <div className="mt-3 rounded-xl border border-brand-line bg-brand-canvas/80 px-3 py-2.5">
+          <div className="mt-2 rounded-xl border border-brand-line bg-brand-canvas/80 px-2.5 py-2 sm:mt-3 sm:px-3 sm:py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-subtle">{t.order.sushiExtras}</p>
-            <div className="mt-2 flex flex-wrap gap-3">
-              <label className="flex items-center gap-2 text-sm text-brand-ink">
+            <div className="mt-1.5 flex flex-wrap gap-2 sm:mt-2 sm:gap-3">
+              <label className="flex items-center gap-2 text-xs text-brand-ink sm:text-sm">
                 <input
                   type="checkbox"
                   checked={wantWasabi}
@@ -175,7 +175,7 @@ export function OrderMenuItem({
                 />
                 {t.order.wasabi}
               </label>
-              <label className="flex items-center gap-2 text-sm text-brand-ink">
+              <label className="flex items-center gap-2 text-xs text-brand-ink sm:text-sm">
                 <input
                   type="checkbox"
                   checked={wantGinger}
@@ -188,18 +188,18 @@ export function OrderMenuItem({
           </div>
         )}
 
-        <div className="mt-auto border-t border-brand-line pt-4">
-          <div className="flex items-center justify-between gap-3">
+        <div className="mt-auto border-t border-brand-line pt-3 sm:pt-4">
+          <div className="flex items-center justify-between gap-2.5 sm:gap-3">
             <span className="shrink-0">
               {discountedPrice !== null ? (
                 <span className="flex flex-col items-start">
-                  <span className="text-sm tabular-nums text-brand-subtle line-through">{L.price}</span>
-                  <span className="text-xl font-bold tabular-nums text-brand-price">
+                  <span className="text-xs tabular-nums text-brand-subtle line-through sm:text-sm">{L.price}</span>
+                  <span className="text-lg font-bold tabular-nums text-brand-price sm:text-xl">
                     {formatPriceEur(discountedPrice, language)}
                   </span>
                 </span>
               ) : (
-                <span className="text-xl font-bold tabular-nums text-brand-price">{L.price}</span>
+                <span className="text-lg font-bold tabular-nums text-brand-price sm:text-xl">{L.price}</span>
               )}
             </span>
             <div className="flex shrink-0 items-center gap-0.5 rounded-full border-2 border-brand-line bg-brand-canvas p-0.5">
@@ -207,17 +207,17 @@ export function OrderMenuItem({
                 type="button"
                 onClick={() => removeOne(lineKey)}
                 disabled={qty <= 0 || isSoldOut}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
                 aria-label="Decrease"
               >
                 −
               </button>
-              <span className="min-w-[2rem] text-center text-sm font-bold tabular-nums text-brand-ink">{qty}</span>
+              <span className="min-w-[1.75rem] text-center text-xs font-bold tabular-nums text-brand-ink sm:min-w-[2rem] sm:text-sm">{qty}</span>
               <button
                 type="button"
                 onClick={onAdd}
                 disabled={isSoldOut || (needsStarter && !starterId)}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-lg font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
                 aria-label="Increase"
               >
                 +

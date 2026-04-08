@@ -24,8 +24,8 @@ export function LanguageSwitcher({
     : "text-brand-body hover:text-brand-primary";
 
   const activeBtn = emphasis
-    ? "bg-[#C9A46C] font-bold text-[#FFFFFF] shadow-inner"
-    : "bg-[#C9A46C] text-[#FFFFFF]";
+    ? "bg-brand-primary font-bold text-[#FFFFFF] shadow-inner"
+    : "bg-brand-primary text-[#FFFFFF]";
 
   return (
     <div className={shell}>
