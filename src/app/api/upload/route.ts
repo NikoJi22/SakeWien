@@ -4,20 +4,11 @@ import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
 import { cookies } from "next/headers";
 
 const MAX_BYTES = 12 * 1024 * 1024;
+export const runtime = "nodejs";
 
 async function requireAdmin() {
   const store = await cookies();
   return verifyAdminSession(store.get(ADMIN_COOKIE)?.value);
-}
-
-function getCloudinaryConfig() {
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-  if (!cloudName || !apiKey || !apiSecret) return null;
-
-  return { cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret };
 }
 
 export async function POST(request: Request) {
@@ -25,8 +16,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const cfg = getCloudinaryConfig();
-  if (!cfg) {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  console.info("[upload] Cloudinary env presence", {
+    cloudName: cloudName ? "ja" : "nein",
+    apiKey: apiKey ? "ja" : "nein",
+    apiSecret: apiSecret ? "ja" : "nein"
+  });
+
+  if (!cloudName || !apiKey || !apiSecret) {
     console.error("[upload] Cloudinary env vars missing");
     return NextResponse.json({ error: "Cloudinary error: configuration missing" }, { status: 500 });
   }
@@ -53,7 +53,11 @@ export async function POST(request: Request) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  cloudinary.config(cfg);
+  cloudinary.config({
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret
+  });
 
   try {
     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
