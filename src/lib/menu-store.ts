@@ -13,12 +13,18 @@ function hasBlobStorage(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 }
 
+function getBlobToken(): string {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!token) throw new Error("BLOB_READ_WRITE_TOKEN is missing");
+  return token;
+}
+
 function isProductionRuntime(): boolean {
   return process.env.NODE_ENV === "production";
 }
 
 async function readJsonFromBlob<T>(pathname: string): Promise<T> {
-  const blobMeta = await head(pathname);
+  const blobMeta = await head(pathname, { token: getBlobToken() });
   const res = await fetch(blobMeta.url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch blob ${pathname}: ${res.status}`);
   return (await res.json()) as T;
@@ -26,6 +32,7 @@ async function readJsonFromBlob<T>(pathname: string): Promise<T> {
 
 async function writeJsonToBlob(pathname: string, data: unknown): Promise<void> {
   await put(pathname, JSON.stringify(data, null, 2), {
+    token: getBlobToken(),
     access: "public",
     addRandomSuffix: false,
     contentType: "application/json"
