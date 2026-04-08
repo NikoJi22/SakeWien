@@ -12,7 +12,7 @@ async function requireAdmin() {
   return verifyAdminSession(store.get(ADMIN_COOKIE)?.value);
 }
 
-export async function POST(request: Request) {
+export async function POST() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
