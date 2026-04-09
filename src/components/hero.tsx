@@ -6,7 +6,6 @@ import { useSiteContent } from "@/context/site-content-context";
 import { HeroFloatingNav } from "./hero-floating-nav";
 import { HeroSideCard } from "./hero-side-card";
 import { HeroSocial } from "./hero-social";
-import { SiteLogo } from "./site-logo";
 
 export function Hero() {
   const { t, language } = useLanguage();
@@ -53,10 +52,6 @@ export function Hero() {
             priority
             sizes="(max-width: 1024px) 100vw, 72vw"
           />
-          {/* Großflächiges Kunstlogo als dezentes Brand-Element (Lesbarkeit im Header bleibt getrennt) */}
-          <div className="absolute inset-0 z-[1] flex items-center justify-center pointer-events-none">
-            <SiteLogo variant="heroWatermark" lightUiTone="markWhite" />
-          </div>
           <div className="absolute inset-0 z-[2] bg-gradient-to-t from-[rgba(31,35,38,0.28)] via-[rgba(70,95,107,0.1)] to-[rgba(70,95,107,0.14)]" />
           <div className="absolute inset-0 z-[2] bg-gradient-to-r from-[rgba(70,95,107,0.18)] via-transparent to-transparent" />
 

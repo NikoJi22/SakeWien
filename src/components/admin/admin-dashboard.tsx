@@ -85,6 +85,15 @@ function itemMatchesSearch(item: MenuItem, q: string): boolean {
   );
 }
 
+/** Admin price inputs: allow empty while typing; validate on blur/save. */
+function parseAdminPriceEur(raw: string): number | "empty" | "invalid" {
+  const t = raw.trim().replace(",", ".");
+  if (t === "") return "empty";
+  const n = parseFloat(t);
+  if (!Number.isFinite(n) || n < 0) return "invalid";
+  return n;
+}
+
 export function AdminDashboard() {
   const router = useRouter();
   const [categories, setCategories] = useState<MenuCategory[]>([]);
@@ -109,6 +118,8 @@ export function AdminDashboard() {
   const [dragOverBefore, setDragOverBefore] = useState<{ catIndex: number; beforeIndex: number } | null>(null);
   const [draggingCategoryIndex, setDraggingCategoryIndex] = useState<number | null>(null);
   const [dragOverCategoryBeforeIndex, setDragOverCategoryBeforeIndex] = useState<number | null>(null);
+  const [giftThresholdInput, setGiftThresholdInput] = useState("45");
+  const [dishPriceDraft, setDishPriceDraft] = useState<Record<string, string>>({});
 
   useEffect(() => {
     try {
@@ -141,6 +152,7 @@ export function AdminDashboard() {
       if (giftRes.ok) {
         const g = (await giftRes.json()) as GiftConfig;
         setGift(g);
+        setGiftThresholdInput(String(g.thresholdEur));
       }
       if (siteRes.ok) {
         const s = (await siteRes.json()) as SiteContentConfig;
@@ -197,10 +209,29 @@ export function AdminDashboard() {
     setMenuStatus("");
     setSavingMenu(true);
     try {
+      const nextMenu = cloneMenu(categories);
+      for (const cat of nextMenu) {
+        for (const item of cat.items) {
+          const draft = dishPriceDraft[item.id];
+          if (draft === undefined) continue;
+          const p = parseAdminPriceEur(draft);
+          if (p === "empty") {
+            setMenuStatus("Bitte alle Preisfelder ausfüllen.");
+            setSavingMenu(false);
+            return;
+          }
+          if (p === "invalid") {
+            setMenuStatus("Ungültiger Preis bei einem Gericht.");
+            setSavingMenu(false);
+            return;
+          }
+          item.priceEur = p;
+        }
+      }
       const res = await fetch("/api/admin/menu", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(categories)
+        body: JSON.stringify(nextMenu)
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -215,6 +246,8 @@ export function AdminDashboard() {
         }
         return;
       }
+      setCategories(nextMenu);
+      setDishPriceDraft({});
       setMenuStatus("Menu saved.");
       window.dispatchEvent(new Event("sake-menu-updated"));
     } catch (error) {
@@ -227,18 +260,30 @@ export function AdminDashboard() {
 
   async function saveGift() {
     setGiftStatus("");
+    const thrParsed = parseAdminPriceEur(giftThresholdInput);
+    if (thrParsed === "empty") {
+      setGiftStatus("Bitte Schwellenwert eintragen.");
+      return;
+    }
+    if (thrParsed === "invalid") {
+      setGiftStatus("Ungültiger Schwellenwert.");
+      return;
+    }
+    const payload: GiftConfig = { ...gift, thresholdEur: thrParsed };
     setSavingGift(true);
     try {
       const res = await fetch("/api/admin/gift", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(gift)
+        body: JSON.stringify(payload)
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setGiftStatus(typeof data.error === "string" ? data.error : "Save failed");
         return;
       }
+      setGift(payload);
+      setGiftThresholdInput(String(thrParsed));
       setGiftStatus("Gift settings saved.");
       window.dispatchEvent(new Event("sake-gift-updated"));
     } finally {
@@ -754,11 +799,24 @@ export function AdminDashboard() {
             <div className="grid gap-4 sm:grid-cols-2">
               <AdminField label="Threshold (EUR)">
                 <input
-                  type="number"
-                  step="0.01"
-                  min={0}
-                  value={gift.thresholdEur}
-                  onChange={(e) => setGift((g) => ({ ...g, thresholdEur: Number(e.target.value) || 0 }))}
+                  type="text"
+                  inputMode="decimal"
+                  value={giftThresholdInput}
+                  onChange={(e) => setGiftThresholdInput(e.target.value)}
+                  onBlur={() => {
+                    const t = giftThresholdInput.trim();
+                    if (t === "") {
+                      setGiftThresholdInput(String(gift.thresholdEur));
+                      return;
+                    }
+                    const n = parseFloat(t.replace(",", "."));
+                    if (!Number.isFinite(n) || n < 0) {
+                      setGiftThresholdInput(String(gift.thresholdEur));
+                      return;
+                    }
+                    setGift((g) => ({ ...g, thresholdEur: n }));
+                    setGiftThresholdInput(String(n));
+                  }}
                   className={adminInputClass}
                 />
               </AdminField>
@@ -1155,11 +1213,35 @@ export function AdminDashboard() {
                               </AdminField>
                               <AdminField label="Price (EUR)">
                                 <input
-                                  type="number"
-                                  step="0.1"
-                                  min={0}
-                                  value={item.priceEur}
-                                  onChange={(e) => setItemField(ci, ii, "priceEur", Number(e.target.value) || 0)}
+                                  type="text"
+                                  inputMode="decimal"
+                                  value={dishPriceDraft[item.id] ?? String(item.priceEur)}
+                                  onChange={(e) =>
+                                    setDishPriceDraft((d) => ({ ...d, [item.id]: e.target.value }))
+                                  }
+                                  onBlur={() => {
+                                    const draft = dishPriceDraft[item.id];
+                                    if (draft === undefined) return;
+                                    const t = draft.trim();
+                                    if (t === "") {
+                                      setDishPriceDraft((d) => {
+                                        const x = { ...d };
+                                        delete x[item.id];
+                                        return x;
+                                      });
+                                      return;
+                                    }
+                                    const p = parseAdminPriceEur(draft);
+                                    if (p === "invalid") return;
+                                    if (typeof p === "number") {
+                                      setItemField(ci, ii, "priceEur", p);
+                                      setDishPriceDraft((d) => {
+                                        const x = { ...d };
+                                        delete x[item.id];
+                                        return x;
+                                      });
+                                    }
+                                  }}
                                   className={adminInputClass}
                                 />
                               </AdminField>

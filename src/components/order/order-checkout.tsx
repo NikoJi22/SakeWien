@@ -17,13 +17,6 @@ function nowTimeValue() {
   return `${hh}:${mm}`;
 }
 
-function parseNonNegativeCount(raw: string): number {
-  if (!raw.trim()) return 0;
-  const n = Number(raw);
-  if (!Number.isFinite(n) || n < 0) return 0;
-  return Math.floor(n);
-}
-
 type OrderCheckoutProps = {
   variant?: "sidebar" | "drawer";
 };
@@ -43,13 +36,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [smsError, setSmsError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pickupClock, setPickupClock] = useState(nowTimeValue);
-  const [chopsticksCount, setChopsticksCount] = useState("0");
-  const [woodenCutleryCount, setWoodenCutleryCount] = useState("0");
+  const [chopsticksCount, setChopsticksCount] = useState(0);
+  const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
   const [codeSent, setCodeSent] = useState(false);
   const [smsInfo, setSmsInfo] = useState<string | null>(null);
-  const chopsticksCountNum = parseNonNegativeCount(chopsticksCount);
-  const woodenCutleryCountNum = parseNonNegativeCount(woodenCutleryCount);
-  const cutleryFeeEur = (chopsticksCountNum + woodenCutleryCountNum) * 0.1;
+  const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
   /** SMS required only for delivery */
@@ -190,6 +181,21 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       return;
     }
 
+    if (fulfillment === "delivery") {
+      const street = String(fd.get("deliveryStreet") ?? "").trim();
+      const houseNumber = String(fd.get("deliveryHouseNumber") ?? "").trim();
+      const postalCode = String(fd.get("deliveryPostalCode") ?? "").replace(/\s/g, "").trim();
+      const city = String(fd.get("deliveryCity") ?? "").trim();
+      if (!street || !houseNumber || !postalCode || !city) {
+        setSubmitError(t.order.errDeliveryAddressIncomplete);
+        return;
+      }
+      if (!/^\d{4}$/.test(postalCode)) {
+        setSubmitError(t.order.errDeliveryAddressPlz);
+        return;
+      }
+    }
+
     setSubmitError(null);
     setSmsInfo(null);
     setStatus("loading");
@@ -198,7 +204,18 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       name: String(fd.get("name") ?? ""),
       phone: String(fd.get("phone") ?? ""),
       email: String(fd.get("email") ?? ""),
-      address: fulfillment === "delivery" ? String(fd.get("address") ?? "") : "",
+      deliveryAddress:
+        fulfillment === "delivery"
+          ? {
+              street: String(fd.get("deliveryStreet") ?? "").trim(),
+              houseNumber: String(fd.get("deliveryHouseNumber") ?? "").trim(),
+              staircase: String(fd.get("deliveryStaircase") ?? "").trim(),
+              floor: String(fd.get("deliveryFloor") ?? "").trim(),
+              door: String(fd.get("deliveryDoor") ?? "").trim(),
+              postalCode: String(fd.get("deliveryPostalCode") ?? "").replace(/\s/g, "").trim(),
+              city: String(fd.get("deliveryCity") ?? "").trim()
+            }
+          : undefined,
       pickupTime,
       deliveryTime: fulfillment === "delivery" ? String(fd.get("deliveryTime") ?? "") : "",
       comment: String(fd.get("comment") ?? ""),
@@ -207,8 +224,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       giftEligible: giftUnlocked,
       giftMessage: giftUnlocked ? giftMessage : "",
       cutlery:
-        chopsticksCountNum + woodenCutleryCountNum > 0
-          ? { chopsticksCount: chopsticksCountNum, woodenCutleryCount: woodenCutleryCountNum, unitPriceEur: 0.1, totalEur: cutleryFeeEur }
+        chopsticksCount + woodenCutleryCount > 0
+          ? { chopsticksCount, woodenCutleryCount, unitPriceEur: 0.1, totalEur: cutleryFeeEur }
           : null,
       lines: lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => ({
         id: lineKey,
@@ -248,11 +265,15 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
               ? t.order.errPhoneMismatch
               : c === "delivery_min_order"
                 ? t.order.deliveryMinOrder
-                : c === "pickup_same_day_only"
-                  ? t.order.pickupSameDayOnly
-              : c === "server_misconfigured"
-                ? t.order.errServerConfig
-                : t.order.orderErrorGeneric
+                : c === "delivery_address_incomplete"
+                  ? t.order.errDeliveryAddressIncomplete
+                  : c === "delivery_address_invalid_plz"
+                    ? t.order.errDeliveryAddressPlz
+                    : c === "pickup_same_day_only"
+                      ? t.order.pickupSameDayOnly
+                      : c === "server_misconfigured"
+                        ? t.order.errServerConfig
+                        : t.order.orderErrorGeneric
         );
         return;
       }
@@ -369,28 +390,60 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         <div className="space-y-4 rounded-xl border border-brand-primary/10 bg-brand-canvas/50 p-4 sm:p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">{t.order.cutlery}</p>
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+            <div className={`flex flex-col gap-2 ${labelMuted}`}>
               <span>{t.order.chopsticks}</span>
-              <input
-                type="number"
-                min={0}
-                value={chopsticksCount}
-                onChange={(e) => setChopsticksCount(e.target.value)}
-                className={inputClass}
-                placeholder={t.order.cutleryCount}
-              />
-            </label>
-            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <div className="flex items-center justify-end sm:justify-start">
+                <div className="flex shrink-0 items-center gap-0.5 rounded-full border-2 border-brand-line bg-brand-canvas p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setChopsticksCount((n) => Math.max(0, n - 1))}
+                    disabled={chopsticksCount <= 0}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    aria-label="Decrease"
+                  >
+                    −
+                  </button>
+                  <span className="min-w-[1.75rem] text-center text-xs font-bold tabular-nums text-brand-ink sm:min-w-[2rem] sm:text-sm">
+                    {chopsticksCount}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setChopsticksCount((n) => n + 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    aria-label="Increase"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className={`flex flex-col gap-2 ${labelMuted}`}>
               <span>{t.order.woodenCutlery}</span>
-              <input
-                type="number"
-                min={0}
-                value={woodenCutleryCount}
-                onChange={(e) => setWoodenCutleryCount(e.target.value)}
-                className={inputClass}
-                placeholder={t.order.cutleryCount}
-              />
-            </label>
+              <div className="flex items-center justify-end sm:justify-start">
+                <div className="flex shrink-0 items-center gap-0.5 rounded-full border-2 border-brand-line bg-brand-canvas p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setWoodenCutleryCount((n) => Math.max(0, n - 1))}
+                    disabled={woodenCutleryCount <= 0}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    aria-label="Decrease"
+                  >
+                    −
+                  </button>
+                  <span className="min-w-[1.75rem] text-center text-xs font-bold tabular-nums text-brand-ink sm:min-w-[2rem] sm:text-sm">
+                    {woodenCutleryCount}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setWoodenCutleryCount((n) => n + 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    aria-label="Increase"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div className="flex items-center justify-between text-sm">
@@ -553,16 +606,65 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
             <span className="text-xs text-brand-subtle">{t.order.pickupSameDayOnly}</span>
           </label>
         ) : (
-          <>
-            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
-              <span>{t.form.address}</span>
-              <input name="address" required className={inputClass} autoComplete="street-address" />
-            </label>
+          <div className="space-y-4">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">
+                {t.order.deliveryAddressHeading}
+              </p>
+              <div className="grid gap-4 sm:grid-cols-6">
+                <label className={`flex flex-col gap-1.5 sm:col-span-4 ${labelMuted}`}>
+                  <span>{t.form.street}</span>
+                  <input
+                    name="deliveryStreet"
+                    required
+                    className={inputClass}
+                    autoComplete="address-line1"
+                  />
+                </label>
+                <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
+                  <span>{t.form.houseNumber}</span>
+                  <input name="deliveryHouseNumber" required className={inputClass} autoComplete="off" />
+                </label>
+                <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
+                  <span>{t.form.staircase}</span>
+                  <input name="deliveryStaircase" className={inputClass} autoComplete="off" />
+                </label>
+                <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
+                  <span>{t.form.floor}</span>
+                  <input name="deliveryFloor" className={inputClass} autoComplete="off" />
+                </label>
+                <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
+                  <span>{t.form.door}</span>
+                  <input name="deliveryDoor" className={inputClass} autoComplete="off" />
+                </label>
+                <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
+                  <span>{t.form.postalCode}</span>
+                  <input
+                    name="deliveryPostalCode"
+                    required
+                    inputMode="numeric"
+                    maxLength={6}
+                    className={inputClass}
+                    autoComplete="postal-code"
+                  />
+                </label>
+                <label className={`flex flex-col gap-1.5 sm:col-span-4 ${labelMuted}`}>
+                  <span>{t.form.city}</span>
+                  <input
+                    name="deliveryCity"
+                    required
+                    className={inputClass}
+                    defaultValue={language === "de" ? "Wien" : "Vienna"}
+                    autoComplete="address-level2"
+                  />
+                </label>
+              </div>
+            </div>
             <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
               <span>{t.order.deliveryTime}</span>
               <input name="deliveryTime" type="datetime-local" required className={inputClass} />
             </label>
-          </>
+          </div>
         )}
 
         <label className={`flex flex-col gap-1.5 ${labelMuted}`}>

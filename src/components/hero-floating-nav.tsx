@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLanguage } from "@/context/language-context";
 import { LanguageSwitcher } from "./language-switcher";
-import { SiteLogo } from "./site-logo";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
 
 function MenuIcon({ className }: { className?: string }) {
@@ -71,18 +70,19 @@ export function HeroFloatingNav() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          <SiteLogo variant="hero" className="justify-start" lightUiTone="subtleContrast" onNavigate={() => setOpen(false)} />
           <nav className="flex flex-col gap-4 text-[11px] font-bold uppercase tracking-[0.25em] text-brand-ink">
             <Link href="/" className={pathname === "/" ? "text-brand-primary" : "hover:text-brand-primary"} onClick={() => setOpen(false)}>
               {t.nav.home}
             </Link>
-            <Link
-              href="/order-online"
-              className={pathname === "/order-online" ? "text-brand-primary" : "hover:text-brand-primary"}
-              onClick={() => setOpen(false)}
-            >
-              {t.nav.orderShort}
-            </Link>
+            {pathname !== "/" && (
+              <Link
+                href="/order-online"
+                className={pathname === "/order-online" ? "text-brand-primary" : "hover:text-brand-primary"}
+                onClick={() => setOpen(false)}
+              >
+                {t.nav.orderShort}
+              </Link>
+            )}
             <Link
               href="/about"
               className={pathname === "/about" ? "text-brand-primary" : "hover:text-brand-primary"}
@@ -150,12 +150,12 @@ export function HeroFloatingNav() {
           <MenuIcon className="h-[22px] w-[22px] text-current" />
         </button>
 
-        <SiteLogo variant="hero" className="shrink-0 transition hover:opacity-95" lightUiTone="subtleContrast" />
-
         <div className="hidden shrink-0 items-center gap-3 sm:flex md:gap-5">
-          <Link href="/order-online" className={navLinkClass("/order-online")}>
-            {t.nav.orderShort}
-          </Link>
+          {pathname !== "/" && (
+            <Link href="/order-online" className={navLinkClass("/order-online")}>
+              {t.nav.orderShort}
+            </Link>
+          )}
           <Link href="/about" className={navLinkClass("/about")}>
             {t.nav.about}
           </Link>

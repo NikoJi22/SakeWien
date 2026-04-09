@@ -71,13 +71,15 @@ export function InteriorNavbar() {
             >
               {t.nav.home}
             </Link>
-            <Link
-              href="/order-online"
-              className={routeActive(pathname, "/order-online") ? "text-brand-primary" : "hover:text-brand-primary"}
-              onClick={() => setOpen(false)}
-            >
-              {t.nav.orderShort}
-            </Link>
+            {pathname !== "/" && (
+              <Link
+                href="/order-online"
+                className={routeActive(pathname, "/order-online") ? "text-brand-primary" : "hover:text-brand-primary"}
+                onClick={() => setOpen(false)}
+              >
+                {t.nav.orderShort}
+              </Link>
+            )}
             <Link
               href="/about"
               className={routeActive(pathname, "/about") ? "text-brand-primary" : "hover:text-brand-primary"}
@@ -134,9 +136,11 @@ export function InteriorNavbar() {
             <Link href="/" className={deskLinkClass("/")}>
               {t.nav.home}
             </Link>
-            <Link href="/order-online" className={deskLinkClass("/order-online")}>
-              {t.nav.orderShort}
-            </Link>
+            {pathname !== "/" && (
+              <Link href="/order-online" className={deskLinkClass("/order-online")}>
+                {t.nav.orderShort}
+              </Link>
+            )}
             <Link href="/about" className={deskLinkClass("/about")}>
               {t.nav.about}
             </Link>

@@ -52,6 +52,13 @@ type TranslationSchema = {
     phoneHint: string;
     email: string;
     address: string;
+    street: string;
+    houseNumber: string;
+    staircase: string;
+    floor: string;
+    door: string;
+    postalCode: string;
+    city: string;
     message: string;
     guests: string;
     date: string;
@@ -150,6 +157,9 @@ type TranslationSchema = {
     lunchStarterHint: string;
     soldOut: string;
     deliveryMinOrder: string;
+    deliveryAddressHeading: string;
+    errDeliveryAddressIncomplete: string;
+    errDeliveryAddressPlz: string;
     pickupSameDayOnly: string;
     sushiExtras: string;
     wasabi: string;
@@ -214,6 +224,13 @@ export const translations: Record<Language, TranslationSchema> = {
         "Use country code +43 or national format (e.g. 0660 1234567). Spaces and dashes are fine.",
       email: "Email",
       address: "Address",
+      street: "Street",
+      houseNumber: "House number",
+      staircase: "Staircase (Stiege)",
+      floor: "Floor",
+      door: "Door / apt. no.",
+      postalCode: "Postal code",
+      city: "City",
       message: "Message",
       guests: "Guests",
       date: "Date",
@@ -312,6 +329,9 @@ export const translations: Record<Language, TranslationSchema> = {
       lunchStarterHint: "Included with this lunch menu — pick one.",
       soldOut: "Sold out",
       deliveryMinOrder: "Minimum order for delivery: €15.00",
+      deliveryAddressHeading: "Delivery address",
+      errDeliveryAddressIncomplete: "Please fill in street, house number, postal code and city.",
+      errDeliveryAddressPlz: "Please enter a valid 4-digit postal code.",
       pickupSameDayOnly: "Pickup is only available for today.",
       sushiExtras: "Sushi extras",
       wasabi: "Wasabi",
@@ -374,6 +394,13 @@ export const translations: Record<Language, TranslationSchema> = {
         "Mit Ländervorwahl +43 oder national z. B. 0660 1234567. Leerzeichen und Bindestriche sind in Ordnung.",
       email: "E-Mail",
       address: "Adresse",
+      street: "Straße",
+      houseNumber: "Hausnummer",
+      staircase: "Stiege",
+      floor: "Stock",
+      door: "Tür / Türnummer",
+      postalCode: "Postleitzahl",
+      city: "Ort",
       message: "Nachricht",
       guests: "Gäste",
       date: "Datum",
@@ -473,6 +500,9 @@ export const translations: Record<Language, TranslationSchema> = {
       lunchStarterHint: "Im Mittagsmenü enthalten — bitte eine Option wählen.",
       soldOut: "Ausverkauft",
       deliveryMinOrder: "Mindestbestellwert für Lieferung: 15,00 €",
+      deliveryAddressHeading: "Lieferadresse",
+      errDeliveryAddressIncomplete: "Bitte Straße, Hausnummer, Postleitzahl und Ort ausfüllen.",
+      errDeliveryAddressPlz: "Bitte eine gültige 4-stellige Postleitzahl eingeben.",
       pickupSameDayOnly: "Abholung ist nur am selben Tag möglich.",
       sushiExtras: "Sushi Extras",
       wasabi: "Wasabi",

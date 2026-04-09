@@ -1,9 +1,10 @@
+import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { sendMail } from "@/lib/mailer";
 import { normalizeToE164 } from "@/lib/phone-normalize";
 import { ORDER_PHONE_COOKIE, parseVerifiedPhoneCookie } from "@/lib/order-phone-cookie";
-import { buildOrderPdf } from "@/lib/order-pdf";
+import { buildOrderPdf, type OrderPdfInput } from "@/lib/order-pdf";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
 
 type OrderLine = {
@@ -14,12 +15,23 @@ type OrderLine = {
   lineTotalEur: number;
 };
 
+type DeliveryAddressPayload = {
+  street: string;
+  houseNumber: string;
+  staircase?: string;
+  floor?: string;
+  door?: string;
+  postalCode: string;
+  city: string;
+};
+
 type OrderBody = {
   fulfillment: "pickup" | "delivery";
   name: string;
   phone: string;
   email?: string;
   address?: string;
+  deliveryAddress?: DeliveryAddressPayload;
   pickupTime?: string;
   deliveryTime?: string;
   paymentMethod?: string;
@@ -32,6 +44,88 @@ type OrderBody = {
   lines: OrderLine[];
 };
 
+const ORDER_NOTIFY_EMAIL = process.env.ORDER_NOTIFY_EMAIL ?? "sakebestellen@gmail.com";
+
+function normalizePlz(raw: string): string {
+  return raw.replace(/\s/g, "");
+}
+
+function formatDeliveryAddressForMail(d: DeliveryAddressPayload): string {
+  const line1 = `${d.street.trim()} ${d.houseNumber.trim()}`.trim();
+  const bits: string[] = [line1];
+  const st = d.staircase?.trim();
+  const fl = d.floor?.trim();
+  const dr = d.door?.trim();
+  if (st) bits.push(`Stiege ${st}`);
+  if (fl) bits.push(`Stock ${fl}`);
+  if (dr) bits.push(`Tür ${dr}`);
+  bits.push(`${normalizePlz(d.postalCode)} ${d.city.trim()}`.trim());
+  return bits.join(", ");
+}
+
+function validateDeliveryAddress(
+  body: OrderBody
+): { ok: true; formatted: string } | { ok: false; error: string } {
+  const raw = body.deliveryAddress;
+  if (!raw || typeof raw !== "object") {
+    return { ok: false, error: "delivery_address_incomplete" };
+  }
+  const street = String(raw.street ?? "").trim();
+  const houseNumber = String(raw.houseNumber ?? "").trim();
+  const postalCode = normalizePlz(String(raw.postalCode ?? ""));
+  const city = String(raw.city ?? "").trim();
+  if (!street || !houseNumber || !postalCode || !city) {
+    return { ok: false, error: "delivery_address_incomplete" };
+  }
+  if (!/^\d{4}$/.test(postalCode)) {
+    return { ok: false, error: "delivery_address_invalid_plz" };
+  }
+  const formatted = formatDeliveryAddressForMail({
+    street,
+    houseNumber,
+    staircase: String(raw.staircase ?? "").trim() || undefined,
+    floor: String(raw.floor ?? "").trim() || undefined,
+    door: String(raw.door ?? "").trim() || undefined,
+    postalCode,
+    city
+  });
+  return { ok: true, formatted };
+}
+
+function formatOrderDateTimeVienna(isoOrText: string | undefined): string | undefined {
+  if (!isoOrText) return undefined;
+  const d = new Date(isoOrText);
+  if (Number.isNaN(d.getTime())) return isoOrText;
+  return new Intl.DateTimeFormat("de-AT", {
+    timeZone: "Europe/Vienna",
+    dateStyle: "short",
+    timeStyle: "short"
+  }).format(d);
+}
+
+function newOrderId(): string {
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  return `BV-${dateStr}-${randomBytes(3).toString("hex").toUpperCase()}`;
+}
+
+function sanitizePdfFilename(orderId: string): string {
+  const safe = orderId.replace(/[^a-zA-Z0-9-]/g, "-");
+  return `bestellung-${safe}.pdf`;
+}
+
+function linesAreValid(lines: unknown): lines is OrderLine[] {
+  if (!Array.isArray(lines) || lines.length === 0) return false;
+  return lines.every(
+    (l) =>
+      l &&
+      typeof l === "object" &&
+      typeof (l as OrderLine).name === "string" &&
+      Number.isFinite((l as OrderLine).quantity) &&
+      Number.isFinite((l as OrderLine).unitPriceEur) &&
+      Number.isFinite((l as OrderLine).lineTotalEur)
+  );
+}
+
 export async function POST(request: Request) {
   try {
     if (!process.env.ORDER_PHONE_VERIFY_SECRET) {
@@ -39,7 +133,24 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as OrderBody;
+
+    if (!linesAreValid(body.lines)) {
+      console.error("[order] incomplete payload: invalid or empty line items");
+      return NextResponse.json({ error: "empty_cart" }, { status: 400 });
+    }
+
+    const customerName = String(body.name ?? "").trim();
+    if (!customerName) {
+      console.error("[order] incomplete payload: missing customer name");
+      return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
+    }
+
     const orderPhone = normalizeToE164(String(body.phone ?? ""));
+    if (!orderPhone) {
+      console.error("[order] incomplete payload: missing or invalid phone");
+      return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
+    }
+
     const store = await cookies();
     if (body.fulfillment === "delivery") {
       const proof = store.get(ORDER_PHONE_COOKIE)?.value;
@@ -47,12 +158,20 @@ export async function POST(request: Request) {
       if (!verified) {
         return NextResponse.json({ error: "phone_not_verified" }, { status: 403 });
       }
-      if (!orderPhone || orderPhone !== verified.phoneE164) {
+      if (orderPhone !== verified.phoneE164) {
         return NextResponse.json({ error: "phone_mismatch" }, { status: 403 });
       }
     }
     if (body.fulfillment === "delivery" && Number(body.subtotalEur || 0) < DELIVERY_MIN_ORDER_EUR) {
       return NextResponse.json({ error: "delivery_min_order" }, { status: 400 });
+    }
+    let deliveryAddressLine = "";
+    if (body.fulfillment === "delivery") {
+      const addr = validateDeliveryAddress(body);
+      if (!addr.ok) {
+        return NextResponse.json({ error: addr.error }, { status: 400 });
+      }
+      deliveryAddressLine = addr.formatted;
     }
     if (body.fulfillment === "pickup" && body.pickupTime) {
       const d = new Date(body.pickupTime);
@@ -62,63 +181,85 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!Array.isArray(body.lines) || body.lines.length === 0) {
-      return NextResponse.json({ error: "empty_cart" }, { status: 400 });
+    const orderId = newOrderId();
+    const itemsSubtotalEur = body.lines.reduce((s, l) => s + Number(l.lineTotalEur || 0), 0);
+    const grandTotalEur = Number(body.subtotalEur || 0);
+
+    const chopsticks = Number(body.cutlery?.chopsticksCount || 0);
+    const wooden = Number(body.cutlery?.woodenCutleryCount || 0);
+    const cutleryTotalEur = Number(body.cutlery?.totalEur || 0);
+    const cutleryPdf =
+      chopsticks > 0 || wooden > 0
+        ? { chopsticks, wooden, totalEur: cutleryTotalEur }
+        : null;
+
+    const pdfInput: OrderPdfInput = {
+      orderId,
+      fulfillment: body.fulfillment,
+      createdAt: new Date(),
+      customerName,
+      phone: orderPhone,
+      email: String(body.email ?? "").trim() || undefined,
+      deliveryAddressLine: body.fulfillment === "delivery" ? deliveryAddressLine : undefined,
+      pickupTime: body.fulfillment === "pickup" ? formatOrderDateTimeVienna(body.pickupTime) : undefined,
+      deliveryTime: body.fulfillment === "delivery" ? formatOrderDateTimeVienna(body.deliveryTime) : undefined,
+      comment: String(body.comment ?? "").trim() || undefined,
+      lines: body.lines.map((l) => ({
+        name: l.name,
+        quantity: l.quantity,
+        unitPriceEur: l.unitPriceEur,
+        lineTotalEur: l.lineTotalEur
+      })),
+      cutlery: cutleryPdf,
+      giftEligible: !!body.giftEligible,
+      giftMessage: body.giftEligible ? String(body.giftMessage ?? "").trim() || undefined : undefined,
+      itemsSubtotalEur,
+      grandTotalEur,
+      deliveryFeeEur: undefined
+    };
+
+    let pdfBuffer: Buffer;
+    try {
+      pdfBuffer = await buildOrderPdf(pdfInput);
+    } catch (err) {
+      console.error("[order] PDF generation failed:", err);
+      return NextResponse.json({ error: "pdf_failed" }, { status: 500 });
     }
 
-    const linesText = body.lines
-      .map((l) => `  - ${l.name} x${l.quantity} @ €${l.unitPriceEur.toFixed(2)} = €${l.lineTotalEur.toFixed(2)}`)
-      .join("\n");
-
-    const paymentLine =
-      body.fulfillment === "delivery"
-        ? "Payment: Cash on delivery only (no online payment)."
-        : "Payment: Cash on pickup (as shown on website). Card payment also available on site at the terminal.";
-
-    const extra: string[] = [
-      `Fulfillment: ${body.fulfillment}`,
-      `Name: ${body.name || ""}`,
-      `Phone: ${orderPhone || "-"}`,
-      `Email: ${body.email || ""}`,
-      paymentLine
+    const subject = `Neue Bestellung ${orderId}`;
+    const emailLines = [
+      subject,
+      "",
+      `Bestellnr.: ${orderId}`,
+      `Zeit (Wien): ${formatOrderDateTimeVienna(new Date().toISOString())}`,
+      `Kunde: ${customerName}`,
+      `Telefon: ${orderPhone}`,
+      "",
+      "Details siehe PDF-Anhang."
     ];
 
-    if (body.fulfillment === "delivery") {
-      extra.push(`Address: ${body.address || ""}`);
-      extra.push(`Delivery time: ${body.deliveryTime || ""}`);
-    } else {
-      extra.push(`Pickup time: ${body.pickupTime || ""}`);
+    try {
+      await sendMail({
+        to: ORDER_NOTIFY_EMAIL,
+        subject,
+        lines: emailLines,
+        attachments: [
+          {
+            filename: sanitizePdfFilename(orderId),
+            content: pdfBuffer,
+            contentType: "application/pdf"
+          }
+        ]
+      });
+    } catch (err) {
+      console.error("[order] Email send failed:", err);
+      return NextResponse.json({ error: "mail_failed" }, { status: 500 });
     }
-
-    extra.push(`Comment: ${body.comment || ""}`);
-    extra.push(`Language: ${body.language || ""}`);
-    extra.push(`Subtotal: €${Number(body.subtotalEur || 0).toFixed(2)}`);
-    if (body.giftEligible) {
-      extra.push(`Bonus gift: YES — ${body.giftMessage || ""}`);
-    }
-    if (body.cutlery) {
-      const chopsticks = Number(body.cutlery.chopsticksCount || 0);
-      const wooden = Number(body.cutlery.woodenCutleryCount || 0);
-      if (chopsticks > 0 || wooden > 0) {
-        extra.push(`Cutlery: chopsticks x${chopsticks}, wooden x${wooden}`);
-      }
-      if (Number(body.cutlery.totalEur || 0) > 0) {
-        extra.push(`Cutlery surcharge: €${Number(body.cutlery.totalEur || 0).toFixed(2)}`);
-      }
-    }
-
-    const subject = `New order — Sake Vienna (${body.fulfillment}) — €${Number(body.subtotalEur || 0).toFixed(2)}`;
-    const pdfBuffer = await buildOrderPdf(subject, ["Items:", linesText, "", ...extra]);
-
-    await sendMail({
-      subject,
-      lines: ["Items:", linesText, "", ...extra],
-      attachments: [{ filename: "order-invoice.pdf", content: pdfBuffer, contentType: "application/pdf" }]
-    });
 
     store.delete(ORDER_PHONE_COOKIE);
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, orderId });
   } catch (error) {
+    console.error("[order] Unexpected error:", error);
     return NextResponse.json({ ok: false, error: (error as Error).message }, { status: 500 });
   }
 }
