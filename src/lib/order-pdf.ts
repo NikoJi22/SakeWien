@@ -1,5 +1,5 @@
-import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 import { PDFDocument, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 
 const COMPANY_NAME = "Sake Pan Jun Tao KG";
@@ -107,11 +107,11 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
     }
   };
 
-  // Logo
+  // Logo (Datei kann JPEG/WebP o. Ä. sein — sharp erzeugt ein echtes PNG für pdf-lib)
   try {
     const logoPath = path.join(process.cwd(), "public", "sake-logo.png");
-    const pngBytes = fs.readFileSync(logoPath);
-    const image = await pdfDoc.embedPng(pngBytes);
+    const pngBuffer = await sharp(logoPath).png().toBuffer();
+    const image = await pdfDoc.embedPng(pngBuffer);
     const targetW = 120;
     const scale = targetW / image.width;
     const h = image.height * scale;
