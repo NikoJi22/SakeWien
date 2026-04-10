@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
+import { isPickupDateSameViennaToday, viennaTodayPickupIso } from "@/lib/vienna-calendar";
 import { normalizeToE164 } from "@/lib/phone-normalize";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
 import type { translations } from "@/lib/translations";
@@ -158,7 +159,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [smsError, setSmsError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitBlockedReason, setSubmitBlockedReason] = useState<string | null>(null);
   const [pickupClock, setPickupClock] = useState(nowTimeValue);
   const [chopsticksCount, setChopsticksCount] = useState(0);
   const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
@@ -179,14 +179,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const pickupSubmitDisabled = isSubmitting;
   const deliverySubmitDisabled = isSubmitting || sendLoading || verifyLoading || !phoneVerified;
   const isSubmitDisabled = isPickup ? pickupSubmitDisabled : deliverySubmitDisabled;
-  const submitDisabledReason = (() => {
-    if (!isSubmitDisabled) return "none";
-    if (isSubmitting) return "isSubmitting";
-    if (isDelivery && sendLoading) return "delivery_sendLoading";
-    if (isDelivery && verifyLoading) return "delivery_verifyLoading";
-    if (isDelivery && !phoneVerified) return "delivery_phoneNotVerified";
-    return "unknown";
-  })();
 
   useEffect(() => {
     if (fulfillment !== "pickup") return;
@@ -199,7 +191,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     setSmsError(null);
     setSmsInfo(null);
     setSubmitError(null);
-    setSubmitBlockedReason(null);
   }, [fulfillment]);
 
   const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
@@ -214,7 +205,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     setShowOtpSection(false);
     setSmsInfo(null);
     setSmsError(null);
-    setSubmitBlockedReason(null);
   }, [lines.length]);
 
   useEffect(() => {
@@ -228,7 +218,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     setOtp("");
     setSmsError(null);
     setSubmitError(null);
-    setSubmitBlockedReason(null);
     setShowOtpSection(false);
     setSmsInfo(null);
   }
@@ -301,35 +290,23 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitBlockedReason(null);
     if (lines.length === 0) {
-      setSubmitBlockedReason("empty_cart");
       setSubmitError(t.order.errEmptyCartPayload);
       return;
     }
 
     const fd = new FormData(e.currentTarget);
     const pickupRaw = fulfillment === "pickup" ? String(fd.get("pickupTime") ?? "") : "";
-    const pickupTime = fulfillment === "pickup" && /^\d{2}:\d{2}$/.test(pickupRaw)
-      ? `${new Date().toISOString().slice(0, 10)}T${pickupRaw}:00`
-      : pickupRaw;
-    if (fulfillment === "pickup" && pickupTime) {
-      const d = new Date(pickupTime);
-      const now = new Date();
-      if (
-        d.getFullYear() !== now.getFullYear() ||
-        d.getMonth() !== now.getMonth() ||
-        d.getDate() !== now.getDate()
-      ) {
-        setStatus("idle");
-        setSubmitError(t.order.pickupSameDayOnly);
-        return;
-      }
+    const pickupTime =
+      fulfillment === "pickup" && /^\d{2}:\d{2}$/.test(pickupRaw) ? viennaTodayPickupIso(pickupRaw) : pickupRaw;
+    if (fulfillment === "pickup" && pickupTime && !isPickupDateSameViennaToday(pickupTime)) {
+      setStatus("idle");
+      setSubmitError(t.order.pickupSameDayOnly);
+      return;
     }
     if (isDelivery && !isDeliveryMinMet) {
       setStatus("idle");
       setSubmitError(t.order.deliveryMinOrder);
-      setSubmitBlockedReason("delivery_min_order");
       return;
     }
 
@@ -337,12 +314,10 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       const phoneTrim = phone.trim();
       if (!phoneTrim || !normalizedPhone) {
         setSubmitError(t.order.errInvalidPhone);
-        setSubmitBlockedReason("delivery_invalid_phone");
         return;
       }
       setSubmitError(t.order.errPhoneNotVerified);
       setSmsInfo(null);
-      setSubmitBlockedReason("delivery_phone_not_verified");
       return;
     }
 
@@ -353,12 +328,10 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       const city = String(fd.get("deliveryCity") ?? "").trim();
       if (!street || !houseNumber || !postalCode || !city) {
         setSubmitError(t.order.errDeliveryAddressIncomplete);
-        setSubmitBlockedReason("delivery_address_incomplete");
         return;
       }
       if (!/^\d{4}$/.test(postalCode)) {
         setSubmitError(t.order.errDeliveryAddressPlz);
-        setSubmitBlockedReason("delivery_address_invalid_plz");
         return;
       }
     }
@@ -871,12 +844,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         >
           {status === "loading" ? t.form.sending : t.order.placeOrder}
         </button>
-        <div className="rounded-lg border border-brand-line bg-brand-canvas/70 px-3 py-2 text-xs text-brand-subtle">
-          <p>debug.mode: {isPickup ? "pickup" : "delivery"}</p>
-          <p>debug.disabledReason: {submitDisabledReason}</p>
-          <p>debug.submitBlockedReason: {submitBlockedReason ?? "none"}</p>
-        </div>
-
         {needsSmsVerification && !phoneVerified && (
           <p className="text-sm text-brand-subtle">Bitte zuerst Telefonnummer per SMS-Code verifizieren.</p>
         )}

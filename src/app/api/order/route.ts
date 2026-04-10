@@ -6,6 +6,7 @@ import { normalizeToE164 } from "@/lib/phone-normalize";
 import { ORDER_PHONE_COOKIE, parseVerifiedPhoneCookie } from "@/lib/order-phone-cookie";
 import { buildOrderPdf, type OrderPdfInput } from "@/lib/order-pdf";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
+import { isPickupDateSameViennaToday } from "@/lib/vienna-calendar";
 
 type OrderLine = {
   id: string;
@@ -101,8 +102,15 @@ function validateDeliveryAddress(
 
 function formatOrderDateTimeVienna(isoOrText: string | undefined): string | undefined {
   if (!isoOrText) return undefined;
-  const d = new Date(isoOrText);
-  if (Number.isNaN(d.getTime())) return isoOrText;
+  const trimmed = isoOrText.trim();
+  /** Naive `YYYY-MM-DDTHH:mm:ss` = Wiener Restaurant-Wandzeit (kein Z), nicht UTC parsen. */
+  const naive = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/.exec(trimmed);
+  if (naive) {
+    const [, y, mo, d, h, mi] = naive;
+    return `${d}.${mo}.${y}, ${h}:${mi}`;
+  }
+  const d = new Date(trimmed);
+  if (Number.isNaN(d.getTime())) return trimmed;
   return new Intl.DateTimeFormat("de-AT", {
     timeZone: "Europe/Vienna",
     dateStyle: "short",
@@ -197,9 +205,7 @@ export async function POST(request: Request) {
       deliveryAddressLine = addr.formatted;
     }
     if (body.fulfillment === "pickup" && body.pickupTime) {
-      const d = new Date(body.pickupTime);
-      const now = new Date();
-      if (d.getFullYear() !== now.getFullYear() || d.getMonth() !== now.getMonth() || d.getDate() !== now.getDate()) {
+      if (!isPickupDateSameViennaToday(String(body.pickupTime))) {
         return NextResponse.json({ error: "pickup_same_day_only" }, { status: 400 });
       }
     }
