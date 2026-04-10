@@ -167,6 +167,10 @@ type TranslationSchema = {
     paymentPickupCardNote: string;
     paymentDeliveryCash: string;
     orderErrorGeneric: string;
+    /** Known server failure after request reached API */
+    errOrderServerError: string;
+    /** Network / connection failure (no usable response) */
+    errOrderNetwork: string;
     /** Mittagsmenü — explain starter choice */
     lunchStarterHint: string;
     soldOut: string;
@@ -354,6 +358,10 @@ export const translations: Record<Language, TranslationSchema> = {
       paymentPickupCardNote: "At the restaurant you can also pay by card (terminal).",
       paymentDeliveryCash: "Delivery is paid in cash to the driver. No online payment.",
       orderErrorGeneric: "Order could not be sent. Please try again.",
+      errOrderServerError:
+        "The server could not complete your order. Please try again in a few minutes or call the restaurant.",
+      errOrderNetwork:
+        "Could not reach the server (network). Check your connection and try again, or call the restaurant.",
       lunchStarterHint: "Included with this lunch menu — pick one.",
       soldOut: "Sold out",
       deliveryMinOrder: "Minimum order for delivery: €15.00",
@@ -540,6 +548,10 @@ export const translations: Record<Language, TranslationSchema> = {
       paymentPickupCardNote: "Vor Ort können Sie zusätzlich mit Karte (Bankomat/Terminal) zahlen.",
       paymentDeliveryCash: "Lieferung wird bar beim Fahrer bezahlt. Keine Online-Zahlung.",
       orderErrorGeneric: "Bestellung konnte nicht gesendet werden. Bitte erneut versuchen.",
+      errOrderServerError:
+        "Der Server konnte die Bestellung nicht abschließen. Bitte in ein paar Minuten erneut versuchen oder das Restaurant anrufen.",
+      errOrderNetwork:
+        "Keine Verbindung zum Server (Netzwerk). Bitte Verbindung prüfen und erneut versuchen, oder anrufen.",
       lunchStarterHint: "Im Mittagsmenü enthalten — bitte eine Option wählen.",
       soldOut: "Ausverkauft",
       deliveryMinOrder: "Mindestbestellwert für Lieferung: 15,00 €",

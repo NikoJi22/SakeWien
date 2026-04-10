@@ -13,7 +13,30 @@ import type { translations } from "@/lib/translations";
 
 type OrderCopy = (typeof translations)["en"]["order"];
 
-function messageForOrderSubmitError(code: string | undefined, o: OrderCopy): string {
+/** API `error` codes for POST /api/order (keep in sync with route). */
+const ORDER_SUBMIT_ERROR_CODES = new Set([
+  "phone_not_verified",
+  "phone_mismatch",
+  "delivery_min_order",
+  "delivery_address_incomplete",
+  "delivery_address_invalid_plz",
+  "pickup_same_day_only",
+  "empty_cart",
+  "missing_customer_name",
+  "invalid_customer_phone",
+  "invalid_json",
+  "invalid_payload",
+  "mail_failed",
+  "smtp_not_configured",
+  "smtp_send_failed",
+  "mail_failed",
+  "pdf_failed",
+  "delivery_phone_secret_missing",
+  "server_misconfigured",
+  "order_internal_error"
+]);
+
+function messageForOrderSubmitError(code: string | undefined, o: OrderCopy, httpStatus: number): string {
   switch (code) {
     case "phone_not_verified":
       return o.errPhoneNotVerified;
@@ -43,15 +66,32 @@ function messageForOrderSubmitError(code: string | undefined, o: OrderCopy): str
       return o.errSmtpNotConfigured;
     case "smtp_send_failed":
       return o.errSmtpSendFailed;
+    case "mail_failed":
+      return o.errSmtpSendFailed;
     case "pdf_failed":
       return o.errPdfFailed;
     case "delivery_phone_secret_missing":
       return o.errDeliveryPhoneSecretMissing;
     case "server_misconfigured":
       return o.errServerConfig;
+    case "order_internal_error":
+      return o.errOrderServerError;
     default:
-      return o.orderErrorGeneric;
+      break;
   }
+
+  if (code && !ORDER_SUBMIT_ERROR_CODES.has(code)) {
+    if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+      console.warn("[order-checkout] Unbekannter API-Fehlercode:", code, "HTTP", httpStatus);
+    }
+  }
+
+  if (httpStatus === 502) return o.errSmtpSendFailed;
+  /** 503 ohne Code: z. B. Wartung / falsches Gateway — nicht immer SMTP */
+  if (httpStatus === 503) return o.errServerConfig;
+  if (httpStatus === 500) return o.errOrderServerError;
+  if (httpStatus === 403) return o.errPhoneNotVerified;
+  return o.orderErrorGeneric;
 }
 
 function messageForSmsSendError(code: string | undefined, o: OrderCopy): string {
@@ -335,7 +375,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setStatus("idle");
-        setSubmitError(messageForOrderSubmitError(data.error, t.order));
+        setSubmitError(messageForOrderSubmitError(data.error, t.order, res.status));
         return;
       }
       setStatus("success");
@@ -349,7 +389,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       if (variant === "drawer") closeCartDrawer();
     } catch {
       setStatus("idle");
-      setSubmitError(t.order.orderErrorGeneric);
+      setSubmitError(t.order.errOrderNetwork);
     }
   }
 

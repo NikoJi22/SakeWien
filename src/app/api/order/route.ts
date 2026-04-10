@@ -44,7 +44,14 @@ type OrderBody = {
   lines: OrderLine[];
 };
 
-const ORDER_NOTIFY_EMAIL = process.env.ORDER_NOTIFY_EMAIL ?? "sakebestellen@gmail.com";
+/** Bestell-PDFs: ORDER_NOTIFY_EMAIL → RESTAURANT_EMAIL → feste Restaurant-Adresse */
+function orderNotifyRecipient(): string {
+  return (
+    process.env.ORDER_NOTIFY_EMAIL?.trim() ||
+    process.env.RESTAURANT_EMAIL?.trim() ||
+    "sakebestellen@gmail.com"
+  );
+}
 
 function normalizePlz(raw: string): string {
   return raw.replace(/\s/g, "");
@@ -254,9 +261,10 @@ export async function POST(request: Request) {
       "Details siehe PDF-Anhang."
     ];
 
+    const notifyTo = orderNotifyRecipient();
     try {
       await sendMail({
-        to: ORDER_NOTIFY_EMAIL,
+        to: notifyTo,
         subject,
         lines: emailLines,
         attachments: [
@@ -269,21 +277,24 @@ export async function POST(request: Request) {
       });
     } catch (err) {
       if (err instanceof MailerConfigError) {
-        console.error("[order] order not accepted: email cannot be sent — SMTP not configured");
+        console.error("[order] mail_failed: SMTP not configured — order not accepted", {
+          notifyTo: notifyTo.replace(/(.{2}).*(@.*)/, "$1…$2")
+        });
         return NextResponse.json({ error: "smtp_not_configured" }, { status: 503 });
       }
       if (err instanceof MailerSendError) {
-        console.error("[order] order not accepted: email send failed after PDF built");
-        return NextResponse.json({ error: "smtp_send_failed" }, { status: 502 });
+        console.error("[order] mail_failed: SMTP send error after PDF built — order not accepted", err);
+        return NextResponse.json({ error: "mail_failed" }, { status: 502 });
       }
-      console.error("[order] order not accepted: unexpected mail error:", err);
-      return NextResponse.json({ error: "smtp_send_failed" }, { status: 502 });
+      console.error("[order] mail_failed: unexpected error after PDF built — order not accepted", err);
+      return NextResponse.json({ error: "mail_failed" }, { status: 502 });
     }
 
     store.delete(ORDER_PHONE_COOKIE);
     return NextResponse.json({ ok: true, orderId });
   } catch (error) {
-    console.error("[order] Unexpected error:", error);
-    return NextResponse.json({ ok: false, error: (error as Error).message }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[order] Unexpected error — order not accepted:", msg, error);
+    return NextResponse.json({ error: "order_internal_error" }, { status: 500 });
   }
 }

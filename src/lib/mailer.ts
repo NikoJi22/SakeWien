@@ -34,7 +34,7 @@ export async function sendMail(payload: EmailPayload) {
   const port = Number(process.env.SMTP_PORT || "587");
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  const to = payload.to ?? process.env.RESTAURANT_EMAIL;
+  const to = payload.to?.trim() || process.env.RESTAURANT_EMAIL?.trim();
 
   if (!host || !user || !pass || !to) {
     console.error("[mailer] SMTP not configured — cannot send mail", {
@@ -42,15 +42,18 @@ export async function sendMail(payload: EmailPayload) {
       hasUser: !!user,
       hasPass: !!pass,
       hasTo: !!to,
-      explicitRecipient: !!payload.to
+      explicitRecipient: !!payload.to?.trim()
     });
     throw new MailerConfigError("SMTP host, user, password and recipient are required.");
   }
 
+  /** Port 465 = implicit TLS (e.g. Gmail); 587 = STARTTLS */
+  const secure = port === 465;
+
   const transporter = nodemailer.createTransport({
     host,
     port,
-    secure: port === 465,
+    secure,
     auth: { user, pass }
   });
 

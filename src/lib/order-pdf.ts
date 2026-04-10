@@ -129,7 +129,7 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   draw(COMPANY_CITY, { size: 10 });
   y -= 8;
 
-  draw(`Bestellnr. / Rechnungsnr.: ${input.orderId}`, { size: 12, bold: true });
+  draw(`Bestellnummer: ${input.orderId}`, { size: 12, bold: true });
   draw(`Datum / Uhrzeit (Wien): ${formatViennaDateTime(input.createdAt)}`, { size: 10 });
   draw(`Bestellart: ${fulfillmentLabel(input.fulfillment)}`, { size: 10, bold: true });
   y -= 4;
@@ -224,8 +224,8 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   y -= 12;
   ({ page, y } = ensureSpace(page, y, 80, pdfDoc));
   const fee = Number(input.deliveryFeeEur || 0);
-  page.drawText(`Zwischensumme Gerichte: ${formatEur(input.itemsSubtotalEur)}`, {
-    x: PAGE_W - MARGIN - 200,
+  page.drawText(`Zwischensumme: ${formatEur(input.itemsSubtotalEur)}`, {
+    x: PAGE_W - MARGIN - 220,
     y,
     size: 10,
     font
@@ -233,8 +233,8 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   y -= LINE_H + 2;
 
   if (input.cutlery && input.cutlery.totalEur > 0) {
-    page.drawText(`Besteck: ${formatEur(input.cutlery.totalEur)}`, {
-      x: PAGE_W - MARGIN - 200,
+    page.drawText(`Besteck (Summe): ${formatEur(input.cutlery.totalEur)}`, {
+      x: PAGE_W - MARGIN - 220,
       y,
       size: 10,
       font
@@ -244,7 +244,7 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
 
   if (fee > 0) {
     page.drawText(`Lieferkosten: ${formatEur(fee)}`, {
-      x: PAGE_W - MARGIN - 200,
+      x: PAGE_W - MARGIN - 220,
       y,
       size: 10,
       font
@@ -252,10 +252,11 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
     y -= LINE_H + 2;
   }
 
+  y -= 6;
   page.drawText(`Gesamtbetrag: ${formatEur(input.grandTotalEur)}`, {
-    x: PAGE_W - MARGIN - 200,
+    x: PAGE_W - MARGIN - 260,
     y,
-    size: 12,
+    size: 14,
     font: fontBold
   });
 
