@@ -90,6 +90,10 @@ const MARGIN_BOTTOM = 16;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 5;
+/** Abhol-/Lieferzeit: kompakter Kassenbon, Label klar getrennt von der Uhrzeit */
+const FULFILLMENT_TIME_LABEL_PT = 10;
+const FULFILLMENT_TIME_VALUE_PT = 14;
+const FULFILLMENT_TIME_GAP_AFTER_LABEL = 12;
 
 function ensureSpace(
   page: PDFPage,
@@ -163,17 +167,39 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   }
   y -= GAP_MD;
 
-  // ——— Abhol- / Lieferzeit: oben, maximal sichtbar ———
+  // ——— Abhol- / Lieferzeit: mittig, lesbar, nicht übergroß (Thermo ~80 mm) ———
+  const drawCenterTimeBlock = (label: string, timeRaw: string | undefined) => {
+    const labelSize = FULFILLMENT_TIME_LABEL_PT;
+    const timeSize = FULFILLMENT_TIME_VALUE_PT;
+    const timeText = timeRaw?.trim() || "—";
+    const timeLines = wrapLine(timeText, fontBold, timeSize, contentW);
+    const blockH =
+      labelSize +
+      FULFILLMENT_TIME_GAP_AFTER_LABEL +
+      timeLines.length * timeSize +
+      Math.max(0, timeLines.length - 1) * 5 +
+      GAP_SM;
+    ({ page, y } = ensureSpace(page, y, blockH + GAP_MD, pdfDoc));
+
+    const lw = fontBold.widthOfTextAtSize(label, labelSize);
+    page.drawText(label, { x: (PAGE_W - lw) / 2, y, size: labelSize, font: fontBold });
+    y -= labelSize + FULFILLMENT_TIME_GAP_AFTER_LABEL;
+
+    for (let i = 0; i < timeLines.length; i++) {
+      const ln = timeLines[i]!;
+      ({ page, y } = ensureSpace(page, y, timeSize + 4, pdfDoc));
+      const tw = fontBold.widthOfTextAtSize(ln, timeSize);
+      page.drawText(ln, { x: (PAGE_W - tw) / 2, y, size: timeSize, font: fontBold });
+      y -= timeSize + (i < timeLines.length - 1 ? 5 : GAP_SM);
+    }
+    y -= GAP_MD;
+  };
+
   if (input.fulfillment === "pickup") {
-    drawCenter("ABHOLZEIT", 12, true);
-    const t = input.pickupTime?.trim() || "—";
-    drawCenter(t, 20, true);
+    drawCenterTimeBlock("ABHOLZEIT", input.pickupTime);
   } else {
-    drawCenter("LIEFERZEIT", 12, true);
-    const t = input.deliveryTime?.trim() || "—";
-    drawCenter(t, 20, true);
+    drawCenterTimeBlock("LIEFERZEIT", input.deliveryTime);
   }
-  y -= GAP_MD;
 
   // ——— Bestelldaten ———
   drawLeft(`Bestellnr.: ${input.orderId}`, { size: 12, bold: true });
