@@ -18,7 +18,8 @@ export type OrderPdfInput = {
   fulfillment: "pickup" | "delivery";
   createdAt: Date;
   customerName: string;
-  phone: string;
+  /** Empty for pickup when customer did not provide a number */
+  phone?: string;
   email?: string;
   deliveryAddressLine?: string;
   pickupTime?: string;

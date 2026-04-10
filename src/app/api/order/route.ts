@@ -147,14 +147,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "missing_customer_name" }, { status: 400 });
     }
 
-    const orderPhone = normalizeToE164(String(body.phone ?? ""));
-    if (!orderPhone) {
-      console.error("[order] rejected: missing or invalid phone number");
-      return NextResponse.json({ error: "invalid_customer_phone" }, { status: 400 });
-    }
+    const rawPhone = String(body.phone ?? "").trim();
+    let orderPhone: string | null = null;
 
     const store = await cookies();
     if (body.fulfillment === "delivery") {
+      const normalized = normalizeToE164(rawPhone);
+      if (!normalized) {
+        console.error("[order] rejected delivery: missing or invalid phone number");
+        return NextResponse.json({ error: "invalid_customer_phone" }, { status: 400 });
+      }
+      orderPhone = normalized;
       if (!process.env.ORDER_PHONE_VERIFY_SECRET) {
         console.error(
           "[order] rejected delivery: ORDER_PHONE_VERIFY_SECRET is not set (SMS verification cannot be secured)"
@@ -169,6 +172,11 @@ export async function POST(request: Request) {
       if (orderPhone !== verified.phoneE164) {
         return NextResponse.json({ error: "phone_mismatch" }, { status: 403 });
       }
+    }
+    /** Pickup: phone not required; optional valid number is stored if sent */
+    else if (rawPhone) {
+      const normalized = normalizeToE164(rawPhone);
+      if (normalized) orderPhone = normalized;
     }
     if (body.fulfillment === "delivery" && Number(body.subtotalEur || 0) < DELIVERY_MIN_ORDER_EUR) {
       return NextResponse.json({ error: "delivery_min_order" }, { status: 400 });
@@ -206,7 +214,7 @@ export async function POST(request: Request) {
       fulfillment: body.fulfillment,
       createdAt: new Date(),
       customerName,
-      phone: orderPhone,
+      phone: orderPhone ?? undefined,
       email: String(body.email ?? "").trim() || undefined,
       deliveryAddressLine: body.fulfillment === "delivery" ? deliveryAddressLine : undefined,
       pickupTime: body.fulfillment === "pickup" ? formatOrderDateTimeVienna(body.pickupTime) : undefined,
@@ -241,7 +249,7 @@ export async function POST(request: Request) {
       `Bestellnr.: ${orderId}`,
       `Zeit (Wien): ${formatOrderDateTimeVienna(new Date().toISOString())}`,
       `Kunde: ${customerName}`,
-      `Telefon: ${orderPhone}`,
+      `Telefon: ${orderPhone ?? "—"}`,
       "",
       "Details siehe PDF-Anhang."
     ];

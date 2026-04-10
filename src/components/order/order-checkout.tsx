@@ -128,6 +128,16 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   /** SMS required only for delivery */
   const needsSmsVerification = fulfillment === "delivery";
 
+  useEffect(() => {
+    if (fulfillment !== "pickup") return;
+    setPhoneVerified(false);
+    setPhone("");
+    setOtp("");
+    setCodeSent(false);
+    setSmsError(null);
+    setSmsInfo(null);
+  }, [fulfillment]);
+
   const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
   const giftMessage = giftConfig.message[language];
   const isDrawer = variant === "drawer";
@@ -270,7 +280,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     const payload = {
       fulfillment,
       name: String(fd.get("name") ?? ""),
-      phone: String(fd.get("phone") ?? ""),
+      phone: fulfillment === "delivery" ? phone.trim() : "",
       email: String(fd.get("email") ?? ""),
       deliveryAddress:
         fulfillment === "delivery"
