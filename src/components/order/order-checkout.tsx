@@ -836,7 +836,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         {submitError && <p className={errorMsg}>{submitError}</p>}
         {status === "success" && (
           <div className="space-y-1">
-            <p className={successMsg}>{t.form.success}</p>
+            <p className={successMsg}>{t.order.orderPlacedSuccess}</p>
             {lastPlacedOrderId && (
               <p className="text-sm text-brand-subtle">
                 {t.order.orderReferenceLabel} {lastPlacedOrderId}
