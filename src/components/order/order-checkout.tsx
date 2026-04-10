@@ -162,6 +162,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
   const [codeSent, setCodeSent] = useState(false);
   const [smsInfo, setSmsInfo] = useState<string | null>(null);
+  const [lastPlacedOrderId, setLastPlacedOrderId] = useState<string | null>(null);
   const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
@@ -316,7 +317,9 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
     setSubmitError(null);
     setSmsInfo(null);
+    setLastPlacedOrderId(null);
     setStatus("loading");
+    const formEl = e.currentTarget;
     const payload = {
       fulfillment,
       name: String(fd.get("name") ?? ""),
@@ -372,12 +375,43 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         body: JSON.stringify(payload),
         credentials: "same-origin"
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string };
+
+      let data: { ok?: boolean; orderId?: string; error?: string } = {};
+      try {
+        const text = await res.text();
+        if (text.trim()) {
+          data = JSON.parse(text) as typeof data;
+        }
+      } catch (parseErr) {
+        console.error("[order-checkout] order response JSON parse failed", res.status, parseErr);
+        setStatus("idle");
+        setSubmitError(messageForOrderSubmitError(undefined, t.order, res.status));
+        return;
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("[order-checkout] /api/order response", res.status, data);
+      }
+
       if (!res.ok) {
         setStatus("idle");
         setSubmitError(messageForOrderSubmitError(data.error, t.order, res.status));
         return;
       }
+
+      if (data.ok !== true) {
+        console.error("[order-checkout] HTTP OK but missing data.ok === true", res.status, data);
+        setStatus("idle");
+        setSubmitError(messageForOrderSubmitError(data.error, t.order, res.status));
+        return;
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("[order-checkout] order success path", data.orderId);
+      }
+
+      setSubmitError(null);
+      setLastPlacedOrderId(typeof data.orderId === "string" ? data.orderId : null);
       setStatus("success");
       clear();
       setPhoneVerified(false);
@@ -385,9 +419,16 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       setOtp("");
       setCodeSent(false);
       setSmsInfo(null);
-      e.currentTarget.reset();
+
+      try {
+        formEl.reset();
+      } catch (resetErr) {
+        console.error("[order-checkout] form reset failed after successful order", resetErr);
+      }
+
       if (variant === "drawer") closeCartDrawer();
-    } catch {
+    } catch (err) {
+      console.error("[order-checkout] fetch failed or network error", err);
       setStatus("idle");
       setSubmitError(t.order.errOrderNetwork);
     }
@@ -793,7 +834,16 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <p className="text-sm text-brand-subtle">Bitte zuerst Telefonnummer per SMS-Code verifizieren.</p>
         )}
         {submitError && <p className={errorMsg}>{submitError}</p>}
-        {status === "success" && <p className={successMsg}>{t.form.success}</p>}
+        {status === "success" && (
+          <div className="space-y-1">
+            <p className={successMsg}>{t.form.success}</p>
+            {lastPlacedOrderId && (
+              <p className="text-sm text-brand-subtle">
+                {t.order.orderReferenceLabel} {lastPlacedOrderId}
+              </p>
+            )}
+          </div>
+        )}
       </form>
     </div>
   );

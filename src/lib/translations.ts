@@ -186,6 +186,8 @@ type TranslationSchema = {
     chopsticks: string;
     woodenCutlery: string;
     cutleryCount: string;
+    /** Shown after successful order next to orderId */
+    orderReferenceLabel: string;
   };
 };
 
@@ -375,7 +377,8 @@ export const translations: Record<Language, TranslationSchema> = {
       cutlery: "Cutlery",
       chopsticks: "Chopsticks",
       woodenCutlery: "Wooden cutlery",
-      cutleryCount: "Count"
+      cutleryCount: "Count",
+      orderReferenceLabel: "Order no."
     }
   },
   de: {
@@ -565,7 +568,8 @@ export const translations: Record<Language, TranslationSchema> = {
       cutlery: "Besteck",
       chopsticks: "Stäbchen",
       woodenCutlery: "Holzbesteck",
-      cutleryCount: "Anzahl"
+      cutleryCount: "Anzahl",
+      orderReferenceLabel: "Bestellnr."
     }
   }
 };
