@@ -148,6 +148,20 @@ type TranslationSchema = {
     errPhoneNotVerified: string;
     errPhoneMismatch: string;
     errServerConfig: string;
+    /** E-Mail (SMTP) env incomplete */
+    errSmtpNotConfigured: string;
+    /** SMTP accepted connection but sending failed */
+    errSmtpSendFailed: string;
+    errPdfFailed: string;
+    /** ORDER_PHONE_VERIFY_SECRET missing — only affects delivery */
+    errDeliveryPhoneSecretMissing: string;
+    /** Twilio Verify env missing */
+    errSmsNotConfigured: string;
+    errSmsProviderFailed: string;
+    errMissingCustomerName: string;
+    errInvalidCustomerPhone: string;
+    errEmptyCartPayload: string;
+    errInvalidJsonBody: string;
     paymentHeading: string;
     paymentPickupCash: string;
     paymentPickupCardNote: string;
@@ -321,6 +335,20 @@ export const translations: Record<Language, TranslationSchema> = {
       errPhoneNotVerified: "Please verify your phone with SMS before ordering.",
       errPhoneMismatch: "Verified phone does not match the number in the form.",
       errServerConfig: "Ordering is temporarily unavailable.",
+      errSmtpNotConfigured:
+        "Order could not be sent: e-mail is not configured on the server (SMTP). Please try again later or call the restaurant.",
+      errSmtpSendFailed:
+        "Order could not be sent: the confirmation e-mail could not be delivered. Please try again later or call the restaurant.",
+      errPdfFailed: "Order could not be sent: the order PDF could not be created. Please try again later or call the restaurant.",
+      errDeliveryPhoneSecretMissing:
+        "Delivery is temporarily unavailable: phone verification is not configured on the server. Pickup may still work.",
+      errSmsNotConfigured:
+        "SMS verification is not available: the text-message service is not configured. Please choose pickup or contact the restaurant.",
+      errSmsProviderFailed: "The SMS service returned an error. Please try again in a moment.",
+      errMissingCustomerName: "Please enter your name.",
+      errInvalidCustomerPhone: "Please enter a valid phone number with country code (e.g. +43…).",
+      errEmptyCartPayload: "Your order data was incomplete. Please refresh the page and add items again.",
+      errInvalidJsonBody: "Invalid request. Please refresh the page and try again.",
       paymentHeading: "Payment",
       paymentPickupCash: "Payment is made in cash when you pick up your order.",
       paymentPickupCardNote: "At the restaurant you can also pay by card (terminal).",
@@ -492,6 +520,21 @@ export const translations: Record<Language, TranslationSchema> = {
       errPhoneNotVerified: "Bitte bestätigen Sie Ihre Nummer per SMS, bevor Sie bestellen.",
       errPhoneMismatch: "Die bestätigte Nummer stimmt nicht mit dem Formular überein.",
       errServerConfig: "Bestellen ist vorübergehend nicht möglich.",
+      errSmtpNotConfigured:
+        "Die Bestellung konnte nicht gesendet werden: E-Mail ist auf dem Server nicht eingerichtet (SMTP). Bitte später erneut versuchen oder das Restaurant anrufen.",
+      errSmtpSendFailed:
+        "Die Bestellung konnte nicht gesendet werden: Die Bestätigungs-E-Mail konnte nicht zugestellt werden. Bitte später erneut versuchen oder anrufen.",
+      errPdfFailed:
+        "Die Bestellung konnte nicht gesendet werden: Das Bestell-PDF konnte nicht erzeugt werden. Bitte später erneut versuchen oder anrufen.",
+      errDeliveryPhoneSecretMissing:
+        "Lieferung vorübergehend nicht möglich: Telefon-Verifizierung ist auf dem Server nicht konfiguriert. Abholung kann weiterhin funktionieren.",
+      errSmsNotConfigured:
+        "SMS-Verifizierung nicht verfügbar: Der SMS-Dienst ist nicht konfiguriert. Bitte Abholung wählen oder das Restaurant kontaktieren.",
+      errSmsProviderFailed: "Der SMS-Dienst hat einen Fehler gemeldet. Bitte in Kürze erneut versuchen.",
+      errMissingCustomerName: "Bitte geben Sie Ihren Namen ein.",
+      errInvalidCustomerPhone: "Bitte geben Sie eine gültige Telefonnummer mit Ländervorwahl ein (z. B. +43 …).",
+      errEmptyCartPayload: "Die Bestelldaten waren unvollständig. Bitte Seite neu laden und erneut bestellen.",
+      errInvalidJsonBody: "Ungültige Anfrage. Bitte Seite neu laden und erneut versuchen.",
       paymentHeading: "Bezahlung",
       paymentPickupCash: "Die Bezahlung erfolgt bei Abholung in bar.",
       paymentPickupCardNote: "Vor Ort können Sie zusätzlich mit Karte (Bankomat/Terminal) zahlen.",

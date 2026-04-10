@@ -48,9 +48,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "unknown";
-    if (msg.includes("is not set")) {
-      return NextResponse.json({ error: "server_misconfigured" }, { status: 503 });
+    if (msg.includes("ORDER_PHONE_VERIFY_SECRET")) {
+      console.error("[verify-code] ORDER_PHONE_VERIFY_SECRET missing — cannot set verified-phone cookie for delivery");
+      return NextResponse.json({ error: "delivery_phone_secret_missing" }, { status: 503 });
     }
+    if (msg.includes("is not set")) {
+      console.error("[verify-code] SMS (Twilio Verify) not configured:", msg);
+      return NextResponse.json({ error: "sms_not_configured" }, { status: 503 });
+    }
+    console.error("[verify-code] verification failed:", msg);
     return NextResponse.json({ error: "verify_failed", detail: msg }, { status: 400 });
   }
 }

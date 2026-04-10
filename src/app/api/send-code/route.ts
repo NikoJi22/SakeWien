@@ -48,8 +48,10 @@ export async function POST(request: Request) {
   } catch (e) {
     const msg = e instanceof Error ? e.message : "unknown";
     if (msg.includes("is not set")) {
-      return NextResponse.json({ error: "server_misconfigured" }, { status: 503 });
+      console.error("[send-code] SMS (Twilio Verify) not configured:", msg);
+      return NextResponse.json({ error: "sms_not_configured" }, { status: 503 });
     }
+    console.error("[send-code] Twilio Verify request failed:", msg);
     return NextResponse.json({ error: "twilio_error", detail: msg }, { status: 502 });
   }
 }

@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { sendMail } from "@/lib/mailer";
+import { MailerConfigError, MailerSendError, sendMail } from "@/lib/mailer";
 import { normalizeToE164 } from "@/lib/phone-normalize";
 import { ORDER_PHONE_COOKIE, parseVerifiedPhoneCookie } from "@/lib/order-phone-cookie";
 import { buildOrderPdf, type OrderPdfInput } from "@/lib/order-pdf";
@@ -128,31 +128,39 @@ function linesAreValid(lines: unknown): lines is OrderLine[] {
 
 export async function POST(request: Request) {
   try {
-    if (!process.env.ORDER_PHONE_VERIFY_SECRET) {
-      return NextResponse.json({ error: "server_misconfigured" }, { status: 503 });
+    let body: OrderBody;
+    try {
+      body = (await request.json()) as OrderBody;
+    } catch {
+      console.error("[order] rejected: invalid or non-JSON request body");
+      return NextResponse.json({ error: "invalid_json" }, { status: 400 });
     }
 
-    const body = (await request.json()) as OrderBody;
-
     if (!linesAreValid(body.lines)) {
-      console.error("[order] incomplete payload: invalid or empty line items");
+      console.error("[order] rejected: invalid or empty line items (cart)");
       return NextResponse.json({ error: "empty_cart" }, { status: 400 });
     }
 
     const customerName = String(body.name ?? "").trim();
     if (!customerName) {
-      console.error("[order] incomplete payload: missing customer name");
-      return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
+      console.error("[order] rejected: missing customer name");
+      return NextResponse.json({ error: "missing_customer_name" }, { status: 400 });
     }
 
     const orderPhone = normalizeToE164(String(body.phone ?? ""));
     if (!orderPhone) {
-      console.error("[order] incomplete payload: missing or invalid phone");
-      return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
+      console.error("[order] rejected: missing or invalid phone number");
+      return NextResponse.json({ error: "invalid_customer_phone" }, { status: 400 });
     }
 
     const store = await cookies();
     if (body.fulfillment === "delivery") {
+      if (!process.env.ORDER_PHONE_VERIFY_SECRET) {
+        console.error(
+          "[order] rejected delivery: ORDER_PHONE_VERIFY_SECRET is not set (SMS verification cannot be secured)"
+        );
+        return NextResponse.json({ error: "delivery_phone_secret_missing" }, { status: 503 });
+      }
       const proof = store.get(ORDER_PHONE_COOKIE)?.value;
       const verified = parseVerifiedPhoneCookie(proof);
       if (!verified) {
@@ -222,7 +230,7 @@ export async function POST(request: Request) {
     try {
       pdfBuffer = await buildOrderPdf(pdfInput);
     } catch (err) {
-      console.error("[order] PDF generation failed:", err);
+      console.error("[order] PDF generation failed — order not accepted:", err);
       return NextResponse.json({ error: "pdf_failed" }, { status: 500 });
     }
 
@@ -252,8 +260,16 @@ export async function POST(request: Request) {
         ]
       });
     } catch (err) {
-      console.error("[order] Email send failed:", err);
-      return NextResponse.json({ error: "mail_failed" }, { status: 500 });
+      if (err instanceof MailerConfigError) {
+        console.error("[order] order not accepted: email cannot be sent — SMTP not configured");
+        return NextResponse.json({ error: "smtp_not_configured" }, { status: 503 });
+      }
+      if (err instanceof MailerSendError) {
+        console.error("[order] order not accepted: email send failed after PDF built");
+        return NextResponse.json({ error: "smtp_send_failed" }, { status: 502 });
+      }
+      console.error("[order] order not accepted: unexpected mail error:", err);
+      return NextResponse.json({ error: "smtp_send_failed" }, { status: 502 });
     }
 
     store.delete(ORDER_PHONE_COOKIE);

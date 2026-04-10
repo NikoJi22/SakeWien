@@ -9,6 +9,88 @@ import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
+import type { translations } from "@/lib/translations";
+
+type OrderCopy = (typeof translations)["en"]["order"];
+
+function messageForOrderSubmitError(code: string | undefined, o: OrderCopy): string {
+  switch (code) {
+    case "phone_not_verified":
+      return o.errPhoneNotVerified;
+    case "phone_mismatch":
+      return o.errPhoneMismatch;
+    case "delivery_min_order":
+      return o.deliveryMinOrder;
+    case "delivery_address_incomplete":
+      return o.errDeliveryAddressIncomplete;
+    case "delivery_address_invalid_plz":
+      return o.errDeliveryAddressPlz;
+    case "pickup_same_day_only":
+      return o.pickupSameDayOnly;
+    case "empty_cart":
+      return o.errEmptyCartPayload;
+    case "missing_customer_name":
+      return o.errMissingCustomerName;
+    case "invalid_customer_phone":
+      return o.errInvalidCustomerPhone;
+    case "invalid_json":
+      return o.errInvalidJsonBody;
+    case "invalid_payload":
+      return o.errEmptyCartPayload;
+    case "mail_failed":
+      return o.errSmtpSendFailed;
+    case "smtp_not_configured":
+      return o.errSmtpNotConfigured;
+    case "smtp_send_failed":
+      return o.errSmtpSendFailed;
+    case "pdf_failed":
+      return o.errPdfFailed;
+    case "delivery_phone_secret_missing":
+      return o.errDeliveryPhoneSecretMissing;
+    case "server_misconfigured":
+      return o.errServerConfig;
+    default:
+      return o.orderErrorGeneric;
+  }
+}
+
+function messageForSmsSendError(code: string | undefined, o: OrderCopy): string {
+  switch (code) {
+    case "invalid_phone":
+      return o.errInvalidPhone;
+    case "rate_limit":
+      return o.errRateLimit;
+    case "wait_before_resend":
+      return o.errWaitResend;
+    case "sms_not_configured":
+      return o.errSmsNotConfigured;
+    case "twilio_error":
+      return o.errSmsProviderFailed;
+    case "server_misconfigured":
+      return o.errSmsNotConfigured;
+    default:
+      return o.errSendCode;
+  }
+}
+
+function messageForSmsVerifyError(code: string | undefined, o: OrderCopy): string {
+  switch (code) {
+    case "invalid_phone":
+      return o.errInvalidPhone;
+    case "invalid_code":
+    case "code_rejected":
+    case "verify_failed":
+      return o.errVerifyCode;
+    case "sms_not_configured":
+      return o.errSmsNotConfigured;
+    case "delivery_phone_secret_missing":
+      return o.errDeliveryPhoneSecretMissing;
+    case "server_misconfigured":
+      return o.errSmsNotConfigured;
+    default:
+      return o.errVerifyCode;
+  }
+}
 
 function nowTimeValue() {
   const d = new Date();
@@ -81,18 +163,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        const c = data.error;
-        setSmsError(
-          c === "invalid_phone"
-            ? t.order.errInvalidPhone
-            : c === "rate_limit"
-              ? t.order.errRateLimit
-              : c === "wait_before_resend"
-                ? t.order.errWaitResend
-                : c === "server_misconfigured"
-                  ? t.order.errServerConfig
-                  : t.order.errSendCode
-        );
+        setSmsError(messageForSmsSendError(data.error, t.order));
         return false;
       }
       return true;
@@ -124,10 +195,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        const c = data.error;
-        setSmsError(
-          c === "server_misconfigured" ? t.order.errServerConfig : t.order.errVerifyCode
-        );
+        setSmsError(messageForSmsVerifyError(data.error, t.order));
         setPhoneVerified(false);
         return;
       }
@@ -257,24 +325,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setStatus("idle");
-        const c = data.error;
-        setSubmitError(
-          c === "phone_not_verified"
-            ? t.order.errPhoneNotVerified
-            : c === "phone_mismatch"
-              ? t.order.errPhoneMismatch
-              : c === "delivery_min_order"
-                ? t.order.deliveryMinOrder
-                : c === "delivery_address_incomplete"
-                  ? t.order.errDeliveryAddressIncomplete
-                  : c === "delivery_address_invalid_plz"
-                    ? t.order.errDeliveryAddressPlz
-                    : c === "pickup_same_day_only"
-                      ? t.order.pickupSameDayOnly
-                      : c === "server_misconfigured"
-                        ? t.order.errServerConfig
-                        : t.order.orderErrorGeneric
-        );
+        setSubmitError(messageForOrderSubmitError(data.error, t.order));
         return;
       }
       setStatus("success");
