@@ -3,15 +3,15 @@ import Link from "next/link";
 
 /**
  * SAKE Kunstlogo — nur Darstellung/Größe/Integration, keine inhaltliche Veränderung.
- * `imageSrc` z. B. `/sake-logo.png` (transparent oder mit dunklem Grund — siehe lightUiTone).
+ * `imageSrc` z. B. `/sake-logo-mark.png` (öffentliches Markenlogo unter `public/`).
  */
-type LogoVariant = "header" | "hero" | "footer" | "heroWatermark" | "aboutFeature" | "heroBand";
+type LogoVariant = "header" | "heroNav" | "hero" | "footer" | "heroWatermark" | "aboutFeature" | "heroBand";
 
 type SiteLogoProps = {
   className?: string;
   variant?: LogoVariant;
   onNavigate?: () => void;
-  /** Standard: `/sake-logo.png` unter `public/` */
+  /** Standard: `/sake-logo-mark.png` unter `public/` */
   imageSrc?: string;
   /**
    * - `original` — Pixel 1:1
@@ -26,6 +26,8 @@ type SiteLogoProps = {
 const shell: Record<LogoVariant, string> = {
   header:
     "inline-flex items-center justify-start bg-transparent py-0.5 pl-0 pr-2 sm:py-1 sm:pr-4 md:pr-5",
+  /** Kompakt: Hero-Pille / schmale Leiste */
+  heroNav: "inline-flex shrink-0 items-center justify-start bg-transparent py-0 pr-1.5 sm:pr-2",
   hero: "inline-flex items-center justify-start bg-transparent py-1 pr-2 sm:pr-3",
   footer: "inline-flex items-center justify-center bg-transparent py-2",
   heroWatermark: "pointer-events-none flex w-full justify-center bg-transparent px-2 select-none",
@@ -36,6 +38,8 @@ const shell: Record<LogoVariant, string> = {
 const imgSize: Record<LogoVariant, string> = {
   header:
     "h-9 w-auto max-w-[min(200px,46vw)] sm:h-10 sm:max-w-[min(220px,40vw)] md:h-11 md:max-w-[min(240px,36vw)] lg:h-12",
+  heroNav:
+    "h-8 w-auto max-w-[min(140px,34vw)] sm:h-9 sm:max-w-[min(160px,30vw)] md:max-w-[180px]",
   hero: "h-[3.35rem] w-auto max-w-[min(320px,52vw)] sm:h-[4.1rem] sm:max-w-[min(380px,46vw)] md:h-[4.85rem] md:max-w-[min(420px,40vw)]",
   footer: "h-20 w-auto max-w-[min(320px,85vw)] sm:h-24 md:h-28",
   heroWatermark:
@@ -53,6 +57,7 @@ const toneClass: Record<NonNullable<SiteLogoProps["lightUiTone"]>, string> = {
 
 const toneVariants: LogoVariant[] = [
   "header",
+  "heroNav",
   "hero",
   "footer",
   "heroBand",
@@ -64,17 +69,17 @@ export function SiteLogo({
   className = "",
   variant = "header",
   onNavigate,
-  imageSrc = "/sake-logo.png",
+  imageSrc = "/sake-logo-mark.png",
   lightUiTone = "subtleContrast"
 }: SiteLogoProps) {
   const isLink = variant !== "heroWatermark";
   const usesToneProp = toneVariants.includes(variant);
   const tone = usesToneProp ? lightUiTone : "original";
   const objectAlign =
-    variant === "header" || variant === "hero" ? "object-left" : "object-center";
+    variant === "header" || variant === "heroNav" || variant === "hero" ? "object-left" : "object-center";
 
   const softShadow =
-    variant === "header" || variant === "hero"
+    variant === "header" || variant === "heroNav" || variant === "hero"
       ? tone === "markGold" || tone === "markWhite"
         ? ""
         : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
@@ -86,16 +91,19 @@ export function SiteLogo({
       alt=""
       width={1024}
       height={1024}
+      unoptimized
       className={`${imgSize[variant]} bg-transparent object-contain ${objectAlign} ${toneClass[tone]} ${softShadow}`}
-      priority={variant === "header" || variant === "hero"}
+      priority={variant === "header" || variant === "heroNav" || variant === "hero"}
       sizes={
         variant === "header"
           ? "(max-width: 768px) 46vw, 240px"
-          : variant === "hero"
-            ? "(max-width: 768px) 52vw, 420px"
-            : variant === "heroWatermark" || variant === "aboutFeature" || variant === "heroBand"
-              ? "(max-width: 768px) 92vw, 520px"
-              : "200px"
+          : variant === "heroNav"
+            ? "180px"
+            : variant === "hero"
+              ? "(max-width: 768px) 52vw, 420px"
+              : variant === "heroWatermark" || variant === "aboutFeature" || variant === "heroBand"
+                ? "(max-width: 768px) 92vw, 520px"
+                : "200px"
       }
     />
   );

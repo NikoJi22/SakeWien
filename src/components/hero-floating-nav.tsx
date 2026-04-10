@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLanguage } from "@/context/language-context";
 import { LanguageSwitcher } from "./language-switcher";
+import { SiteLogo } from "./site-logo";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
 
 function MenuIcon({ className }: { className?: string }) {
@@ -138,6 +139,7 @@ export function HeroFloatingNav() {
         className="pointer-events-auto inline-flex w-max max-w-[calc(100vw-1.25rem)] flex-nowrap items-center gap-1.5 rounded-full border border-brand-line bg-brand-card/95 px-2 py-2 shadow-[0_4px_28px_rgba(31,35,38,0.08),0_0_0_1px_rgba(216,225,229,0.6)] sm:gap-2.5 sm:px-4 sm:py-2.5 md:gap-3 md:px-6 md:py-3"
         aria-label="Main"
       >
+        <SiteLogo variant="heroNav" lightUiTone="subtleContrast" />
         <button
           type="button"
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark hover:shadow-sm active:scale-95 active:bg-brand-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 ${

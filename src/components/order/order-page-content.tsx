@@ -15,6 +15,7 @@ import { OrderMobileBar } from "./order-mobile-bar";
 import { OrderCartDrawer } from "./order-cart-drawer";
 import { emptyMenuAttributeFilter, filterBestsellersAndNewSections, itemMatchesMenuFilters } from "@/lib/menu-filter";
 import { MENU_NAV_BESTSELLERS, MENU_NAV_NEW } from "@/lib/menu-scroll";
+import { categoryHasSushiExtras } from "@/lib/menu-sushi-order-categories";
 
 /** Desktop: 2 Karten pro Zeile, gleiche Zeilenhöhe · Mobile/Tablet: 1 Spalte */
 const orderMenuGridClass =
@@ -47,7 +48,7 @@ export function OrderPageContent() {
   const sushiLikeIds = useMemo(() => {
     const ids = new Set<string>();
     categories
-      .filter((c) => c.id === "sushi" || c.id === "maki-cat" || c.id === "sashimi")
+      .filter((c) => categoryHasSushiExtras(c.id))
       .forEach((c) => c.items.forEach((i) => ids.add(i.id)));
     return ids;
   }, [categories]);
@@ -136,9 +137,7 @@ export function OrderPageContent() {
                           key={`${category.id}-${item.id}`}
                           item={item}
                           starterGroupId={category.id}
-                          allowSushiExtras={
-                            category.id === "sushi" || category.id === "maki-cat" || category.id === "sashimi"
-                          }
+                          allowSushiExtras={categoryHasSushiExtras(category.id)}
                         />
                       ))}
                     </div>

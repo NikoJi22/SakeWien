@@ -133,6 +133,8 @@ type TranslationSchema = {
     smsVerifyHintSubmit: string;
     /** After SMS was sent successfully */
     codeSentInfo: string;
+    smsPhonePlaceholder: string;
+    smsCodePlaceholder: string;
     sendCode: string;
     resendCode: string;
     enterCode: string;
@@ -328,10 +330,12 @@ export const translations: Record<Language, TranslationSchema> = {
       smsVerifyTitle: "Verify your phone",
       smsVerifyHintSubmit: "Enter your phone number, tap “Send code”, then enter the SMS code below and confirm.",
       codeSentInfo: "Code sent. Enter it below and tap Confirm.",
+      smsPhonePlaceholder: "06761234567",
+      smsCodePlaceholder: "Enter 6-digit code",
       sendCode: "Send code",
       resendCode: "Resend code",
       enterCode: "SMS code",
-      confirmCode: "Confirm",
+      confirmCode: "Confirm code",
       codeSending: "Sending…",
       codeVerifying: "Checking…",
       verifiedPhone: "Phone verified",
@@ -519,10 +523,12 @@ export const translations: Record<Language, TranslationSchema> = {
       smsVerifyHintSubmit:
         "Telefonnummer eingeben, auf „Code senden“ tippen, dann den SMS-Code unten eingeben und bestätigen.",
       codeSentInfo: "Code gesendet. Bitte unten eingeben und auf Bestätigen tippen.",
+      smsPhonePlaceholder: "06761234567",
+      smsCodePlaceholder: "6-stelligen Code eingeben",
       sendCode: "Code senden",
       resendCode: "Code erneut senden",
       enterCode: "SMS-Code",
-      confirmCode: "Bestätigen",
+      confirmCode: "Code bestätigen",
       codeSending: "Wird gesendet…",
       codeVerifying: "Wird geprüft…",
       verifiedPhone: "Telefon bestätigt",

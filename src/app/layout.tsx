@@ -7,6 +7,7 @@ import { MenuDataProvider } from "@/context/menu-data-context";
 import { OrderCartDrawerProvider } from "@/context/order-cart-drawer-context";
 import { SiteContentProvider } from "@/context/site-content-context";
 import { ConditionalNav } from "@/components/conditional-nav";
+import { ConditionalMain } from "@/components/conditional-main";
 import { ConditionalFooter } from "@/components/conditional-footer";
 import { MobileLanguageSwitcher } from "@/components/mobile-language-switcher";
 
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
   title: "Sake Vienna",
   description: "Modern Japanese restaurant website for Sake in Vienna.",
   icons: {
-    icon: "/sake-logo.png"
+    icon: "/sake-logo-mark.png"
   }
 };
 
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <GiftConfigProvider>
                 <SiteContentProvider>
                   <ConditionalNav />
-                  <main className="min-h-screen">{children}</main>
+                  <ConditionalMain>{children}</ConditionalMain>
                   <ConditionalFooter />
                   <MobileLanguageSwitcher />
                 </SiteContentProvider>

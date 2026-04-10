@@ -1,10 +1,24 @@
-import path from "path";
-import sharp from "sharp";
 import { PDFDocument, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 
-const COMPANY_NAME = "Sake Pan Jun Tao KG";
+/** Rechtsträger (Fußzeile / intern) */
+const COMPANY_LEGAL = "Sake Pan Jun Tao KG";
 const COMPANY_STREET = "Kaiserstraße 81/6";
 const COMPANY_CITY = "1070 Wien";
+
+/** Kassenbon: Anzeigename (ohne Logo, thermotauglich) */
+const headerRestaurantName = () => process.env.ORDER_PDF_RESTAURANT_NAME?.trim() || "Sake";
+
+const headerRestaurantPhone = () =>
+  process.env.RESTAURANT_PHONE?.trim() || process.env.ORDER_PDF_PHONE?.trim() || "";
+
+/** z. B. Mo–So 11:00–22:00 · Di Ruhetag — optional ORDER_PDF_OPENING_HOURS (eine Zeile) */
+const openingHoursLine = () =>
+  process.env.ORDER_PDF_OPENING_HOURS?.trim() || "Mo–So 11:00–22:00 Uhr · Dienstag Ruhetag";
+
+/** Hinweis Lieferbezirke (fest, thermotauglich; optional ORDER_PDF_DELIVERY_DISTRICTS) */
+const deliveryDistrictsNotice = () =>
+  process.env.ORDER_PDF_DELIVERY_DISTRICTS?.trim() ||
+  "Lieferung nur in den Wiener Bezirken 6, 7, 8, 15 und 16. In alle anderen Bezirke liefern wir nicht.";
 
 export type OrderPdfLine = {
   name: string;
@@ -18,7 +32,6 @@ export type OrderPdfInput = {
   fulfillment: "pickup" | "delivery";
   createdAt: Date;
   customerName: string;
-  /** Empty for pickup when customer did not provide a number */
   phone?: string;
   email?: string;
   deliveryAddressLine?: string;
@@ -29,16 +42,13 @@ export type OrderPdfInput = {
   cutlery: { chopsticks: number; wooden: number; totalEur: number } | null;
   giftEligible: boolean;
   giftMessage?: string;
-  /** Summe Gerichte (ohne Besteck) */
   itemsSubtotalEur: number;
-  /** Gesamtbetrag inkl. Besteck (wie vom Client übermittelt) */
   grandTotalEur: number;
-  /** Lieferkosten EUR, nur anzeigen wenn > 0 */
   deliveryFeeEur?: number;
 };
 
 function formatEur(n: number): string {
-  return `€ ${n.toFixed(2).replace(".", ",")}`;
+  return `${n.toFixed(2).replace(".", ",")} €`;
 }
 
 function formatViennaDateTime(d: Date): string {
@@ -70,15 +80,31 @@ function wrapLine(text: string, font: PDFFont, size: number, maxW: number): stri
   return out;
 }
 
-const MARGIN = 48;
-const LINE_H = 14;
-const PAGE_W = 595.28;
+/** 80 mm Breite (Thermo/Kassenbon); Standardhöhe — bei langen Bestellungen neue Seite */
+const PAGE_W = (80 * 72) / 25.4;
 const PAGE_H = 841.89;
 
-function ensureSpace(page: PDFPage, y: number, need: number, pdfDoc: PDFDocument): { page: PDFPage; y: number } {
-  if (y - need >= MARGIN) return { page, y };
+const MARGIN_X = 10;
+const MARGIN_TOP = 14;
+const MARGIN_BOTTOM = 16;
+const LINE_H = 13;
+const GAP_SM = 2;
+const GAP_MD = 5;
+
+function ensureSpace(
+  page: PDFPage,
+  y: number,
+  need: number,
+  pdfDoc: PDFDocument
+): { page: PDFPage; y: number } {
+  if (y - need >= MARGIN_BOTTOM) return { page, y };
   const newPage = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  return { page: newPage, y: PAGE_H - MARGIN };
+  return { page: newPage, y: PAGE_H - MARGIN_TOP };
+}
+
+function drawTextRight(page: PDFPage, y: number, text: string, size: number, font: PDFFont): void {
+  const w = font.widthOfTextAtSize(text, size);
+  page.drawText(text, { x: PAGE_W - MARGIN_X - w, y, size, font });
 }
 
 export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
@@ -87,178 +113,169 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  let y = PAGE_H - MARGIN;
+  let y = PAGE_H - MARGIN_TOP;
 
-  const draw = (text: string, opts?: { size?: number; bold?: boolean; indent?: number }) => {
-    const size = opts?.size ?? 10;
-    const f = opts?.bold ? fontBold : font;
-    const x = MARGIN + (opts?.indent ?? 0);
-    page.drawText(text, { x, y, size, font: f });
-    y -= size + 3;
+  const contentW = PAGE_W - MARGIN_X * 2;
+
+  const drawCenter = (text: string, size: number, useBold = false) => {
+    const f = useBold ? fontBold : font;
+    const w = f.widthOfTextAtSize(text, size);
+    ({ page, y } = ensureSpace(page, y, size + GAP_SM + 2, pdfDoc));
+    page.drawText(text, { x: (PAGE_W - w) / 2, y, size, font: f });
+    y -= size + GAP_SM;
   };
 
-  const drawParagraph = (text: string, size = 10) => {
-    const maxW = PAGE_W - MARGIN * 2;
-    const lines = wrapLine(text, font, size, maxW);
+  const drawCenterWrapped = (text: string, size: number, useBold = false) => {
+    const f = useBold ? fontBold : font;
+    const lines = wrapLine(text, f, size, contentW);
     for (const ln of lines) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 4, pdfDoc));
-      page.drawText(ln, { x: MARGIN, y, size, font });
+      ({ page, y } = ensureSpace(page, y, LINE_H + 1, pdfDoc));
+      const w = f.widthOfTextAtSize(ln, size);
+      page.drawText(ln, { x: (PAGE_W - w) / 2, y, size, font: f });
       y -= LINE_H;
     }
   };
 
-  // Logo (Datei kann JPEG/WebP o. Ä. sein — sharp erzeugt ein echtes PNG für pdf-lib)
-  try {
-    const logoPath = path.join(process.cwd(), "public", "sake-logo.png");
-    const pngBuffer = await sharp(logoPath).png().toBuffer();
-    const image = await pdfDoc.embedPng(pngBuffer);
-    const targetW = 120;
-    const scale = targetW / image.width;
-    const h = image.height * scale;
-    ({ page, y } = ensureSpace(page, y, h + 16, pdfDoc));
-    page.drawImage(image, { x: MARGIN, y: y - h, width: targetW, height: h });
-    y -= h + 12;
-  } catch (e) {
-    console.error("[order-pdf] Could not embed logo:", e);
-    draw("SAKE", { size: 18, bold: true });
-    y -= 4;
+  const drawLeft = (text: string, opts?: { size?: number; bold?: boolean }) => {
+    const size = opts?.size ?? 11;
+    const f = opts?.bold ? fontBold : font;
+    ({ page, y } = ensureSpace(page, y, size + GAP_SM + 1, pdfDoc));
+    page.drawText(text, { x: MARGIN_X, y, size, font: f });
+    y -= size + GAP_SM;
+  };
+
+  const drawLeftWrapped = (text: string, size = 10) => {
+    const lines = wrapLine(text, font, size, contentW);
+    for (const ln of lines) {
+      ({ page, y } = ensureSpace(page, y, LINE_H + 1, pdfDoc));
+      page.drawText(ln, { x: MARGIN_X, y, size, font });
+      y -= LINE_H;
+    }
+  };
+
+  // ——— Kassenkopf (zentriert, sofort Kontakt) ———
+  drawCenter(headerRestaurantName(), 14, true);
+  drawCenterWrapped(COMPANY_STREET, 11, false);
+  drawCenterWrapped(COMPANY_CITY, 11, false);
+  const tel = headerRestaurantPhone();
+  if (tel) {
+    drawCenter(`Tel. ${tel}`, 11, true);
   }
+  y -= GAP_MD;
 
-  draw(COMPANY_NAME, { size: 11, bold: true });
-  draw(COMPANY_STREET, { size: 10 });
-  draw(COMPANY_CITY, { size: 10 });
-  y -= 8;
+  // ——— Abhol- / Lieferzeit: oben, maximal sichtbar ———
+  if (input.fulfillment === "pickup") {
+    drawCenter("ABHOLZEIT", 12, true);
+    const t = input.pickupTime?.trim() || "—";
+    drawCenter(t, 20, true);
+  } else {
+    drawCenter("LIEFERZEIT", 12, true);
+    const t = input.deliveryTime?.trim() || "—";
+    drawCenter(t, 20, true);
+  }
+  y -= GAP_MD;
 
-  draw(`Bestellnummer: ${input.orderId}`, { size: 12, bold: true });
-  draw(`Datum / Uhrzeit (Wien): ${formatViennaDateTime(input.createdAt)}`, { size: 10 });
-  draw(`Bestellart: ${fulfillmentLabel(input.fulfillment)}`, { size: 10, bold: true });
-  y -= 4;
+  // ——— Bestelldaten ———
+  drawLeft(`Bestellnr.: ${input.orderId}`, { size: 12, bold: true });
+  drawLeft(`Datum (Wien): ${formatViennaDateTime(input.createdAt)}`, { size: 11 });
+  drawLeft(`Art: ${fulfillmentLabel(input.fulfillment)}`, { size: 11, bold: true });
+  y -= GAP_SM;
 
-  draw(`Kunde: ${input.customerName || "—"}`, { size: 10 });
-  draw(`Telefon: ${input.phone || "—"}`, { size: 10 });
-  if (input.email?.trim()) draw(`E-Mail: ${input.email.trim()}`, { size: 10 });
+  drawLeft(`Kunde: ${input.customerName || "—"}`, { size: 11 });
+  drawLeft(`Telefon: ${input.phone || "—"}`, { size: 11 });
+  if (input.email?.trim()) drawLeft(`E-Mail: ${input.email.trim()}`, { size: 11 });
 
   if (input.fulfillment === "delivery" && input.deliveryAddressLine) {
-    y -= 2;
-    draw("Lieferadresse:", { size: 10, bold: true });
-    drawParagraph(input.deliveryAddressLine, 10);
+    y -= GAP_SM;
+    drawLeft("Lieferadresse:", { size: 11, bold: true });
+    drawLeftWrapped(input.deliveryAddressLine, 11);
   }
 
-  if (input.fulfillment === "pickup" && input.pickupTime) {
-    draw(`Abholzeit: ${input.pickupTime}`, { size: 10 });
-  }
-  if (input.fulfillment === "delivery" && input.deliveryTime) {
-    draw(`Lieferzeit: ${input.deliveryTime}`, { size: 10 });
-  }
+  y -= GAP_MD;
+  ({ page, y } = ensureSpace(page, y, LINE_H * 2 + 8, pdfDoc));
+  drawLeft("POSITIONEN", { size: 12, bold: true });
+  y -= GAP_SM;
 
-  y -= 8;
-  ({ page, y } = ensureSpace(page, y, 40, pdfDoc));
-  draw("Positionen", { size: 11, bold: true });
-  y -= 4;
-
-  const colQty = MARGIN;
-  const colDesc = MARGIN + 36;
-  const colUnit = PAGE_W - MARGIN - 160;
-  const colSum = PAGE_W - MARGIN - 70;
-  const descMaxW = colUnit - colDesc - 8;
-
-  const headerY = y;
-  page.drawText("Menge", { x: colQty, y: headerY, size: 9, font: fontBold });
-  page.drawText("Gericht / Optionen", { x: colDesc, y: headerY, size: 9, font: fontBold });
-  page.drawText("Einzel", { x: colUnit, y: headerY, size: 9, font: fontBold });
-  page.drawText("Summe", { x: colSum, y: headerY, size: 9, font: fontBold });
-  y -= LINE_H + 2;
+  const rowFont = 10;
+  const priceColW = 52;
+  const descMaxW = contentW - priceColW - 6;
 
   for (const line of input.lines) {
-    const nameLines = wrapLine(line.name, font, 9, descMaxW);
-    const rowH = Math.max(LINE_H, nameLines.length * LINE_H) + 4;
-    ({ page, y } = ensureSpace(page, y, rowH + 8, pdfDoc));
-
+    const leftLabel = `${line.quantity}× ${line.name}`;
+    const nameLines = wrapLine(leftLabel, font, rowFont, descMaxW);
+    const rowH = nameLines.length * LINE_H + GAP_SM + 4;
+    ({ page, y } = ensureSpace(page, y, rowH, pdfDoc));
     const rowTop = y;
-    page.drawText(String(line.quantity), { x: colQty, y: rowTop, size: 9, font });
-    page.drawText(formatEur(line.unitPriceEur), { x: colUnit, y: rowTop, size: 9, font });
-    page.drawText(formatEur(line.lineTotalEur), { x: colSum, y: rowTop, size: 9, font });
-
+    drawTextRight(page, rowTop, formatEur(line.lineTotalEur), rowFont, fontBold);
     let ty = rowTop;
     for (const nl of nameLines) {
-      page.drawText(nl, { x: colDesc, y: ty, size: 9, font });
-      ty -= LINE_H - 1;
+      page.drawText(nl, { x: MARGIN_X, y: ty, size: rowFont, font });
+      ty -= LINE_H;
     }
-    y = Math.min(ty, rowTop - (nameLines.length - 1) * (LINE_H - 1)) - 6;
+    y = ty - GAP_SM;
   }
 
   if (input.cutlery && (input.cutlery.chopsticks > 0 || input.cutlery.wooden > 0)) {
-    ({ page, y } = ensureSpace(page, y, LINE_H * 5, pdfDoc));
-    y -= 4;
-    draw("Besteck / Extras", { size: 10, bold: true });
+    y -= GAP_SM;
+    drawLeft("Besteck / Extras", { size: 11, bold: true });
     const parts: string[] = [];
     if (input.cutlery.chopsticks > 0) parts.push(`Stäbchen × ${input.cutlery.chopsticks}`);
     if (input.cutlery.wooden > 0) parts.push(`Holzbesteck × ${input.cutlery.wooden}`);
-    drawParagraph(parts.join(", "), 9);
+    drawLeftWrapped(parts.join(", "), 10);
     if (input.cutlery.totalEur > 0) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 6, pdfDoc));
-      page.drawText(`Summe Besteck: ${formatEur(input.cutlery.totalEur)}`, {
-        x: PAGE_W - MARGIN - 220,
-        y,
-        size: 9,
-        font
-      });
+      ({ page, y } = ensureSpace(page, y, LINE_H + 4, pdfDoc));
+      drawTextRight(page, y, `Besteck: ${formatEur(input.cutlery.totalEur)}`, 10, font);
       y -= LINE_H + 2;
     }
   }
 
   if (input.giftEligible) {
-    ({ page, y } = ensureSpace(page, y, LINE_H * 3, pdfDoc));
-    y -= 4;
-    draw("Bonus / Geschenk", { size: 10, bold: true });
-    drawParagraph(input.giftMessage?.trim() || "Aktiv (Schwellenwert erreicht)", 9);
+    y -= GAP_SM;
+    drawLeft("Bonus / Geschenk", { size: 11, bold: true });
+    drawLeftWrapped(input.giftMessage?.trim() || "Aktiv (Schwellenwert erreicht)", 10);
   }
 
   if (input.comment?.trim()) {
-    ({ page, y } = ensureSpace(page, y, LINE_H * 3, pdfDoc));
-    y -= 4;
-    draw("Anmerkung", { size: 10, bold: true });
-    drawParagraph(input.comment.trim(), 9);
+    y -= GAP_SM;
+    drawLeft("Anmerkung", { size: 11, bold: true });
+    drawLeftWrapped(input.comment.trim(), 10);
   }
 
-  y -= 12;
-  ({ page, y } = ensureSpace(page, y, 80, pdfDoc));
+  y -= GAP_MD;
+  ({ page, y } = ensureSpace(page, y, 72, pdfDoc));
+
   const fee = Number(input.deliveryFeeEur || 0);
-  page.drawText(`Zwischensumme: ${formatEur(input.itemsSubtotalEur)}`, {
-    x: PAGE_W - MARGIN - 220,
-    y,
-    size: 10,
-    font
-  });
+  drawTextRight(page, y, `Zwischensumme: ${formatEur(input.itemsSubtotalEur)}`, 11, font);
   y -= LINE_H + 2;
 
   if (input.cutlery && input.cutlery.totalEur > 0) {
-    page.drawText(`Besteck (Summe): ${formatEur(input.cutlery.totalEur)}`, {
-      x: PAGE_W - MARGIN - 220,
-      y,
-      size: 10,
-      font
-    });
+    drawTextRight(page, y, `Besteck (Summe): ${formatEur(input.cutlery.totalEur)}`, 11, font);
     y -= LINE_H + 2;
   }
 
   if (fee > 0) {
-    page.drawText(`Lieferkosten: ${formatEur(fee)}`, {
-      x: PAGE_W - MARGIN - 220,
-      y,
-      size: 10,
-      font
-    });
+    drawTextRight(page, y, `Lieferkosten: ${formatEur(fee)}`, 11, font);
     y -= LINE_H + 2;
   }
 
-  y -= 6;
-  page.drawText(`Gesamtbetrag: ${formatEur(input.grandTotalEur)}`, {
-    x: PAGE_W - MARGIN - 260,
-    y,
-    size: 14,
-    font: fontBold
-  });
+  y -= GAP_SM;
+  ({ page, y } = ensureSpace(page, y, 28, pdfDoc));
+  const totalStr = `GESAMT: ${formatEur(input.grandTotalEur)}`;
+  const totalSize = 15;
+  const tw = fontBold.widthOfTextAtSize(totalStr, totalSize);
+  page.drawText(totalStr, { x: PAGE_W - MARGIN_X - tw, y, size: totalSize, font: fontBold });
+  y -= totalSize + GAP_MD;
+
+  // ——— Fuß: Liefergebiete + Öffnungszeiten (keine Website) ———
+  y -= GAP_MD;
+  ({ page, y } = ensureSpace(page, y, LINE_H * 6, pdfDoc));
+  drawLeft("LIEFERGEBIET", { size: 10, bold: true });
+  drawLeftWrapped(deliveryDistrictsNotice(), 9);
+  y -= GAP_MD;
+  drawLeft("ÖFFNUNGSZEITEN", { size: 10, bold: true });
+  drawLeftWrapped(openingHoursLine(), 9);
+  y -= GAP_SM;
+  drawLeftWrapped(COMPANY_LEGAL, 7);
 
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);

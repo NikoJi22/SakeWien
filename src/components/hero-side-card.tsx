@@ -16,13 +16,18 @@ type Props = {
   label: string;
   imageSrc: string;
   imageAlt: string;
+  /** Vollflächiger Hero: keine Rundung / kein Rand an den Viewport-Kanten */
+  edgeToEdge?: boolean;
 };
 
-export function HeroSideCard({ href, label, imageSrc, imageAlt }: Props) {
+export function HeroSideCard({ href, label, imageSrc, imageAlt, edgeToEdge = false }: Props) {
+  const frame = edgeToEdge
+    ? "rounded-none border-0"
+    : "rounded-[1.75rem] border border-white/[0.08] shadow-sm sm:rounded-[2rem]";
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[128px] flex-1 basis-0 overflow-hidden rounded-[1.75rem] border border-white/[0.08] sm:min-h-[148px] lg:min-h-0"
+      className={`group relative flex min-h-[120px] flex-1 basis-0 overflow-hidden sm:min-h-[140px] lg:min-h-0 ${frame}`}
     >
       <Image
         src={imageSrc}

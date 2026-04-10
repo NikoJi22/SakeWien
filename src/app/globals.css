@@ -29,7 +29,7 @@
 }
 
 body {
-  @apply bg-brand-page text-brand-ink antialiased;
+  @apply m-0 bg-brand-page p-0 text-brand-ink antialiased;
   font-size: 17px;
 }
 
@@ -41,6 +41,9 @@ body {
  */
 html {
   cursor: auto;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
 }
 
 @layer base {

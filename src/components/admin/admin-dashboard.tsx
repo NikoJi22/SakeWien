@@ -142,7 +142,8 @@ export function AdminDashboard() {
     setLoadError("");
     try {
       const [menuRes, giftRes, siteRes] = await Promise.all([
-        fetch("/api/menu", { cache: "no-store" }),
+        /** Volle Karte inkl. Mittagsmenü — `/api/menu` blendet Lunch außerhalb der Zeiten aus. */
+        fetch("/api/admin/menu", { cache: "no-store", credentials: "same-origin" }),
         fetch("/api/gift", { cache: "no-store" }),
         fetch("/api/site-content", { cache: "no-store" })
       ]);

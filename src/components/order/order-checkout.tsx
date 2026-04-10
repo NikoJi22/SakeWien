@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { useCart } from "@/context/cart-context";
 import { useGiftConfig } from "@/context/gift-config-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
@@ -8,6 +8,7 @@ import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
+import { normalizeToE164 } from "@/lib/phone-normalize";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
 import type { translations } from "@/lib/translations";
 
@@ -157,26 +158,48 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [smsError, setSmsError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitBlockedReason, setSubmitBlockedReason] = useState<string | null>(null);
   const [pickupClock, setPickupClock] = useState(nowTimeValue);
   const [chopsticksCount, setChopsticksCount] = useState(0);
   const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
-  const [codeSent, setCodeSent] = useState(false);
+  const [showOtpSection, setShowOtpSection] = useState(false);
   const [smsInfo, setSmsInfo] = useState<string | null>(null);
   const [lastPlacedOrderId, setLastPlacedOrderId] = useState<string | null>(null);
   const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
+  const isPickup = fulfillment === "pickup";
+  const isDelivery = fulfillment === "delivery";
   /** SMS required only for delivery */
-  const needsSmsVerification = fulfillment === "delivery";
+  const needsSmsVerification = isDelivery;
+  const normalizedPhone = normalizeToE164(phone);
+  const shouldShowOtpInput = !phoneVerified && showOtpSection;
+  const otpSectionRef = useRef<HTMLDivElement | null>(null);
+  const isSubmitting = status === "loading";
+  const pickupSubmitDisabled = isSubmitting;
+  const deliverySubmitDisabled = isSubmitting || sendLoading || verifyLoading || !phoneVerified;
+  const isSubmitDisabled = isPickup ? pickupSubmitDisabled : deliverySubmitDisabled;
+  const submitDisabledReason = (() => {
+    if (!isSubmitDisabled) return "none";
+    if (isSubmitting) return "isSubmitting";
+    if (isDelivery && sendLoading) return "delivery_sendLoading";
+    if (isDelivery && verifyLoading) return "delivery_verifyLoading";
+    if (isDelivery && !phoneVerified) return "delivery_phoneNotVerified";
+    return "unknown";
+  })();
 
   useEffect(() => {
     if (fulfillment !== "pickup") return;
     setPhoneVerified(false);
     setPhone("");
     setOtp("");
-    setCodeSent(false);
+    setShowOtpSection(false);
+    setSendLoading(false);
+    setVerifyLoading(false);
     setSmsError(null);
     setSmsInfo(null);
+    setSubmitError(null);
+    setSubmitBlockedReason(null);
   }, [fulfillment]);
 
   const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
@@ -188,10 +211,16 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     setPhoneVerified(false);
     setPhone("");
     setOtp("");
-    setCodeSent(false);
+    setShowOtpSection(false);
     setSmsInfo(null);
     setSmsError(null);
+    setSubmitBlockedReason(null);
   }, [lines.length]);
+
+  useEffect(() => {
+    if (!shouldShowOtpInput) return;
+    otpSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [shouldShowOtpInput]);
 
   function onPhoneInput(v: string) {
     setPhone(v);
@@ -199,18 +228,23 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     setOtp("");
     setSmsError(null);
     setSubmitError(null);
-    setCodeSent(false);
+    setSubmitBlockedReason(null);
+    setShowOtpSection(false);
     setSmsInfo(null);
   }
 
   async function requestSmsCode(): Promise<boolean> {
     setSmsError(null);
+    if (!normalizedPhone) {
+      setSmsError(t.order.errInvalidPhone);
+      return false;
+    }
     setSendLoading(true);
     try {
       const res = await fetch("/api/send-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone })
+        body: JSON.stringify({ phone: normalizedPhone })
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
@@ -227,9 +261,10 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   }
 
   async function handleResendCode() {
+    setShowOtpSection(true);
     const ok = await requestSmsCode();
     if (ok) {
-      setCodeSent(true);
+      setPhone(normalizedPhone ?? phone);
       setSmsInfo(t.order.codeSentInfo);
     }
   }
@@ -241,7 +276,10 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       const res = await fetch("/api/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, code: otp }),
+        body: JSON.stringify({
+          phone: normalizedPhone ?? phone,
+          code: otp.replace(/\D/g, "").slice(0, 6)
+        }),
         credentials: "same-origin"
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
@@ -263,7 +301,12 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (lines.length === 0) return;
+    setSubmitBlockedReason(null);
+    if (lines.length === 0) {
+      setSubmitBlockedReason("empty_cart");
+      setSubmitError(t.order.errEmptyCartPayload);
+      return;
+    }
 
     const fd = new FormData(e.currentTarget);
     const pickupRaw = fulfillment === "pickup" ? String(fd.get("pickupTime") ?? "") : "";
@@ -283,20 +326,23 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         return;
       }
     }
-    if (!isDeliveryMinMet) {
+    if (isDelivery && !isDeliveryMinMet) {
       setStatus("idle");
       setSubmitError(t.order.deliveryMinOrder);
+      setSubmitBlockedReason("delivery_min_order");
       return;
     }
 
-    if (needsSmsVerification && !phoneVerified) {
+    if (isDelivery && !phoneVerified) {
       const phoneTrim = phone.trim();
-      if (!phoneTrim) {
+      if (!phoneTrim || !normalizedPhone) {
         setSubmitError(t.order.errInvalidPhone);
+        setSubmitBlockedReason("delivery_invalid_phone");
         return;
       }
       setSubmitError(t.order.errPhoneNotVerified);
       setSmsInfo(null);
+      setSubmitBlockedReason("delivery_phone_not_verified");
       return;
     }
 
@@ -307,10 +353,12 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       const city = String(fd.get("deliveryCity") ?? "").trim();
       if (!street || !houseNumber || !postalCode || !city) {
         setSubmitError(t.order.errDeliveryAddressIncomplete);
+        setSubmitBlockedReason("delivery_address_incomplete");
         return;
       }
       if (!/^\d{4}$/.test(postalCode)) {
         setSubmitError(t.order.errDeliveryAddressPlz);
+        setSubmitBlockedReason("delivery_address_invalid_plz");
         return;
       }
     }
@@ -323,7 +371,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     const payload = {
       fulfillment,
       name: String(fd.get("name") ?? ""),
-      phone: fulfillment === "delivery" ? phone.trim() : "",
+      phone: isDelivery ? normalizedPhone ?? phone.trim() : "",
       email: String(fd.get("email") ?? ""),
       deliveryAddress:
         fulfillment === "delivery"
@@ -417,7 +465,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       setPhoneVerified(false);
       setPhone("");
       setOtp("");
-      setCodeSent(false);
+      setShowOtpSection(false);
       setSmsInfo(null);
 
       try {
@@ -646,34 +694,34 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                 required
                 autoComplete="tel"
                 inputMode="tel"
-                placeholder={t.form.phonePlaceholder}
+                placeholder={t.order.smsPhonePlaceholder}
                 value={phone}
                 onChange={(e) => onPhoneInput(e.target.value)}
+                onBlur={() => {
+                  if (normalizedPhone) setPhone(normalizedPhone);
+                }}
                 className={inputClass}
                 disabled={phoneVerified}
               />
-              {!phoneVerified && <p className="text-xs leading-relaxed text-brand-subtle">{t.form.phoneHint}</p>}
+              {!phoneVerified && <p className="text-xs leading-relaxed text-brand-subtle">{t.order.smsVerifyHintSubmit}</p>}
             </label>
-            {!phoneVerified && !codeSent && (
-              <>
-                <p className="text-sm leading-relaxed text-brand-body">{t.order.smsVerifyHintSubmit}</p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => void handleResendCode()}
-                    disabled={sendLoading || !phone.trim()}
-                    className={`${btnPrimary} py-2.5 text-xs tracking-wider sm:px-8`}
-                  >
-                    {sendLoading ? t.order.codeSending : t.order.sendCode}
-                  </button>
-                </div>
-              </>
+            {!phoneVerified && (
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void handleResendCode()}
+                  disabled={sendLoading}
+                  className={`${btnPrimary} py-2.5 text-xs tracking-wider sm:px-8`}
+                >
+                  {sendLoading ? t.order.codeSending : t.order.sendCode}
+                </button>
+              </div>
             )}
             {smsInfo && !phoneVerified && (
               <p className="text-sm font-medium text-brand-primary">{smsInfo}</p>
             )}
-            {!phoneVerified && codeSent && (
-              <>
+            {shouldShowOtpInput && (
+              <div ref={otpSectionRef} className="space-y-3">
                 <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
                   <span>{t.order.enterCode}</span>
                   <input
@@ -681,16 +729,16 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                     inputMode="numeric"
                     autoComplete="one-time-code"
                     value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                     className={inputClass}
-                    placeholder="000000"
+                    placeholder={t.order.smsCodePlaceholder}
                   />
                 </label>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => void handleVerifyCode()}
-                    disabled={verifyLoading || !otp.trim()}
+                    disabled={verifyLoading || otp.trim().length !== 6 || !normalizedPhone}
                     className={`${btnPrimary} py-2.5 text-xs tracking-wider sm:px-8`}
                   >
                     {verifyLoading ? t.order.codeVerifying : t.order.confirmCode}
@@ -698,13 +746,13 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                   <button
                     type="button"
                     onClick={() => void handleResendCode()}
-                    disabled={sendLoading || !phone.trim()}
+                    disabled={sendLoading || !normalizedPhone}
                     className={btnOutline}
                   >
                     {sendLoading ? t.order.codeSending : t.order.resendCode}
                   </button>
                 </div>
-              </>
+              </div>
             )}
             {phoneVerified && (
               <span className="inline-flex items-center text-sm font-medium text-brand-success">
@@ -734,7 +782,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           {fulfillment === "pickup" && <p className="mt-2 text-xs opacity-90">{t.order.paymentPickupCardNote}</p>}
         </div>
 
-        {fulfillment === "pickup" ? (
+        {isPickup ? (
           <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
             <span>{t.order.pickupTime}</span>
             <input
@@ -818,17 +866,16 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
         <button
           type="submit"
-          disabled={
-            lines.length === 0 ||
-            status === "loading" ||
-            sendLoading ||
-            !isDeliveryMinMet ||
-            (needsSmsVerification && !phoneVerified)
-          }
+          disabled={isSubmitDisabled}
           className={`${btnPrimary} py-3.5 text-sm tracking-[0.15em]`}
         >
           {status === "loading" ? t.form.sending : t.order.placeOrder}
         </button>
+        <div className="rounded-lg border border-brand-line bg-brand-canvas/70 px-3 py-2 text-xs text-brand-subtle">
+          <p>debug.mode: {isPickup ? "pickup" : "delivery"}</p>
+          <p>debug.disabledReason: {submitDisabledReason}</p>
+          <p>debug.submitBlockedReason: {submitBlockedReason ?? "none"}</p>
+        </div>
 
         {needsSmsVerification && !phoneVerified && (
           <p className="text-sm text-brand-subtle">Bitte zuerst Telefonnummer per SMS-Code verifizieren.</p>

@@ -16,58 +16,62 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 3.9,
-        "image": "/uploads/menu/soup-miso.webp",
+        "priceEur": 3,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "F"
         ],
         "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
+        "vegan": true
       },
       {
         "id": "soup-hot-sour",
         "name": {
-          "de": "Peking-Sauer-Suppe",
-          "en": "Hot & sour soup"
+          "de": "Süß-Sauer Suppe",
+          "en": "Sweet & sour soup"
         },
         "description": {
-          "de": "Leicht scharf, asiatisch-würzig.",
-          "en": "Lightly spicy, aromatic."
+          "de": "Klassische asiatische Suppe.",
+          "en": "Classic sweet and sour soup."
         },
-        "priceEur": 4.5,
-        "image": "https://res.cloudinary.com/dlats4nsx/image/upload/v1775646836/sake-menu/rlvxee3ykkl5pq44djv0.jpg",
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "soup-vegetable",
+        "name": {
+          "de": "Gemüse Suppe",
+          "en": "Vegetable soup"
+        },
+        "description": {
+          "de": "Vegan.",
+          "en": "Vegan."
+        },
+        "priceEur": 3.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "C",
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "soup-tom-kha",
+        "name": {
+          "de": "Tom Kha Gai Suppe",
+          "en": "Tom kha gai soup"
+        },
+        "description": {
+          "de": "Kokos, Zitronengras, kräftig aromatisch.",
+          "en": "Coconut, lemongrass, aromatic."
+        },
+        "priceEur": 5.5,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
           "F",
           "G"
         ],
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "soup-tom-yam",
-        "name": {
-          "de": "Tom Yum Suppe",
-          "en": "Tom yum soup"
-        },
-        "description": {
-          "de": "Mit Garnelen, Zitronengras und Chili.",
-          "en": "With prawns, lemongrass and chili."
-        },
-        "priceEur": 5.9,
-        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "B",
-          "D",
-          "F",
-          "G",
-          "N"
-        ],
-        "spicy": true,
-        "isBestseller": true,
-        "spicyLevel": 1
+        "spicy": true
       }
     ]
   },
@@ -79,6 +83,92 @@
     },
     "items": [
       {
+        "id": "starter-mini-spring",
+        "name": {
+          "de": "Mini Frühlingsrollen (6 Stk.)",
+          "en": "Mini spring rolls (6 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": "starter-spring-chicken",
+        "name": {
+          "de": "Frühlingsrollen mit Chicken (4 Stk.)",
+          "en": "Spring rolls with chicken (4 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": "starter-spring-shrimp",
+        "name": {
+          "de": "Garnelen Frühlingsrollen (4 Stk.)",
+          "en": "Shrimp spring rolls (4 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.5,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      {
+        "id": "starter-fried-shrimp",
+        "name": {
+          "de": "Frittierte Garnelen (5 Stk.)",
+          "en": "Fried shrimp (5 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.5,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "id": "starter-chicken-popcorn",
+        "name": {
+          "de": "Chicken Popcorn",
+          "en": "Chicken popcorn"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
+      },
+      {
         "id": "starter-edamame",
         "name": {
           "de": "Edamame",
@@ -88,396 +178,400 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 4.5,
+        "priceEur": 4.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "F"
         ],
         "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
+        "vegan": true
       },
       {
-        "id": "starter-gyoza",
+        "id": "starter-gyoza-veg",
         "name": {
-          "de": "Gyoza (6 Stk.)",
-          "en": "Gyoza (6 pcs.)"
-        },
-        "description": {
-          "de": "Hausgemachte Teigtaschen, leicht angebraten.",
-          "en": "Pan-fried dumplings."
-        },
-        "priceEur": 6.9,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      },
-      {
-        "id": "starter-wakame",
-        "name": {
-          "de": "Wakame Salat",
-          "en": "Wakame salad"
+          "de": "Gyoza mit Gemüse (5 Stk.)",
+          "en": "Gyoza with vegetables (5 pcs.)"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 5.5,
+        "priceEur": 5,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "D",
-          "F",
-          "G",
-          "P"
+          "A",
+          "F"
         ],
         "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
+        "vegan": true
       },
       {
-        "id": "starter-thai-beef",
+        "id": "starter-gyoza-chicken",
         "name": {
-          "de": "Thai Beef Salat",
-          "en": "Thai beef salad"
+          "de": "Gyoza mit Hühnerfleisch (5 Stk.)",
+          "en": "Gyoza with chicken (5 pcs.)"
         },
         "description": {
-          "de": "Rindfleischstreifen, Kräuter, Limette.",
-          "en": "Beef strips, herbs, lime."
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
         },
-        "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "priceEur": 5,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "F",
-          "G",
-          "N",
-          "P"
-        ],
-        "spicy": true,
-        "spicyLevel": 1
+          "A",
+          "F"
+        ]
       },
       {
-        "id": "starter-summer-roll",
+        "id": "starter-summer-roll-duck",
         "name": {
-          "de": "Sommerrollen (2 Stk.)",
-          "en": "Summer rolls (2 pcs.)"
+          "de": "Sommerrolle mit Ente (2 Stk.)",
+          "en": "Summer roll with duck (2 pcs.)"
         },
         "description": {
-          "de": "Reispapier, Gemüse, Kräuter, Erdnussdip.",
-          "en": "Rice paper, vegetables, herbs, peanut dip."
+          "de": "Reispapier, Gemüse, Kräuter.",
+          "en": "Rice paper, vegetables, herbs."
+        },
+        "priceEur": 5.9,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "F"
+        ]
+      },
+      {
+        "id": "starter-summer-roll-shrimp",
+        "name": {
+          "de": "Sommerrolle mit Garnelen (2 Stk.)",
+          "en": "Summer roll with shrimp (2 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "F"
+        ]
+      },
+      {
+        "id": "starter-bean-sprout",
+        "name": {
+          "de": "Sojasprossen Salat",
+          "en": "Bean sprout salad"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "starter-seaweed-salad",
+        "name": {
+          "de": "Seetang Salat",
+          "en": "Seaweed salad"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
         },
         "priceEur": 6.5,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "E",
           "F",
           "P"
         ],
         "vegetarian": true,
-        "vegan": true,
-        "isNew": true,
-        "spicyLevel": 0
+        "vegan": true
+      },
+      {
+        "id": "starter-salmon-tartar-salad",
+        "name": {
+          "de": "Lachstatar Salat",
+          "en": "Salmon tartar salad"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "starter-avocado-tuna-salad",
+        "name": {
+          "de": "Avocado Tuna Salat",
+          "en": "Avocado tuna salad"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "starter-salmon-tartar-bowl",
+        "name": {
+          "de": "Lachstatar Bowl",
+          "en": "Salmon tartar bowl"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "starter-tuna-bowl",
+        "name": {
+          "de": "Tuna Bowl",
+          "en": "Tuna bowl"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dim-sum",
+    "title": {
+      "en": "Dim Sum",
+      "de": "Dim Sum"
+    },
+    "items": [
+      {
+        "id": "dimsum-ha-gao",
+        "name": {
+          "de": "Ha Gao (3 Stk.)",
+          "en": "Ha gao (3 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 6,
+        "image": "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "id": "dimsum-baerlauch-ha-gao",
+        "name": {
+          "de": "Bärlauch Ha Gao (3 Stk.)",
+          "en": "Garlic chive ha gao (3 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 6,
+        "image": "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "id": "dimsum-xiao-long-bao",
+        "name": {
+          "de": "Xiao Long Bao (4 Stk.)",
+          "en": "Xiao long bao (4 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 6,
+        "image": "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
       }
     ]
   },
   {
     "id": "sushi",
     "title": {
-      "en": "Sushi",
-      "de": "Sushi"
+      "en": "Sushi Sets",
+      "de": "Sushi Sets"
     },
     "items": [
       {
-        "id": "sushi-nigiri-salmon",
+        "id": "sushi-klein-6",
         "name": {
-          "de": "Nigiri Lachs (2 Stk.)",
-          "en": "Salmon nigiri (2 pcs.)"
+          "de": "Sushi Klein (6 Stk.)",
+          "en": "Small sushi set (6 pcs.)"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 4.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      },
-      {
-        "id": "sushi-nigiri-tuna",
-        "name": {
-          "de": "Nigiri Thunfisch (2 Stk.)",
-          "en": "Tuna nigiri (2 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 5.2,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      },
-      {
-        "id": "sushi-nigiri-ebi",
-        "name": {
-          "de": "Nigiri Garnele (2 Stk.)",
-          "en": "Prawn nigiri (2 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 5.2,
-        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      },
-      {
-        "id": "sushi-nigiri-tamago",
-        "name": {
-          "de": "Nigiri Tamago (2 Stk.)",
-          "en": "Egg nigiri (2 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 4.5,
+        "priceEur": 11.9,
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "vegetarian": true,
-        "spicyLevel": 0
+          "D"
+        ]
       },
       {
-        "id": "sushi-set-9",
+        "id": "sushi-mittel-8",
         "name": {
-          "de": "Sushi Set klein (9 Stk.)",
-          "en": "Small sushi set (9 pcs.)"
+          "de": "Sushi Mittel (8 Stk.)",
+          "en": "Medium sushi set (8 pcs.)"
         },
         "description": {
-          "de": "Auswahl Nigiri & Maki.",
-          "en": "Assorted nigiri & maki."
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sushi-gross-10",
+        "name": {
+          "de": "Sushi Gross (10 Stk.)",
+          "en": "Large sushi set (10 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 15.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sushi-sake-mittel-8",
+        "name": {
+          "de": "Sake Sushi Mittel (8 Stk.)",
+          "en": "Salmon sushi medium (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sushi-sake-gross-10",
+        "name": {
+          "de": "Sake Sushi Gross (10 Stk.)",
+          "en": "Salmon sushi large (10 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sushi-sake-maguro-mittel-8",
+        "name": {
+          "de": "Sake Maguro Mittel (8 Stk.)",
+          "en": "Salmon & tuna medium (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
         },
         "priceEur": 14.9,
-        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "isBestseller": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "sushi-set-15",
-        "name": {
-          "de": "Sushi Set gross (15 Stk.)",
-          "en": "Large sushi set (15 pcs.)"
-        },
-        "description": {
-          "de": "Auswahl Nigiri & Maki.",
-          "en": "Assorted nigiri & maki."
-        },
-        "priceEur": 22.9,
-        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      }
-    ]
-  },
-  {
-    "id": "maki-cat",
-    "title": {
-      "en": "Maki",
-      "de": "Maki"
-    },
-    "items": [
-      {
-        "id": "maki-salmon",
-        "name": {
-          "de": "Maki Lachs (8 Stk.)",
-          "en": "Salmon maki (8 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 7.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
+          "D"
+        ]
       },
       {
-        "id": "maki-avocado",
+        "id": "sushi-maguro-mittel-8",
         "name": {
-          "de": "Maki Avocado (8 Stk.)",
-          "en": "Avocado maki (8 pcs.)"
+          "de": "Maguro Sushi Mittel (8 Stk.)",
+          "en": "Tuna sushi medium (8 pcs.)"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 6.9,
+        "priceEur": 15.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sushi-ebi-mittel-8",
+        "name": {
+          "de": "Ebi Sushi Mittel (8 Stk.)",
+          "en": "Prawn sushi medium (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 15.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "B"
+        ]
+      },
+      {
+        "id": "sushi-vegan-mittel-8",
+        "name": {
+          "de": "Vegan Sushi Mittel (8 Stk.)",
+          "en": "Vegan sushi medium (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
           "F"
         ],
         "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "maki-cucumber",
-        "name": {
-          "de": "Maki Gurke (8 Stk.)",
-          "en": "Cucumber maki (8 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 6.5,
-        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "F"
-        ],
-        "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "maki-tuna",
-        "name": {
-          "de": "Maki Thunfisch (8 Stk.)",
-          "en": "Tuna maki (8 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      },
-      {
-        "id": "maki-california",
-        "name": {
-          "de": "California Roll (8 Stk.)",
-          "en": "California roll (8 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "isBestseller": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "maki-spicy-tuna",
-        "name": {
-          "de": "Spicy Tuna Roll (8 Stk.)",
-          "en": "Spicy tuna roll (8 pcs.)"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 10.5,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "D",
-          "F",
-          "G",
-          "O"
-        ],
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "maki-dragon",
-        "name": {
-          "de": "Dragon Roll (8 Stk.)",
-          "en": "Dragon roll (8 pcs.)"
-        },
-        "description": {
-          "de": "Lachs, Avocado, Sesam.",
-          "en": "Salmon, avocado, sesame."
-        },
-        "priceEur": 12.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "D",
-          "F",
-          "G",
-          "P"
-        ],
-        "isNew": true,
-        "spicyLevel": 0
+        "vegan": true
       }
     ]
   },
@@ -489,27 +583,215 @@
     },
     "items": [
       {
-        "id": "sashimi-salmon-5",
+        "id": "sashimi-klein-lachs",
         "name": {
-          "de": "Sashimi Lachs (5 Stk.)",
-          "en": "Salmon sashimi (5 pcs.)"
+          "de": "Sashimi Klein (nur Lachs, 12 Scheiben)",
+          "en": "Small sashimi (salmon only, 12 slices)"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 11.9,
+        "priceEur": 20.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "sashimi-gross-mix",
+        "name": {
+          "de": "Sashimi Gross Mix (21 Scheiben)",
+          "en": "Large sashimi mix (21 slices)"
+        },
+        "description": {
+          "de": "Gemischter Fisch.",
+          "en": "Assorted fish."
+        },
+        "priceEur": 30.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "isBestseller": true
+      }
+    ]
+  },
+  {
+    "id": "sushi-platters",
+    "title": {
+      "en": "Sushi Platters",
+      "de": "Sushi Teller"
+    },
+    "items": [
+      {
+        "id": "platter-maki-1p",
+        "name": {
+          "de": "Sushi Maki Teller 1P",
+          "en": "Sushi maki platter 1 person"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 16.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
       },
       {
-        "id": "sashimi-tuna-5",
+        "id": "platter-maki-2p",
         "name": {
-          "de": "Sashimi Thunfisch (5 Stk.)",
-          "en": "Tuna sashimi (5 pcs.)"
+          "de": "Sushi Maki Teller 2P",
+          "en": "Sushi maki platter 2 persons"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 30.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "platter-sashimi-2p",
+        "name": {
+          "de": "Sushi Sashimi Teller 2P",
+          "en": "Sushi & sashimi platter 2 persons"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 32.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "platter-traum-mix-4p",
+        "name": {
+          "de": "Sushi Traum Mix 4P",
+          "en": "Sushi dream mix 4 persons"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 56.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "special-rolls",
+    "title": {
+      "en": "Special Rolls",
+      "de": "Special Rolls"
+    },
+    "items": [
+      {
+        "id": "roll-ichiban",
+        "name": {
+          "de": "Ichiban Roll",
+          "en": "Ichiban roll"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B",
+          "D",
+          "F",
+          "C"
+        ]
+      },
+      {
+        "id": "roll-dragon",
+        "name": {
+          "de": "Dragon Roll",
+          "en": "Dragon roll"
+        },
+        "description": {
+          "de": "Lachs, Avocado, Sesam.",
+          "en": "Salmon, avocado, sesame."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D",
+          "F"
+        ],
+        "isBestseller": true
+      },
+      {
+        "id": "roll-teriyaki-chicken",
+        "name": {
+          "de": "Teriyaki Chicken Roll",
+          "en": "Teriyaki chicken roll"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ]
+      },
+      {
+        "id": "roll-vegan",
+        "name": {
+          "de": "Vegan Roll",
+          "en": "Vegan roll"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "roll-frisch-tuna",
+        "name": {
+          "de": "Frisch Tuna Roll",
+          "en": "Fresh tuna roll"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 14.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D",
+          "B",
+          "F"
+        ]
+      },
+      {
+        "id": "roll-lachs-tatar",
+        "name": {
+          "de": "Lachs Tatar Roll",
+          "en": "Salmon tartar roll"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
@@ -519,26 +801,339 @@
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "D"
-        ],
-        "spicyLevel": 0
+        ]
       },
       {
-        "id": "sashimi-mix-9",
+        "id": "roll-aburi-lachs",
         "name": {
-          "de": "Sashimi Mix (9 Stk.)",
-          "en": "Sashimi mix (9 pcs.)"
+          "de": "Aburi Lachs Roll",
+          "en": "Seared salmon roll"
         },
         "description": {
-          "de": "Lachs, Thunfisch, weißer Fisch.",
-          "en": "Salmon, tuna, white fish."
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
         },
-        "priceEur": 21.9,
+        "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "D"
+        ]
+      },
+      {
+        "id": "roll-lachs-philadelphia",
+        "name": {
+          "de": "Lachs Philadelphia Roll",
+          "en": "Salmon Philadelphia roll"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D",
+          "G"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "maki-cat",
+    "title": {
+      "en": "Maki",
+      "de": "Maki"
+    },
+    "items": [
+      {
+        "id": "maki-sake-6",
+        "name": {
+          "de": "Sake Maki (6 Stk.)",
+          "en": "Salmon maki (6 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 4.5,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "maki-sake-12",
+        "name": {
+          "de": "Sake Maki (12 Stk.)",
+          "en": "Salmon maki (12 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 7.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "maki-sake-18",
+        "name": {
+          "de": "Sake Maki (18 Stk.)",
+          "en": "Salmon maki (18 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "maki-kappa-6",
+        "name": {
+          "de": "Kappa Maki (6 Stk.)",
+          "en": "Cucumber maki (6 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 4.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-kappa-12",
+        "name": {
+          "de": "Kappa Maki (12 Stk.)",
+          "en": "Cucumber maki (12 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 7.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-kappa-18",
+        "name": {
+          "de": "Kappa Maki (18 Stk.)",
+          "en": "Cucumber maki (18 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-avocado-6",
+        "name": {
+          "de": "Avocado Maki (6 Stk.)",
+          "en": "Avocado maki (6 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 4.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-avocado-12",
+        "name": {
+          "de": "Avocado Maki (12 Stk.)",
+          "en": "Avocado maki (12 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 7.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-avocado-18",
+        "name": {
+          "de": "Avocado Maki (18 Stk.)",
+          "en": "Avocado maki (18 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "maki-ebi-tempura-6",
+        "name": {
+          "de": "Ebi Tempura Maki (6 Stk.)",
+          "en": "Prawn tempura maki (6 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "id": "maki-ebi-tempura-12",
+        "name": {
+          "de": "Ebi Tempura Maki (12 Stk.)",
+          "en": "Prawn tempura maki (12 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "id": "maki-ebi-tempura-18",
+        "name": {
+          "de": "Ebi Tempura Maki (18 Stk.)",
+          "en": "Prawn tempura maki (18 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 17.9,
+        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "B"
+        ]
+      },
+      {
+        "id": "maki-mix-klein",
+        "name": {
+          "de": "Maki Mix (klein)",
+          "en": "Maki mix (small)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 7.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "maki-mix-gross",
+        "name": {
+          "de": "Maki Mix (gross)",
+          "en": "Maki mix (large)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.5,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ]
+      },
+      {
+        "id": "maki-salmon-sesame-8",
+        "name": {
+          "de": "Lachs Sesam Maki (8 Stk.)",
+          "en": "Salmon sesame maki (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 7.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D",
+          "P"
+        ]
+      },
+      {
+        "id": "maki-salmon-sesame-16",
+        "name": {
+          "de": "Lachs Sesam Maki (16 Stk.)",
+          "en": "Salmon sesame maki (16 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 13.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D",
+          "P"
+        ]
+      },
+      {
+        "id": "maki-california-8",
+        "name": {
+          "de": "California Maki (8 Stk.)",
+          "en": "California maki (8 pcs.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "B",
+          "C"
         ],
-        "isBestseller": true,
-        "spicyLevel": 0
+        "isBestseller": true
+      },
+      {
+        "id": "maki-california-temaki",
+        "name": {
+          "de": "California Temaki (1 Stk.)",
+          "en": "California hand roll (1 pc.)"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 5.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "B",
+          "C"
+        ]
       }
     ]
   },
@@ -550,28 +1145,7 @@
     },
     "items": [
       {
-        "id": "veg-eierreis-gemuese",
-        "name": {
-          "de": "Eierreis mit Gemüse",
-          "en": "Egg fried rice with vegetables"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "vegetarian": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "veg-gebratene-nudeln-gemuese",
+        "id": "fnr-noodles-veg",
         "name": {
           "de": "Gebratene Nudeln mit Gemüse",
           "en": "Fried noodles with vegetables"
@@ -580,26 +1154,340 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 9.5,
+        "priceEur": 9.9,
         "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "F",
-          "G"
+          "C"
+        ],
+        "vegetarian": true
+      },
+      {
+        "id": "fnr-noodles-chicken",
+        "name": {
+          "de": "Gebratene Nudeln mit Gemüse & Hühnerfleisch",
+          "en": "Fried noodles with vegetables & chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": "fnr-noodles-crispy-chicken",
+        "name": {
+          "de": "Gebratene Nudeln mit Gemüse & knusprigem Huhn",
+          "en": "Fried noodles with vegetables & crispy chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.5,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": "fnr-noodles-duck",
+        "name": {
+          "de": "Gebratene Nudeln mit Gemüse & Ente",
+          "en": "Fried noodles with vegetables & duck"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": "fnr-noodles-salmon",
+        "name": {
+          "de": "Gebratene Nudeln mit Gemüse & Lachs",
+          "en": "Fried noodles with vegetables & salmon"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C",
+          "D"
+        ]
+      },
+      {
+        "id": "fnr-rice-veg",
+        "name": {
+          "de": "Gebratener Eierreis mit Gemüse",
+          "en": "Egg fried rice with vegetables"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C"
+        ],
+        "vegetarian": true
+      },
+      {
+        "id": "fnr-rice-chicken",
+        "name": {
+          "de": "Gebratener Eierreis mit Gemüse & Hühnerfleisch",
+          "en": "Egg fried rice with vegetables & chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C"
+        ]
+      },
+      {
+        "id": "fnr-rice-crispy-chicken",
+        "name": {
+          "de": "Gebratener Eierreis mit Gemüse & knusprigem Huhn",
+          "en": "Egg fried rice with vegetables & crispy chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.5,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ]
+      },
+      {
+        "id": "fnr-rice-duck",
+        "name": {
+          "de": "Gebratener Eierreis mit Gemüse & Ente",
+          "en": "Egg fried rice with vegetables & duck"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C"
+        ]
+      },
+      {
+        "id": "fnr-rice-salmon",
+        "name": {
+          "de": "Gebratener Eierreis mit Gemüse & Lachs",
+          "en": "Egg fried rice with vegetables & salmon"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C",
+          "D"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "udon-ramen",
+    "title": {
+      "en": "Udon & Ramen",
+      "de": "Udon & Ramen"
+    },
+    "items": [
+      {
+        "id": "udon-veg",
+        "name": {
+          "de": "Udon Suppe mit Gemüse",
+          "en": "Udon soup with vegetables"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
         ],
         "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
+        "vegan": true
+      },
+      {
+        "id": "udon-chicken",
+        "name": {
+          "de": "Udon Suppe mit Hühnerfleisch",
+          "en": "Udon soup with chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ]
+      },
+      {
+        "id": "udon-duck",
+        "name": {
+          "de": "Udon Suppe mit Ente",
+          "en": "Udon soup with duck"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ]
+      },
+      {
+        "id": "ramen-veg",
+        "name": {
+          "de": "Ramen Suppe mit Gemüse",
+          "en": "Ramen soup with vegetables"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "ramen-chicken",
+        "name": {
+          "de": "Ramen Suppe mit Hühnerfleisch",
+          "en": "Ramen soup with chicken"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ]
+      },
+      {
+        "id": "ramen-duck",
+        "name": {
+          "de": "Ramen Suppe mit Ente",
+          "en": "Ramen soup with duck"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A"
+        ]
       }
     ]
   },
   {
     "id": "warm-dishes",
     "title": {
-      "en": "Warm Dishes with Rice",
-      "de": "Warme Speisen mit Reis"
+      "en": "Warm Dishes",
+      "de": "Warme Speisen"
     },
     "items": [
+      {
+        "id": "warm-wok-vegetables",
+        "name": {
+          "de": "Wok Gemüse",
+          "en": "Wok vegetables"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
+      {
+        "id": "warm-red-curry-tofu",
+        "name": {
+          "de": "Red Curry Tofu",
+          "en": "Red curry tofu"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "vegetarian": true,
+        "vegan": true,
+        "spicy": true
+      },
+      {
+        "id": "warm-cashew-tofu",
+        "name": {
+          "de": "Cashew Tofu",
+          "en": "Cashew tofu"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 11.5,
+        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F",
+          "H"
+        ],
+        "vegetarian": true,
+        "vegan": true
+      },
       {
         "id": "warm-wok-chicken",
         "name": {
@@ -610,101 +1498,12 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 12.9,
+        "priceEur": 10.9,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
+          "F"
         ],
-        "isBestseller": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "warm-teriyaki-chicken",
-        "name": {
-          "de": "Teriyaki Chicken",
-          "en": "Teriyaki chicken"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "isBestseller": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "warm-basilikum-chicken",
-        "name": {
-          "de": "Basilikum Chicken",
-          "en": "Basil chicken"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G",
-          "N"
-        ],
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "warm-red-curry-chicken",
-        "name": {
-          "de": "Red Curry Chicken",
-          "en": "Red curry chicken"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "warm-sesam-chicken",
-        "name": {
-          "de": "Sesam Chicken",
-          "en": "Sesame chicken"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G",
-          "P"
-        ],
-        "spicyLevel": 0
+        "isBestseller": true
       },
       {
         "id": "warm-cashew-chicken",
@@ -716,54 +1515,45 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 13.5,
+        "priceEur": 11.9,
         "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "C",
-          "F",
-          "G",
           "H"
-        ],
-        "spicyLevel": 0
+        ]
       },
       {
-        "id": "warm-wok-duck",
+        "id": "warm-basilikum-chicken",
         "name": {
-          "de": "Wok Duck",
-          "en": "Wok duck"
+          "de": "Basilikum Chicken",
+          "en": "Basil chicken"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "F",
-          "G"
+          "F"
         ],
-        "spicyLevel": 0
+        "spicy": true
       },
       {
-        "id": "warm-mango-duck",
+        "id": "warm-red-curry-chicken",
         "name": {
-          "de": "Mango Duck",
-          "en": "Mango duck"
+          "de": "Red Curry Chicken",
+          "en": "Red curry chicken"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "priceEur": 11.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "F",
-          "G"
+          "F"
         ],
-        "spicyLevel": 0
+        "spicy": true
       },
       {
         "id": "warm-red-curry-duck",
@@ -775,95 +1565,28 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 14.5,
+        "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "F",
-          "G"
+          "F"
         ],
-        "spicy": true,
-        "spicyLevel": 1
+        "spicy": true
       },
       {
-        "id": "warm-wok-beef",
+        "id": "warm-wok-duck",
         "name": {
-          "de": "Wok Beef",
-          "en": "Wok beef"
+          "de": "Wok Duck",
+          "en": "Wok duck"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
+        "priceEur": 12.9,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      },
-      {
-        "id": "warm-chili-beef",
-        "name": {
-          "de": "Chili Beef",
-          "en": "Chili beef"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "F",
-          "G"
-        ],
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "warm-black-pfeffer-beef",
-        "name": {
-          "de": "Black Pfeffer Beef",
-          "en": "Black pepper beef"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "F",
-          "G"
-        ],
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "warm-bulgogi",
-        "name": {
-          "de": "Bulgogi",
-          "en": "Bulgogi"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 14.9,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "isBestseller": true,
-        "spicyLevel": 0
+          "F"
+        ]
       },
       {
         "id": "warm-lachs-teriyaki",
@@ -875,16 +1598,13 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 14.9,
+        "priceEur": 12.9,
         "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "C",
           "D",
-          "F",
-          "G"
+          "F"
         ],
-        "isBestseller": true,
-        "spicyLevel": 0
+        "isBestseller": true
       },
       {
         "id": "warm-red-curry-garnelen",
@@ -896,37 +1616,12 @@
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 17.9,
+        "priceEur": 15.9,
         "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "B",
-          "D",
-          "F",
-          "G"
+          "B"
         ],
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "warm-pfeffer-garnelen",
-        "name": {
-          "de": "Pfeffer Garnelen",
-          "en": "Pepper prawns"
-        },
-        "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
-        },
-        "priceEur": 17.9,
-        "image": "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "B",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicy": true,
-        "spicyLevel": 1
+        "spicy": true
       }
     ]
   },
@@ -947,17 +1642,11 @@
           "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
           "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
         },
-        "priceEur": 13.5,
+        "priceEur": 13.9,
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
+          "F"
+        ]
       },
       {
         "id": "bento-lachs",
@@ -969,82 +1658,12 @@
           "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
           "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
         },
-        "priceEur": 13.5,
+        "priceEur": 13.9,
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
+          "D"
         ],
-        "isBestseller": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "bento-vegan",
-        "name": {
-          "de": "Vegan Bento",
-          "en": "Vegan bento"
-        },
-        "description": {
-          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
-          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
-        },
-        "priceEur": 12.5,
-        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "F"
-        ],
-        "vegetarian": true,
-        "vegan": true,
-        "isNew": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "bento-thunfisch",
-        "name": {
-          "de": "Thunfisch Bento",
-          "en": "Tuna bento"
-        },
-        "description": {
-          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
-          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
-        },
-        "priceEur": 14.5,
-        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
-      },
-      {
-        "id": "bento-sesam-chicken",
-        "name": {
-          "de": "Sesam Chicken Bento",
-          "en": "Sesame chicken bento"
-        },
-        "description": {
-          "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
-          "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
-        },
-        "priceEur": 13.5,
-        "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G",
-          "P"
-        ],
-        "spicyLevel": 0
+        "isBestseller": true
       },
       {
         "id": "bento-bulgogi",
@@ -1056,113 +1675,571 @@
           "de": "Mit Miso Suppe, Salat, Obst, 2 Sushi & 3 Maki.",
           "en": "With miso soup, salad, fruit, 2 sushi & 3 maki."
         },
-        "priceEur": 14.5,
+        "priceEur": 14.9,
         "image": "https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
+          "F"
+        ]
       }
     ]
   },
   {
-    "id": "vegetarian",
+    "id": "lunch",
     "title": {
-      "en": "Vegetarian",
-      "de": "Vegetarisch"
+      "en": "Lunch menu (Mon–Fri 11:00–15:00)\n(Starter: miso soup / sweet & sour soup / mini spring rolls)",
+      "de": "Mittagsmenü (Mo–Fr 11:00–15:00)\n(Vorspeise: Miso Suppe / Süßsauer Suppe / Mini Frühlingsrollen)"
     },
     "items": [
       {
-        "id": "veg-wok-gemuese-reis",
+        "id": "m1",
         "name": {
-          "de": "Wok Gemüse mit Reis",
-          "en": "Wok vegetables with rice"
+          "de": "M1 Wok Gemüse",
+          "en": "M1 Wok vegetables"
         },
         "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
         },
-        "priceEur": 12.9,
+        "priceEur": 9.9,
         "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "F",
-          "G"
+          "F"
         ],
-        "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "vegetarian": true
       },
       {
-        "id": "veg-red-curry-tofu",
+        "id": "m2",
         "name": {
-          "de": "Red Curry Tofu mit Reis",
-          "en": "Red curry tofu with rice"
+          "de": "M2 Red Curry Tofu",
+          "en": "M2 Red curry tofu"
         },
         "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
         },
-        "priceEur": 12.9,
+        "priceEur": 10.9,
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "F",
-          "G"
+          "F"
         ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
         "vegetarian": true,
         "vegan": true,
-        "spicy": true,
-        "isNew": true,
-        "spicyLevel": 1
+        "spicy": true
       },
       {
-        "id": "veg-cashew-tofu",
+        "id": "m3",
         "name": {
-          "de": "Cashew Tofu mit Reis",
-          "en": "Cashew tofu with rice"
+          "de": "M3 Red Curry Chicken",
+          "en": "M3 Red curry chicken"
         },
         "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
         },
-        "priceEur": 12.9,
-        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "F",
-          "G",
-          "H"
+          "F"
         ],
-        "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicy": true
       },
       {
-        "id": "veg-basilikum-tofu",
+        "id": "m4",
         "name": {
-          "de": "Basilikum Tofu mit Reis",
-          "en": "Basil tofu with rice"
+          "de": "M4 Basilikum Chicken",
+          "en": "M4 Basil chicken"
         },
         "description": {
-          "de": "Gericht von unserer Speisekarte.",
-          "en": "Signature dish from our menu."
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
         },
-        "priceEur": 12.9,
-        "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "spicy": true
+      },
+      {
+        "id": "m5",
+        "name": {
+          "de": "M5 Wok Ente",
+          "en": "M5 Wok duck"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "F"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "m6",
+        "name": {
+          "de": "M6 Lachs Teriyaki",
+          "en": "M6 Salmon teriyaki"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D",
+          "F"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "m7",
+        "name": {
+          "de": "M7 Gebratener Reis",
+          "en": "M7 Fried rice"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 8.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "m8",
+        "name": {
+          "de": "M8 Gebratene Nudeln mit Hühnerfleisch",
+          "en": "M8 Fried noodles with chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.5,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "F",
-          "G",
-          "N"
+          "C"
         ],
-        "vegetarian": true,
-        "vegan": true,
-        "spicy": true,
-        "spicyLevel": 1
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "m9",
+        "name": {
+          "de": "M9 Eierreis mit Lachs",
+          "en": "M9 Egg fried rice with salmon"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "C",
+          "D"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "m10",
+        "name": {
+          "de": "M10 Nudeln mit knusprigem Huhn",
+          "en": "M10 Noodles with crispy chicken"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 9.9,
+        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "A",
+          "C"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "id": "m11",
+        "name": {
+          "de": "M11 Sushi Set klein",
+          "en": "M11 Small sushi set"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        },
+        "isBestseller": true
+      },
+      {
+        "id": "m12",
+        "name": {
+          "de": "M12 Maki Mix",
+          "en": "M12 Maki mix"
+        },
+        "description": {
+          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
+          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
+        },
+        "priceEur": 10.9,
+        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
+        "allergens": [
+          "D"
+        ],
+        "lunchStarterChoice": {
+          "label": {
+            "de": "Vorspeise",
+            "en": "Starter"
+          },
+          "options": [
+            {
+              "id": "ls-miso",
+              "name": {
+                "de": "Miso Suppe",
+                "en": "Miso soup"
+              }
+            },
+            {
+              "id": "ls-sweet-sour",
+              "name": {
+                "de": "Süßsauer Suppe",
+                "en": "Sweet & sour soup"
+              }
+            },
+            {
+              "id": "ls-spring-rolls",
+              "name": {
+                "de": "Mini Frühlingsrollen",
+                "en": "Mini spring rolls"
+              }
+            }
+          ]
+        }
       }
     ]
   },
@@ -1187,16 +2264,14 @@
         "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
+          "C"
+        ]
       },
       {
         "id": "side-eierreis",
         "name": {
-          "de": "Eierreis",
-          "en": "Egg fried rice"
+          "de": "Gebratener Reis",
+          "en": "Fried rice"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
@@ -1205,31 +2280,34 @@
         "priceEur": 5,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "spicyLevel": 0
+          "C"
+        ]
       },
       {
-        "id": "side-bananen",
+        "id": "side-jasmin-reis",
         "name": {
-          "de": "Gebackene Bananen",
-          "en": "Baked bananas"
+          "de": "Jasmin Reis",
+          "en": "Jasmine rice"
         },
         "description": {
           "de": "Gericht von unserer Speisekarte.",
           "en": "Signature dish from our menu."
         },
-        "priceEur": 3.9,
-        "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "G"
-        ],
-        "vegetarian": true,
-        "spicyLevel": 0
+        "priceEur": 2.5,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
+      },
+      {
+        "id": "side-sushi-reis",
+        "name": {
+          "de": "Sushi Reis",
+          "en": "Sushi rice"
+        },
+        "description": {
+          "de": "Gericht von unserer Speisekarte.",
+          "en": "Signature dish from our menu."
+        },
+        "priceEur": 3,
+        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80"
       },
       {
         "id": "side-mochi-sesam",
@@ -1244,12 +2322,10 @@
         "priceEur": 3.5,
         "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
           "G",
           "P"
         ],
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "side-mochi-peanut",
@@ -1264,12 +2340,10 @@
         "priceEur": 3.5,
         "image": "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=80",
         "allergens": [
-          "A",
-          "E",
-          "G"
+          "G",
+          "E"
         ],
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       }
     ]
   },
@@ -1283,72 +2357,68 @@
       {
         "id": "drink-cola",
         "name": {
-          "de": "Cola (0,33L)",
-          "en": "Cola (0.33L)"
+          "de": "Cola",
+          "en": "Cola"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 2,
+        "priceEur": 2.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-cola-zero",
         "name": {
-          "de": "Cola Zero (0,33L)",
-          "en": "Cola Zero (0.33L)"
+          "de": "Cola Zero",
+          "en": "Cola Zero"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 2,
+        "priceEur": 2.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-almdudler",
         "name": {
-          "de": "Almdudler (0,33L)",
-          "en": "Almdudler (0.33L)"
+          "de": "Almdudler",
+          "en": "Almdudler"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 2,
+        "priceEur": 2.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-fanta",
         "name": {
-          "de": "Fanta (0,33L)",
-          "en": "Fanta (0.33L)"
+          "de": "Fanta",
+          "en": "Fanta"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 2,
+        "priceEur": 2.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
-        "id": "drink-eistee",
+        "id": "drink-eistee-zitrone",
         "name": {
-          "de": "Rauch Eistee (0,5L)",
-          "en": "Rauch iced tea (0.5L)"
+          "de": "Rauch Eistee Zitrone",
+          "en": "Rauch iced tea lemon"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
@@ -1357,40 +2427,52 @@
         "priceEur": 2.8,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
-        "id": "drink-aloe",
+        "id": "drink-eistee-pfirsich",
         "name": {
-          "de": "Aloe Vera",
-          "en": "Aloe vera"
+          "de": "Rauch Eistee Pfirsich",
+          "en": "Rauch iced tea peach"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 3.5,
+        "priceEur": 2.8,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
-        "id": "drink-roemer",
+        "id": "drink-roemer-still",
         "name": {
-          "de": "Römerquelle",
-          "en": "Römerquelle mineral water"
+          "de": "Römerquelle Still",
+          "en": "Römerquelle still"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 2.6,
+        "priceEur": 2.8,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
+      },
+      {
+        "id": "drink-roemer-prickelnd",
+        "name": {
+          "de": "Römerquelle Prickelnd",
+          "en": "Römerquelle sparkling"
+        },
+        "description": {
+          "de": "Aus unserer Getränkekarte.",
+          "en": "From our drinks menu."
+        },
+        "priceEur": 2.8,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
       },
       {
         "id": "drink-mango-saft",
@@ -1402,11 +2484,10 @@
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 3.5,
+        "priceEur": 4.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-lychee-saft",
@@ -1418,33 +2499,16 @@
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 3.5,
+        "priceEur": 4.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-apfel",
         "name": {
-          "de": "Apfelsaft 0,25L",
-          "en": "Apple juice 0.25L"
-        },
-        "description": {
-          "de": "Aus unserer Getränkekarte.",
-          "en": "From our drinks menu."
-        },
-        "priceEur": 2.9,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
-        "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "drink-apfel-soda",
-        "name": {
-          "de": "Apfelsaft mit Soda",
-          "en": "Apple juice with soda"
+          "de": "Apfelsaft",
+          "en": "Apple juice"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
@@ -1453,14 +2517,28 @@
         "priceEur": 4.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
-        "id": "drink-apfel-wasser",
+        "id": "drink-aloe",
         "name": {
-          "de": "Apfelsaft mit Wasser",
-          "en": "Apple juice with water"
+          "de": "Aloe Vera",
+          "en": "Aloe vera"
+        },
+        "description": {
+          "de": "Aus unserer Getränkekarte.",
+          "en": "From our drinks menu."
+        },
+        "priceEur": 4.5,
+        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
+        "vegan": true,
+        "vegetarian": true
+      },
+      {
+        "id": "drink-soda-zitrone",
+        "name": {
+          "de": "Soda Zitrone",
+          "en": "Lemon soda"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
@@ -1469,24 +2547,7 @@
         "priceEur": 3.9,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "drink-redbull",
-        "name": {
-          "de": "Red Bull",
-          "en": "Red Bull"
-        },
-        "description": {
-          "de": "Aus unserer Getränkekarte.",
-          "en": "From our drinks menu."
-        },
-        "priceEur": 3.5,
-        "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
-        "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-gruener-tee",
@@ -1498,47 +2559,44 @@
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 3.9,
+        "priceEur": 4.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-tsingtao",
         "name": {
-          "de": "Tsing Dao Bier",
-          "en": "Tsing Dao beer"
+          "de": "Tsing Tao Bier",
+          "en": "Tsing Tao beer"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 3.5,
+        "priceEur": 3.9,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A"
         ],
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
-        "id": "drink-kirin",
+        "id": "drink-ichiban-bier",
         "name": {
-          "de": "Kirin Ichiban Bier",
-          "en": "Kirin Ichiban beer"
+          "de": "Ichiban Bier",
+          "en": "Ichiban beer"
         },
         "description": {
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 3.5,
+        "priceEur": 3.9,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A"
         ],
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-stiegl",
@@ -1550,13 +2608,12 @@
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 3,
+        "priceEur": 3.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A"
         ],
-        "vegetarian": true,
-        "spicyLevel": 0
+        "vegetarian": true
       },
       {
         "id": "drink-ottakringer",
@@ -1568,766 +2625,12 @@
           "de": "Aus unserer Getränkekarte.",
           "en": "From our drinks menu."
         },
-        "priceEur": 2.8,
+        "priceEur": 3.5,
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "allergens": [
           "A"
         ],
-        "vegetarian": true,
-        "spicyLevel": 0
-      }
-    ]
-  },
-  {
-    "id": "lunch",
-    "title": {
-      "en": "Lunch menu (Mon–Fri 11:00–15:00)\n(Starter: miso soup / sweet & sour soup / mini spring rolls)",
-      "de": "Mittagsmenü (Mo–Fr 11:00–15:00)\n(Vorspeise: Miso Suppe / Süßsauer Suppe / Mini Frühlingsrollen)"
-    },
-    "items": [
-      {
-        "id": "m1",
-        "name": {
-          "de": "M1 Wok Gemüse mit Reis",
-          "en": "M1 Wok vegetables with rice"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1559314809-0d155014e29e?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "vegetarian": true,
-        "vegan": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "m2",
-        "name": {
-          "de": "M2 Wok Chicken mit Reis",
-          "en": "M2 Wok chicken with rice"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m3",
-        "name": {
-          "de": "M3 Wok Rindfleisch mit Reis",
-          "en": "M3 Wok beef with rice"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m4",
-        "name": {
-          "de": "M4 Wok Ente mit Teriyaki und Reis",
-          "en": "M4 Wok duck with teriyaki and rice"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m5",
-        "name": {
-          "de": "M5 Eierreis mit Hühnerfleisch",
-          "en": "M5 Egg fried rice with chicken"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m6",
-        "name": {
-          "de": "M6 Gebratene Nudeln mit Hühnerfleisch",
-          "en": "M6 Fried noodles with chicken"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 8.9,
-        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m7",
-        "name": {
-          "de": "M7 Eierreis mit Lachs",
-          "en": "M7 Egg fried rice with salmon"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m8",
-        "name": {
-          "de": "M8 Gebratene Nudeln mit Lachs",
-          "en": "M8 Fried noodles with salmon"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m9",
-        "name": {
-          "de": "M9 Lachs Teriyaki mit Gemüse",
-          "en": "M9 Salmon teriyaki with vegetables"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m10",
-        "name": {
-          "de": "M10 Sushi Set klein (6 Nigiri, 3 Maki)",
-          "en": "M10 Small sushi set (6 nigiri, 3 maki)"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 10.9,
-        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "isBestseller": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "m11",
-        "name": {
-          "de": "M11 Vietn. Basilikum Chicken",
-          "en": "M11 Vietnamese basil chicken"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G",
-          "N"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicy": true,
-        "spicyLevel": 1
-      },
-      {
-        "id": "m12",
-        "name": {
-          "de": "M12 Maki Mix",
-          "en": "M12 Maki mix"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 10.9,
-        "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "D",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "isNew": true,
-        "spicyLevel": 0
-      },
-      {
-        "id": "m13",
-        "name": {
-          "de": "M13 Eierreis mit Gemüse & knusprigem Huhn",
-          "en": "M13 Egg fried rice with vegetables & crispy chicken"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m14",
-        "name": {
-          "de": "M14 Nudeln mit Gemüse & knusprigem Huhn",
-          "en": "M14 Noodles with vegetables & crispy chicken"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.5,
-        "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "spicyLevel": 0
-      },
-      {
-        "id": "m15",
-        "name": {
-          "de": "M15 Knuspriges Huhn",
-          "en": "M15 Crispy chicken"
-        },
-        "description": {
-          "de": "Mo–Fr 11:00–15:00. Inklusive einer wählbaren Vorspeise (beim Bestellen auswählen).",
-          "en": "Mon–Fri 11:00–15:00. Includes one starter of your choice (select when ordering)."
-        },
-        "priceEur": 9.9,
-        "image": "https://images.unsplash.com/photo-1598103442097-550bdae62528?auto=format&fit=crop&w=900&q=80",
-        "allergens": [
-          "A",
-          "C",
-          "F",
-          "G"
-        ],
-        "lunchStarterChoice": {
-          "label": {
-            "de": "Vorspeise",
-            "en": "Starter"
-          },
-          "options": [
-            {
-              "id": "ls-miso",
-              "name": {
-                "de": "Miso Suppe",
-                "en": "Miso soup"
-              }
-            },
-            {
-              "id": "ls-sweet-sour",
-              "name": {
-                "de": "Süßsauer Suppe",
-                "en": "Sweet & sour soup"
-              }
-            },
-            {
-              "id": "ls-spring-rolls",
-              "name": {
-                "de": "Mini Frühlingsrollen",
-                "en": "Mini spring rolls"
-              }
-            }
-          ]
-        },
-        "isNew": true,
-        "spicyLevel": 0
+        "vegetarian": true
       }
     ]
   }
