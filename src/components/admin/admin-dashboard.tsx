@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem, SiteContentConfig } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
+import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
 import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
 import { defaultSiteContent } from "@/lib/site-content-default";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
@@ -149,7 +150,11 @@ export function AdminDashboard() {
       ]);
       if (!menuRes.ok) throw new Error("Menu load failed");
       const menuData = (await menuRes.json()) as MenuCategory[];
-      setCategories(cloneMenu(Array.isArray(menuData) ? menuData : []));
+      const list = cloneMenu(Array.isArray(menuData) ? menuData : []);
+      setCategories(list);
+      if (list.some((c) => c.id === LUNCH_CATEGORY_ID)) {
+        setExpandedCat((prev) => ({ ...prev, [LUNCH_CATEGORY_ID]: true }));
+      }
       if (giftRes.ok) {
         const g = (await giftRes.json()) as GiftConfig;
         setGift(g);
@@ -231,6 +236,7 @@ export function AdminDashboard() {
       }
       const res = await fetch("/api/admin/menu", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nextMenu)
       });
@@ -251,6 +257,7 @@ export function AdminDashboard() {
       setDishPriceDraft({});
       setMenuStatus("Menu saved.");
       window.dispatchEvent(new Event("sake-menu-updated"));
+      void load();
     } catch (error) {
       console.error("[admin] Save menu network error", error);
       setMenuStatus("Netzwerkfehler beim Speichern.");
@@ -552,7 +559,11 @@ export function AdminDashboard() {
         <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6">
           <div className="min-w-0 flex-1">
             <h1 className="font-serif text-lg tracking-wide text-neutral-900 sm:text-xl">Admin</h1>
-            <p className="hidden text-[11px] text-neutral-500 sm:block">Search, jump to a category, or expand one section at a time.</p>
+            <p className="hidden text-[11px] text-neutral-500 sm:block">
+              Search, jump to a category, or expand one section at a time. Lunch menu (Mittagsmenü): category id{" "}
+              <code className="rounded bg-neutral-100 px-1">{LUNCH_CATEGORY_ID}</code> — opens expanded after load; use sidebar or
+              &quot;Jump to&quot;.
+            </p>
           </div>
           <div className="flex w-full flex-col gap-2 sm:max-w-md sm:flex-1">
             <input

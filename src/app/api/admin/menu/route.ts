@@ -4,7 +4,16 @@ import type { LunchStarterChoice, LunchStarterOption, MenuCategory, MenuItem } f
 import { normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { readMenuFromDisk, writeMenuToDisk } from "@/lib/menu-store";
 import { menuCategories } from "@/lib/menu-data";
+import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
 import { cookies } from "next/headers";
+
+/** Gespeicherte Menüs (z. B. älterer Blob-Export) können ohne Lunch-Kategorie sein — Admin soll sie immer bearbeiten können. */
+function ensureLunchCategoryForAdmin(cats: MenuCategory[]): MenuCategory[] {
+  if (cats.some((c) => c.id === LUNCH_CATEGORY_ID)) return cats;
+  const fallback = menuCategories.find((c) => c.id === LUNCH_CATEGORY_ID);
+  if (!fallback) return cats;
+  return [...cats, JSON.parse(JSON.stringify(fallback)) as MenuCategory];
+}
 
 function isMenuCategoryArray(x: unknown): x is MenuCategory[] {
   if (!Array.isArray(x)) return false;
@@ -55,9 +64,9 @@ export async function GET() {
   }
   try {
     const data = await readMenuFromDisk();
-    return NextResponse.json(data);
+    return NextResponse.json(ensureLunchCategoryForAdmin(data));
   } catch {
-    return NextResponse.json(menuCategories);
+    return NextResponse.json(ensureLunchCategoryForAdmin(menuCategories));
   }
 }
 
@@ -78,7 +87,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid menu payload" }, { status: 400 });
   }
 
-  for (const cat of body) {
+  const bodyWithLunch = ensureLunchCategoryForAdmin(body);
+
+  for (const cat of bodyWithLunch) {
     for (const item of cat.items) {
       if (
         !item.id ||
@@ -101,7 +112,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const sanitized = body.map((cat) => ({
+    const sanitized = bodyWithLunch.map((cat) => ({
       ...cat,
       items: cat.items.map((item) => {
         const mi = item as MenuItem;

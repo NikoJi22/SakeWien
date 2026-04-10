@@ -56,10 +56,10 @@ export function OrderPageContent() {
   const leadingNav = useMemo(() => {
     const items: { id: string; label: string }[] = [];
     if (filteredDeals.length > 0) items.push({ id: "special-deals", label: "Aktionen" });
-    if (filteredBestsellers.length > 0) items.push({ id: MENU_NAV_BESTSELLERS, label: t.sections.bestsellers });
+    // Kein „Bestseller“-Tab hier: nur auf der Bestellseite ausgeblendet; Abschnitt darunter bleibt.
     if (filteredNew.length > 0) items.push({ id: MENU_NAV_NEW, label: t.sections.newDishes });
     return items;
-  }, [filteredBestsellers, filteredDeals.length, filteredNew, t.sections.bestsellers, t.sections.newDishes]);
+  }, [filteredDeals.length, filteredNew, t.sections.newDishes]);
 
   const anyMenu =
     filteredDeals.length > 0 || filteredBestsellers.length > 0 || filteredNew.length > 0 || withItems.some((c) => c.items.length > 0);
