@@ -87,10 +87,15 @@ function wrapLine(text: string, font: PDFFont, size: number, maxW: number): stri
 /** 80 mm Breite (Thermo/Kassenbon) — fest, keine A4-Breite */
 const RECEIPT_W = (80 * 72) / 25.4;
 /**
- * Nur für die Höhen-Messung: eine künstlich hohe „Rolle“, damit ohne Seitenumbruch alles Platz hat.
- * Kein A4, kein Paging — danach wird exakt eine Seite mit `dynamicHeight` erzeugt.
+ * Nur für die Höhen-Messung (pt). Groß genug für lange Bestellungen, aber unter üblichen PDF-/Viewer-Limits
+ * (extrem hohe Werte können pdf-lib oder Drucker-Treiber brechen).
  */
-const RECEIPT_PROBE_HEIGHT_PT = 400_000;
+const RECEIPT_PROBE_HEIGHT_PT = 16_000;
+/**
+ * Zusätzliche Höhe auf dem finalen Bon: Messung (`finalY`) und tatsächliches Layout weichen leicht ab
+ * (ensureSpace-Reserven, `LINE_H` vs. Schriftgröße) — ohne Puffer schlägt der zweite Render fehl.
+ */
+const RECEIPT_HEIGHT_BUFFER_PT = 120;
 
 const MARGIN_X = 10;
 /** Fester Rand oben bis erste Inhaltszeile (PDF-Punkte ≈ px bei 72 dpi). */
@@ -109,7 +114,7 @@ const FULFILLMENT_TIME_GAP_AFTER_LABEL = 8;
 function ensureSpace(page: PDFPage, y: number, need: number): { page: PDFPage; y: number } {
   if (y - need >= MARGIN_BOTTOM) return { page, y };
   throw new Error(
-    `[order-pdf] Bon-Inhalt übersteigt RECEIPT_PROBE_HEIGHT_PT (${RECEIPT_PROBE_HEIGHT_PT}). Messhöhe erhöhen oder Inhalt kürzen.`
+    `[order-pdf] Bon: zu wenig Platz unterhalb (y=${y.toFixed(1)}, need=${need}). Messhöhe (${RECEIPT_PROBE_HEIGHT_PT}) oder RECEIPT_HEIGHT_BUFFER_PT erhöhen.`
   );
 }
 
@@ -329,10 +334,13 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
 
   const startY = RECEIPT_PROBE_HEIGHT_PT - MARGIN_TOP;
   const contentSpanPt = startY - probe.finalY;
-  const dynamicHeight = Math.max(MARGIN_TOP + contentSpanPt + MARGIN_BOTTOM, MARGIN_TOP + MARGIN_BOTTOM + 48);
+  const dynamicHeight = Math.ceil(
+    MARGIN_TOP + contentSpanPt + MARGIN_BOTTOM + RECEIPT_HEIGHT_BUFFER_PT
+  );
+  const dynamicHeightClamped = Math.max(dynamicHeight, MARGIN_TOP + MARGIN_BOTTOM + 80);
 
   const pdfDoc = await PDFDocument.create();
-  await renderReceiptContent(pdfDoc, input, { pageHeight: dynamicHeight });
+  await renderReceiptContent(pdfDoc, input, { pageHeight: dynamicHeightClamped });
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);
 }
