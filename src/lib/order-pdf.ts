@@ -89,10 +89,8 @@ const PAGE_W = (80 * 72) / 25.4;
 const PAGE_H = 841.89;
 
 const MARGIN_X = 10;
-/** Oben: knapper Bon-Anfang (kein großer Weißraum). */
-const MARGIN_TOP = 24;
-/** Unten: etwas mehr als oben, Thermo-/Schnittzone — ohne übertriebenen Leerraum. */
-const MARGIN_BOTTOM = 34;
+/** Oberer und unterer Außenabstand identisch (PDF-Punkte; bei 72 dpi entspricht 1 pt ≈ 1 px). */
+const MARGIN_Y = 40;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 4;
@@ -107,9 +105,9 @@ function ensureSpace(
   need: number,
   pdfDoc: PDFDocument
 ): { page: PDFPage; y: number } {
-  if (y - need >= MARGIN_BOTTOM) return { page, y };
+  if (y - need >= MARGIN_Y) return { page, y };
   const newPage = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  return { page: newPage, y: PAGE_H - MARGIN_TOP };
+  return { page: newPage, y: PAGE_H - MARGIN_Y };
 }
 
 function drawTextRight(page: PDFPage, y: number, text: string, size: number, font: PDFFont): void {
@@ -117,24 +115,21 @@ function drawTextRight(page: PDFPage, y: number, text: string, size: number, fon
   page.drawText(text, { x: PAGE_W - MARGIN_X - w, y, size, font });
 }
 
-/** Erste Textzeile: knapp unter dem oberen Rand (Bon von oben lesbar, nicht vertikal „schwebend“). */
-function initialY(): number {
-  return PAGE_H - MARGIN_TOP;
-}
-
 /**
- * Komplettes Bon-Layout — oben ausgerichtet, ohne vertikale Mittelzentrierung.
+ * Komplettes Bon-Layout.
+ * `firstBaselineY`: erste Zeile (Höhe); bei einseitigem Bon so gewählt, dass Weißraum oben = unten.
  * @returns End-`y` (unterste Textzeile / Cursor) und Seitenanzahl
  */
 async function renderReceiptContent(
   pdfDoc: PDFDocument,
-  input: OrderPdfInput
+  input: OrderPdfInput,
+  firstBaselineY: number
 ): Promise<{ finalY: number; pageCount: number }> {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  let y = initialY();
+  let y = firstBaselineY;
 
   const contentW = PAGE_W - MARGIN_X * 2;
 
@@ -317,15 +312,27 @@ async function renderReceiptContent(
   y -= GAP_SM;
   drawLeft("ÖFFNUNGSZEITEN", { size: 10, bold: true });
   drawLeftWrapped(openingHoursLine(), 9);
-  y -= GAP_SM;
   drawLeftWrapped(COMPANY_LEGAL, 7);
 
   return { finalY: y, pageCount: pdfDoc.getPageCount() };
 }
 
 export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
+  const innerTop = PAGE_H - MARGIN_Y;
+  const innerBottom = MARGIN_Y;
+
+  const probeDoc = await PDFDocument.create();
+  const { finalY: probeFinalY, pageCount } = await renderReceiptContent(probeDoc, input, innerTop);
+
+  /** Einseitig: vertikal im Innenbereich zentrieren → identischer Weißraum oben und unten (jeweils MARGIN_Y bis Text). */
+  let firstY = innerTop;
+  if (pageCount === 1 && probeFinalY >= innerBottom) {
+    const slack = probeFinalY - innerBottom;
+    firstY = innerTop - slack / 2;
+  }
+
   const pdfDoc = await PDFDocument.create();
-  await renderReceiptContent(pdfDoc, input);
+  await renderReceiptContent(pdfDoc, input, firstY);
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);
 }
