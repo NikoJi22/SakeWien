@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/context/cart-context";
 import { useGiftConfig } from "@/context/gift-config-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
@@ -8,7 +8,17 @@ import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
-import { isPickupDateSameViennaToday, viennaTodayPickupIso } from "@/lib/vienna-calendar";
+import {
+  canAcceptNewOrdersVienna,
+  earliestFulfillmentDateKeyVienna,
+  hhmmToMinutes,
+  isAllowedDeliveryPostalCode,
+  latestFulfillmentDateKeyVienna,
+  maxPickupTimeHHmm,
+  minPickupTimeHHmmForDateKey,
+  validateDeliveryDateKey,
+  validatePickupNaiveIso
+} from "@/lib/order-schedule";
 import { normalizeToE164 } from "@/lib/phone-normalize";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
 import type { translations } from "@/lib/translations";
@@ -22,7 +32,15 @@ const ORDER_SUBMIT_ERROR_CODES = new Set([
   "delivery_min_order",
   "delivery_address_incomplete",
   "delivery_address_invalid_plz",
-  "pickup_same_day_only",
+  "orders_closed_cutoff",
+  "pickup_invalid_datetime",
+  "pickup_closed_tuesday",
+  "pickup_date_out_of_range",
+  "pickup_time_out_of_range",
+  "delivery_invalid_date",
+  "delivery_closed_tuesday",
+  "delivery_date_out_of_range",
+  "delivery_outside_area",
   "empty_cart",
   "missing_customer_name",
   "invalid_customer_phone",
@@ -50,8 +68,24 @@ function messageForOrderSubmitError(code: string | undefined, o: OrderCopy, http
       return o.errDeliveryAddressIncomplete;
     case "delivery_address_invalid_plz":
       return o.errDeliveryAddressPlz;
-    case "pickup_same_day_only":
-      return o.pickupSameDayOnly;
+    case "orders_closed_cutoff":
+      return o.errOrdersClosedCutoff;
+    case "pickup_invalid_datetime":
+      return o.errPickupInvalidDatetime;
+    case "pickup_closed_tuesday":
+      return o.errPickupClosedTuesday;
+    case "pickup_date_out_of_range":
+      return o.errPickupDateOutOfRange;
+    case "pickup_time_out_of_range":
+      return o.errPickupTimeOutOfRange;
+    case "delivery_invalid_date":
+      return o.errDeliveryInvalidDate;
+    case "delivery_closed_tuesday":
+      return o.errDeliveryClosedTuesday;
+    case "delivery_date_out_of_range":
+      return o.errDeliveryDateOutOfRange;
+    case "delivery_outside_area":
+      return o.errDeliveryOutsideArea;
     case "empty_cart":
       return o.errEmptyCartPayload;
     case "missing_customer_name":
@@ -134,13 +168,6 @@ function messageForSmsVerifyError(code: string | undefined, o: OrderCopy): strin
   }
 }
 
-function nowTimeValue() {
-  const d = new Date();
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  return `${hh}:${mm}`;
-}
-
 type OrderCheckoutProps = {
   variant?: "sidebar" | "drawer";
 };
@@ -159,13 +186,18 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [smsError, setSmsError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [pickupClock, setPickupClock] = useState(nowTimeValue);
+  const [fulfillmentDate, setFulfillmentDate] = useState(() => earliestFulfillmentDateKeyVienna());
+  const [pickupClock, setPickupClock] = useState(() =>
+    minPickupTimeHHmmForDateKey(earliestFulfillmentDateKeyVienna())
+  );
+  const [schedulePulse, setSchedulePulse] = useState(0);
   const [chopsticksCount, setChopsticksCount] = useState(0);
-  const [woodenCutleryCount, setWoodenCutleryCount] = useState(0);
+  const [woodSpoonCount, setWoodSpoonCount] = useState(0);
+  const [woodForkCount, setWoodForkCount] = useState(0);
   const [showOtpSection, setShowOtpSection] = useState(false);
   const [smsInfo, setSmsInfo] = useState<string | null>(null);
   const [lastPlacedOrderId, setLastPlacedOrderId] = useState<string | null>(null);
-  const cutleryFeeEur = (chopsticksCount + woodenCutleryCount) * 0.1;
+  const cutleryFeeEur = (chopsticksCount + woodSpoonCount + woodForkCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
   const isPickup = fulfillment === "pickup";
@@ -179,6 +211,43 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const pickupSubmitDisabled = isSubmitting;
   const deliverySubmitDisabled = isSubmitting || sendLoading || verifyLoading || !phoneVerified;
   const isSubmitDisabled = isPickup ? pickupSubmitDisabled : deliverySubmitDisabled;
+
+  useEffect(() => {
+    const id = setInterval(() => setSchedulePulse((n) => n + 1), 20000);
+    return () => clearInterval(id);
+  }, []);
+
+  const canOrderNow = useMemo(() => {
+    void schedulePulse;
+    return canAcceptNewOrdersVienna();
+  }, [schedulePulse]);
+  const minDateKey = earliestFulfillmentDateKeyVienna();
+  const maxDateKey = latestFulfillmentDateKeyVienna();
+  const pickupTimeMin = minPickupTimeHHmmForDateKey(fulfillmentDate);
+  const pickupTimeMax = maxPickupTimeHHmm();
+
+  useEffect(() => {
+    const minD = earliestFulfillmentDateKeyVienna();
+    const maxD = latestFulfillmentDateKeyVienna();
+    setFulfillmentDate((prev) => {
+      if (prev < minD) return minD;
+      if (prev > maxD) return maxD;
+      return prev;
+    });
+  }, [schedulePulse]);
+
+  useEffect(() => {
+    setPickupClock((prev) => {
+      const minS = minPickupTimeHHmmForDateKey(fulfillmentDate);
+      const maxS = maxPickupTimeHHmm();
+      const curM = hhmmToMinutes(prev);
+      const minM = hhmmToMinutes(minS)!;
+      const maxM = hhmmToMinutes(maxS)!;
+      if (curM == null || curM < minM) return minS;
+      if (curM > maxM) return maxS;
+      return prev;
+    });
+  }, [fulfillmentDate]);
 
   useEffect(() => {
     if (fulfillment !== "pickup") return;
@@ -295,14 +364,30 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       return;
     }
 
-    const fd = new FormData(e.currentTarget);
-    const pickupRaw = fulfillment === "pickup" ? String(fd.get("pickupTime") ?? "") : "";
-    const pickupTime =
-      fulfillment === "pickup" && /^\d{2}:\d{2}$/.test(pickupRaw) ? viennaTodayPickupIso(pickupRaw) : pickupRaw;
-    if (fulfillment === "pickup" && pickupTime && !isPickupDateSameViennaToday(pickupTime)) {
-      setStatus("idle");
-      setSubmitError(t.order.pickupSameDayOnly);
+    if (!canAcceptNewOrdersVienna()) {
+      setSubmitError(t.order.errOrdersClosedCutoff);
       return;
+    }
+
+    const fd = new FormData(e.currentTarget);
+    const pickupTime =
+      fulfillment === "pickup" ? `${fulfillmentDate}T${pickupClock}:00` : "";
+    if (fulfillment === "pickup") {
+      const pVal = validatePickupNaiveIso(pickupTime);
+      if (!pVal.ok) {
+        const map: Record<string, string> = {
+          pickup_invalid_datetime: t.order.errPickupInvalidDatetime,
+          pickup_closed_tuesday: t.order.errPickupClosedTuesday,
+          pickup_date_out_of_range: t.order.errPickupDateOutOfRange,
+          pickup_time_out_of_range: t.order.errPickupTimeOutOfRange,
+          orders_closed_cutoff: t.order.errOrdersClosedCutoff,
+          delivery_invalid_date: t.order.errDeliveryInvalidDate,
+          delivery_closed_tuesday: t.order.errDeliveryClosedTuesday,
+          delivery_date_out_of_range: t.order.errDeliveryDateOutOfRange
+        };
+        setSubmitError(map[pVal.error] ?? t.order.errPickupInvalidDatetime);
+        return;
+      }
     }
     if (isDelivery && !isDeliveryMinMet) {
       setStatus("idle");
@@ -334,6 +419,20 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         setSubmitError(t.order.errDeliveryAddressPlz);
         return;
       }
+      if (!isAllowedDeliveryPostalCode(postalCode)) {
+        setSubmitError(t.order.errDeliveryOutsideArea);
+        return;
+      }
+      const dVal = validateDeliveryDateKey(fulfillmentDate);
+      if (!dVal.ok) {
+        const map: Record<string, string> = {
+          delivery_invalid_date: t.order.errDeliveryInvalidDate,
+          delivery_closed_tuesday: t.order.errDeliveryClosedTuesday,
+          delivery_date_out_of_range: t.order.errDeliveryDateOutOfRange
+        };
+        setSubmitError(map[dVal.error] ?? t.order.errDeliveryInvalidDate);
+        return;
+      }
     }
 
     setSubmitError(null);
@@ -359,15 +458,21 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
             }
           : undefined,
       pickupTime,
-      deliveryTime: fulfillment === "delivery" ? String(fd.get("deliveryTime") ?? "") : "",
+      deliveryDate: fulfillment === "delivery" ? fulfillmentDate : undefined,
       comment: String(fd.get("comment") ?? ""),
       language,
       subtotalEur: totalEur,
       giftEligible: giftUnlocked,
       giftMessage: giftUnlocked ? giftMessage : "",
       cutlery:
-        chopsticksCount + woodenCutleryCount > 0
-          ? { chopsticksCount, woodenCutleryCount, unitPriceEur: 0.1, totalEur: cutleryFeeEur }
+        chopsticksCount + woodSpoonCount + woodForkCount > 0
+          ? {
+              chopsticksCount,
+              woodSpoonCount,
+              woodForkCount,
+              unitPriceEur: 0.1,
+              totalEur: cutleryFeeEur
+            }
           : null,
       lines: lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => ({
         id: lineKey,
@@ -435,6 +540,9 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       setLastPlacedOrderId(typeof data.orderId === "string" ? data.orderId : null);
       setStatus("success");
       clear();
+      const nextEarliest = earliestFulfillmentDateKeyVienna();
+      setFulfillmentDate(nextEarliest);
+      setPickupClock(minPickupTimeHHmmForDateKey(nextEarliest));
       setPhoneVerified(false);
       setPhone("");
       setOtp("");
@@ -550,29 +658,30 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       </div>
 
       <div className={subtotalBg}>
-        <div className="space-y-4 rounded-xl border border-brand-primary/10 bg-brand-canvas/50 p-4 sm:p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">{t.order.cutlery}</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className={`flex flex-col gap-2 ${labelMuted}`}>
-              <span>{t.order.chopsticks}</span>
-              <div className="flex items-center justify-end sm:justify-start">
-                <div className="flex shrink-0 items-center gap-0.5 rounded-full border-2 border-brand-line bg-brand-canvas p-0.5">
+        <div className="space-y-2 rounded-xl border border-brand-primary/10 bg-brand-canvas/50 p-3 sm:p-4">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-brand-subtle">{t.order.cutlery}</p>
+          {/** Immer 1 Spalte: schmale Sidebar/Drawer + sm:grid-cols-3 hat zu Überlappungen geführt. */}
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <div className="flex w-full min-w-0 items-center justify-between gap-2 rounded-lg border border-brand-line bg-brand-card/90 px-2.5 py-1.5">
+              <span className="min-w-0 shrink text-xs font-medium text-brand-ink">{t.order.chopsticks}</span>
+              <div className="flex shrink-0 items-center">
+                <div className="flex items-center rounded-full border border-brand-line bg-brand-canvas p-px">
                   <button
                     type="button"
                     onClick={() => setChopsticksCount((n) => Math.max(0, n - 1))}
                     disabled={chopsticksCount <= 0}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30"
                     aria-label="Decrease"
                   >
                     −
                   </button>
-                  <span className="min-w-[1.75rem] text-center text-xs font-bold tabular-nums text-brand-ink sm:min-w-[2rem] sm:text-sm">
+                  <span className="min-w-[1.5rem] px-0.5 text-center text-xs font-bold tabular-nums text-brand-ink">
                     {chopsticksCount}
                   </span>
                   <button
                     type="button"
                     onClick={() => setChopsticksCount((n) => n + 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark"
                     aria-label="Increase"
                   >
                     +
@@ -580,26 +689,53 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                 </div>
               </div>
             </div>
-            <div className={`flex flex-col gap-2 ${labelMuted}`}>
-              <span>{t.order.woodenCutlery}</span>
-              <div className="flex items-center justify-end sm:justify-start">
-                <div className="flex shrink-0 items-center gap-0.5 rounded-full border-2 border-brand-line bg-brand-canvas p-0.5">
+            <div className="flex w-full min-w-0 items-center justify-between gap-2 rounded-lg border border-brand-line bg-brand-card/90 px-2.5 py-1.5">
+              <span className="min-w-0 shrink text-xs font-medium text-brand-ink">{t.order.woodSpoon}</span>
+              <div className="flex shrink-0 items-center">
+                <div className="flex items-center rounded-full border border-brand-line bg-brand-canvas p-px">
                   <button
                     type="button"
-                    onClick={() => setWoodenCutleryCount((n) => Math.max(0, n - 1))}
-                    disabled={woodenCutleryCount <= 0}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    onClick={() => setWoodSpoonCount((n) => Math.max(0, n - 1))}
+                    disabled={woodSpoonCount <= 0}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30"
                     aria-label="Decrease"
                   >
                     −
                   </button>
-                  <span className="min-w-[1.75rem] text-center text-xs font-bold tabular-nums text-brand-ink sm:min-w-[2rem] sm:text-sm">
-                    {woodenCutleryCount}
+                  <span className="min-w-[1.5rem] px-0.5 text-center text-xs font-bold tabular-nums text-brand-ink">
+                    {woodSpoonCount}
                   </span>
                   <button
                     type="button"
-                    onClick={() => setWoodenCutleryCount((n) => n + 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
+                    onClick={() => setWoodSpoonCount((n) => n + 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark"
+                    aria-label="Increase"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex w-full min-w-0 items-center justify-between gap-2 rounded-lg border border-brand-line bg-brand-card/90 px-2.5 py-1.5">
+              <span className="min-w-0 shrink text-xs font-medium text-brand-ink">{t.order.woodFork}</span>
+              <div className="flex shrink-0 items-center">
+                <div className="flex items-center rounded-full border border-brand-line bg-brand-canvas p-px">
+                  <button
+                    type="button"
+                    onClick={() => setWoodForkCount((n) => Math.max(0, n - 1))}
+                    disabled={woodForkCount <= 0}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30"
+                    aria-label="Decrease"
+                  >
+                    −
+                  </button>
+                  <span className="min-w-[1.5rem] px-0.5 text-center text-xs font-bold tabular-nums text-brand-ink">
+                    {woodForkCount}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setWoodForkCount((n) => n + 1)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark"
                     aria-label="Increase"
                   >
                     +
@@ -652,6 +788,21 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
               {t.form.delivery}
             </button>
           </div>
+        </div>
+
+        <div className={`${infoBox} px-4 py-4 text-sm sm:px-5 sm:py-4`}>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-primary">{t.order.openingHoursTitle}</p>
+          <dl className="mt-3 space-y-2.5">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-brand-line/70 pb-2.5">
+              <dt className="min-w-0 font-medium text-brand-ink">{t.order.openingHoursWedMon}</dt>
+              <dd className="text-right text-brand-body">{t.order.openingHoursOpenSlot}</dd>
+            </div>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <dt className="font-medium text-brand-ink">{t.order.openingHoursTuesday}</dt>
+              <dd className="text-right font-medium text-brand-subtle">{t.order.openingHoursClosed}</dd>
+            </div>
+          </dl>
+          <p className="mt-3 text-xs leading-relaxed text-brand-subtle">{t.order.openingHoursFootnote}</p>
         </div>
 
         {needsSmsVerification && (
@@ -755,21 +906,65 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           {fulfillment === "pickup" && <p className="mt-2 text-xs opacity-90">{t.order.paymentPickupCardNote}</p>}
         </div>
 
+        {!canOrderNow && (
+          <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/5 px-4 py-3 text-sm font-medium text-brand-danger">
+            {t.order.ordersClosedMessage}
+          </p>
+        )}
+
         {isPickup ? (
-          <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
-            <span>{t.order.pickupTime}</span>
-            <input
-              name="pickupTime"
-              type="time"
-              required
-              value={pickupClock}
-              onChange={(e) => setPickupClock(e.target.value)}
-              className={inputClass}
-            />
-            <span className="text-xs text-brand-subtle">{t.order.pickupSameDayOnly}</span>
-          </label>
+          <div className="space-y-4">
+            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <span>{t.order.pickupDateLabel}</span>
+              <input
+                type="date"
+                required
+                value={fulfillmentDate}
+                min={minDateKey}
+                max={maxDateKey}
+                onChange={(e) => setFulfillmentDate(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <span>{t.order.pickupTime}</span>
+              <input
+                type="time"
+                required
+                value={pickupClock}
+                min={pickupTimeMin}
+                max={pickupTimeMax}
+                step={300}
+                onChange={(e) => setPickupClock(e.target.value)}
+                className={inputClass}
+              />
+              <span className="text-xs text-brand-subtle">{t.order.pickupSlotHint}</span>
+            </label>
+          </div>
         ) : (
           <div className="space-y-4">
+            <div
+              className="rounded-xl border-2 border-brand-primary/35 bg-brand-primary/8 px-4 py-3 text-center text-sm font-bold leading-snug text-brand-ink sm:text-base"
+              role="note"
+            >
+              {t.order.deliveryAreaNotice}
+            </div>
+            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <span>{t.order.deliveryDateLabel}</span>
+              <input
+                type="date"
+                required
+                value={fulfillmentDate}
+                min={minDateKey}
+                max={maxDateKey}
+                onChange={(e) => setFulfillmentDate(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+            <p className="text-sm text-brand-body">
+              <span className="font-semibold text-brand-ink">{t.order.deliveryTime}</span> —{" "}
+              {t.order.deliveryTimeEstimate}
+            </p>
             <div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand-subtle">
                 {t.order.deliveryAddressHeading}
@@ -823,10 +1018,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                 </label>
               </div>
             </div>
-            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
-              <span>{t.order.deliveryTime}</span>
-              <input name="deliveryTime" type="datetime-local" required className={inputClass} />
-            </label>
           </div>
         )}
 
@@ -839,7 +1030,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
         <button
           type="submit"
-          disabled={isSubmitDisabled}
+          disabled={isSubmitDisabled || !canOrderNow}
           className={`${btnPrimary} py-3.5 text-sm tracking-[0.15em]`}
         >
           {status === "loading" ? t.form.sending : t.order.placeOrder}

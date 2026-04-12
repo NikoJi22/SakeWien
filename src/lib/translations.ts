@@ -114,7 +114,29 @@ type TranslationSchema = {
     giftHint: string;
     fulfillment: string;
     pickupTime: string;
+    pickupDateLabel: string;
+    pickupSlotHint: string;
+    deliveryDateLabel: string;
     deliveryTime: string;
+    deliveryTimeEstimate: string;
+    deliveryAreaNotice: string;
+    openingHoursTitle: string;
+    /** Öffnungstage außer Dienstag (hier: Mi–Mo, Di Ruhetag dazwischen) */
+    openingHoursWedMon: string;
+    openingHoursTuesday: string;
+    openingHoursOpenSlot: string;
+    openingHoursClosed: string;
+    openingHoursFootnote: string;
+    ordersClosedMessage: string;
+    errOrdersClosedCutoff: string;
+    errPickupInvalidDatetime: string;
+    errPickupClosedTuesday: string;
+    errPickupDateOutOfRange: string;
+    errPickupTimeOutOfRange: string;
+    errDeliveryInvalidDate: string;
+    errDeliveryClosedTuesday: string;
+    errDeliveryDateOutOfRange: string;
+    errDeliveryOutsideArea: string;
     paymentMethod: string;
     cash: string;
     card: string;
@@ -180,13 +202,13 @@ type TranslationSchema = {
     deliveryAddressHeading: string;
     errDeliveryAddressIncomplete: string;
     errDeliveryAddressPlz: string;
-    pickupSameDayOnly: string;
     sushiExtras: string;
     wasabi: string;
     ginger: string;
     cutlery: string;
     chopsticks: string;
-    woodenCutlery: string;
+    woodSpoon: string;
+    woodFork: string;
     cutleryCount: string;
     /** Shown after successful order next to orderId */
     orderReferenceLabel: string;
@@ -315,7 +337,31 @@ export const translations: Record<Language, TranslationSchema> = {
       giftHint: "Spend more to unlock a complimentary gift.",
       fulfillment: "Pickup or delivery",
       pickupTime: "Pickup time",
+      pickupDateLabel: "Pickup date",
+      pickupSlotHint:
+        "Times are Vienna local time. Earliest slot 11:30; last slot 21:30. Tuesdays we are closed — choose another day.",
+      deliveryDateLabel: "Preferred delivery day",
       deliveryTime: "Delivery time",
+      deliveryTimeEstimate: "Delivery usually takes approx. 45–60 minutes (estimate only, not guaranteed).",
+      deliveryAreaNotice: "Delivery only to Vienna districts 6, 7, 8, 15 and 16 (postal codes 1060–1069, 1070–1079, 1080–1089, 1150–1159, 1160–1169).",
+      openingHoursTitle: "Opening hours",
+      openingHoursWedMon: "Wednesday – Monday",
+      openingHoursTuesday: "Tuesday",
+      openingHoursOpenSlot: "11:00 a.m. – 9:30 p.m.",
+      openingHoursClosed: "Closed",
+      openingHoursFootnote: "Vienna local time.",
+      ordersClosedMessage:
+        "We are not accepting new online orders after 9:15 p.m. Vienna time until midnight. Please try again tomorrow.",
+      errOrdersClosedCutoff:
+        "Online ordering is closed for today after 9:15 p.m. Vienna time. Please try again tomorrow from 12:00 a.m.",
+      errPickupInvalidDatetime: "Please choose a valid pickup date and time.",
+      errPickupClosedTuesday: "We are closed on Tuesdays — please pick another day for pickup.",
+      errPickupDateOutOfRange: "The pickup date is outside the allowed booking window.",
+      errPickupTimeOutOfRange: "Pickup must be between 11:30 and 9:30 p.m. on the chosen day.",
+      errDeliveryInvalidDate: "Please choose a valid delivery day.",
+      errDeliveryClosedTuesday: "We are closed on Tuesdays — please pick another day for delivery.",
+      errDeliveryDateOutOfRange: "The delivery day is outside the allowed booking window.",
+      errDeliveryOutsideArea: "Delivery is only available to districts 6, 7, 8, 15 and 16 (see postal code ranges above).",
       paymentMethod: "Payment on delivery",
       cash: "Cash",
       card: "Card (terminal)",
@@ -376,13 +422,13 @@ export const translations: Record<Language, TranslationSchema> = {
       deliveryAddressHeading: "Delivery address",
       errDeliveryAddressIncomplete: "Please fill in street, house number, postal code and city.",
       errDeliveryAddressPlz: "Please enter a valid 4-digit postal code.",
-      pickupSameDayOnly: "Pickup is only available for today.",
       sushiExtras: "Sushi extras",
       wasabi: "Wasabi",
       ginger: "Ginger",
       cutlery: "Cutlery",
       chopsticks: "Chopsticks",
-      woodenCutlery: "Wooden cutlery",
+      woodSpoon: "Wooden spoon",
+      woodFork: "Wooden fork",
       cutleryCount: "Count",
       orderReferenceLabel: "Order no.",
       orderPlacedSuccess: "Order sent."
@@ -507,7 +553,32 @@ export const translations: Record<Language, TranslationSchema> = {
       giftHint: "Mehr bestellen, um ein Gratis-Geschenk zu erhalten.",
       fulfillment: "Abholung oder Lieferung",
       pickupTime: "Abholzeit",
+      pickupDateLabel: "Abholdatum",
+      pickupSlotHint:
+        "Angaben in Wiener Ortszeit. Früheste Abholung 11:30 Uhr, letzter Slot 21:30 Uhr. Dienstag geschlossen — bitte anderen Tag wählen.",
+      deliveryDateLabel: "Gewünschter Liefertermin",
       deliveryTime: "Lieferzeit",
+      deliveryTimeEstimate: "Lieferzeit in der Regel ca. 45–60 Minuten (Richtwert, keine feste Zusage).",
+      deliveryAreaNotice:
+        "Lieferung nur in den 6., 7., 8., 15. und 16. Wiener Gemeindebezirk (Postleitzahlen 1060–1069, 1070–1079, 1080–1089, 1150–1159, 1160–1169).",
+      openingHoursTitle: "Öffnungszeiten",
+      openingHoursWedMon: "Mittwoch – Montag",
+      openingHoursTuesday: "Dienstag",
+      openingHoursOpenSlot: "11:00 – 21:30 Uhr",
+      openingHoursClosed: "Geschlossen",
+      openingHoursFootnote: "Angaben in Ortszeit Wien.",
+      ordersClosedMessage:
+        "Ab 21:15 Uhr (Wiener Zeit) ist für heute keine neue Online-Bestellung mehr möglich. Bitte ab Mitternacht erneut versuchen.",
+      errOrdersClosedCutoff:
+        "Online-Bestellungen sind heute ab 21:15 Uhr Wiener Zeit nicht mehr möglich. Bitte ab Mitternacht erneut versuchen.",
+      errPickupInvalidDatetime: "Bitte gültiges Abholdatum und eine gültige Uhrzeit wählen.",
+      errPickupClosedTuesday: "Dienstags haben wir geschlossen — bitte wählen Sie einen anderen Abholtag.",
+      errPickupDateOutOfRange: "Das Abholdatum liegt außerhalb des erlaubten Zeitraums.",
+      errPickupTimeOutOfRange: "Die Abholzeit muss am gewählten Tag zwischen 11:30 und 21:30 Uhr liegen.",
+      errDeliveryInvalidDate: "Bitte wählen Sie einen gültigen Liefertermin.",
+      errDeliveryClosedTuesday: "Dienstags haben wir geschlossen — bitte wählen Sie einen anderen Liefertag.",
+      errDeliveryDateOutOfRange: "Der Liefertermin liegt außerhalb des erlaubten Zeitraums.",
+      errDeliveryOutsideArea: "Lieferung nur in die Bezirke 6, 7, 8, 15 und 16 (siehe Postleitzahl-Hinweis oben).",
       paymentMethod: "Zahlung bei Lieferung",
       cash: "Bar",
       card: "Karte (Terminal)",
@@ -570,13 +641,13 @@ export const translations: Record<Language, TranslationSchema> = {
       deliveryAddressHeading: "Lieferadresse",
       errDeliveryAddressIncomplete: "Bitte Straße, Hausnummer, Postleitzahl und Ort ausfüllen.",
       errDeliveryAddressPlz: "Bitte eine gültige 4-stellige Postleitzahl eingeben.",
-      pickupSameDayOnly: "Abholung ist nur am selben Tag möglich.",
       sushiExtras: "Sushi Extras",
       wasabi: "Wasabi",
       ginger: "Ingwer",
       cutlery: "Besteck",
       chopsticks: "Stäbchen",
-      woodenCutlery: "Holzbesteck",
+      woodSpoon: "Holzlöffel",
+      woodFork: "Holzgabel",
       cutleryCount: "Anzahl",
       orderReferenceLabel: "Bestellnr.",
       orderPlacedSuccess: "Bestellung gesendet."

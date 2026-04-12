@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
+import { SITE_LOGO_MARK_PATH } from "@/lib/site-logo-asset";
 import "./globals.css";
 import { LanguageProvider } from "@/context/language-context";
 import { GiftConfigProvider } from "@/context/gift-config-context";
@@ -29,7 +30,8 @@ export const metadata: Metadata = {
   title: "Sake Vienna",
   description: "Modern Japanese restaurant website for Sake in Vienna.",
   icons: {
-    icon: "/sake-logo-mark.png"
+    icon: SITE_LOGO_MARK_PATH,
+    apple: SITE_LOGO_MARK_PATH
   }
 };
 

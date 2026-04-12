@@ -130,7 +130,7 @@ export function InteriorNavbar() {
         className="sticky top-0 z-50 border-b border-brand-line bg-brand-card shadow-[0_1px_0_rgba(31,35,38,0.04)]"
       >
         <div         className="mx-auto flex max-w-[1600px] items-center gap-2 px-3 py-2 sm:gap-3 sm:px-5 sm:py-2.5 lg:gap-5 lg:px-8 lg:py-2.5">
-          <SiteLogo variant="header" className="shrink-0" lightUiTone="subtleContrast" />
+          <SiteLogo variant="header" className="shrink-0" />
 
           <nav className="hidden min-w-0 flex-1 justify-center gap-5 md:flex lg:gap-8">
             <Link href="/" className={deskLinkClass("/")}>

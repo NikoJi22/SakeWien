@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SITE_LOGO_MARK_PATH } from "@/lib/site-logo-asset";
 
 /**
- * SAKE Kunstlogo — nur Darstellung/Größe/Integration, keine inhaltliche Veränderung.
- * `imageSrc` z. B. `/sake-logo-mark.png` (öffentliches Markenlogo unter `public/`).
+ * SAKE Markenlogo: statische PNG mit Alpha aus `public/` (kein Cloudinary, keine Transformation).
  */
 type LogoVariant = "header" | "heroNav" | "hero" | "footer" | "heroWatermark" | "aboutFeature" | "heroBand";
 
@@ -11,13 +11,12 @@ type SiteLogoProps = {
   className?: string;
   variant?: LogoVariant;
   onNavigate?: () => void;
-  /** Standard: `/sake-logo-mark.png` unter `public/` */
+  /** Standard: `SITE_LOGO_MARK_PATH` aus `@/lib/site-logo-asset` */
   imageSrc?: string;
   /**
-   * - `original` — Pixel 1:1
-   * - `subtleContrast` — leicht mehr Kontrast auf hellem Grund
-   * - `markGold` — Integration auf hellem UI: Screen-Blend (kein Vollflächen-Recolor)
-   * - `markWhite` — Wasserzeichen auf Fotos (Screen, dezent)
+   * - `original` — PNG/Alpha 1:1, keine Filter (empfohlen für transparentes Logo)
+   * - `subtleContrast` — leicht Kontrast/Sättigung (kann Anti-Alias-Ränder verändern)
+   * - `markGold` / `markWhite` — nur Klassen-Hooks; kein Screen-Blend mehr
    */
   lightUiTone?: "original" | "subtleContrast" | "markGold" | "markWhite";
 };
@@ -25,7 +24,7 @@ type SiteLogoProps = {
 /** Kein Kasten, kein Badge, kein Hintergrund — nur das Bild. */
 const shell: Record<LogoVariant, string> = {
   header:
-    "inline-flex items-center justify-start bg-transparent py-0.5 pl-0 pr-2 sm:py-1 sm:pr-4 md:pr-5",
+    "inline-flex items-center justify-start bg-transparent py-1.5 pl-0 pr-2 sm:py-2 sm:pr-4 md:pr-5",
   /** Kompakt: Hero-Pille / schmale Leiste */
   heroNav: "inline-flex shrink-0 items-center justify-start bg-transparent py-0 pr-1.5 sm:pr-2",
   hero: "inline-flex items-center justify-start bg-transparent py-1 pr-2 sm:pr-3",
@@ -37,7 +36,7 @@ const shell: Record<LogoVariant, string> = {
 
 const imgSize: Record<LogoVariant, string> = {
   header:
-    "h-9 w-auto max-w-[min(200px,46vw)] sm:h-10 sm:max-w-[min(220px,40vw)] md:h-11 md:max-w-[min(240px,36vw)] lg:h-12",
+    "h-14 w-auto max-w-[min(320px,68vw)] sm:h-16 sm:max-w-[min(380px,58vw)] md:h-[4.5rem] md:max-w-[min(440px,50vw)] lg:h-[5rem] lg:max-w-[min(480px,44vw)]",
   heroNav:
     "h-8 w-auto max-w-[min(140px,34vw)] sm:h-9 sm:max-w-[min(160px,30vw)] md:max-w-[180px]",
   hero: "h-[3.35rem] w-auto max-w-[min(320px,52vw)] sm:h-[4.1rem] sm:max-w-[min(380px,46vw)] md:h-[4.85rem] md:max-w-[min(420px,40vw)]",
@@ -69,8 +68,8 @@ export function SiteLogo({
   className = "",
   variant = "header",
   onNavigate,
-  imageSrc = "/sake-logo-mark.png",
-  lightUiTone = "subtleContrast"
+  imageSrc = SITE_LOGO_MARK_PATH,
+  lightUiTone = "original"
 }: SiteLogoProps) {
   const isLink = variant !== "heroWatermark";
   const usesToneProp = toneVariants.includes(variant);
@@ -78,25 +77,20 @@ export function SiteLogo({
   const objectAlign =
     variant === "header" || variant === "heroNav" || variant === "hero" ? "object-left" : "object-center";
 
-  const softShadow =
-    variant === "header" || variant === "heroNav" || variant === "hero"
-      ? tone === "markGold" || tone === "markWhite"
-        ? ""
-        : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-      : "";
-
   const img = (
     <Image
       src={imageSrc}
       alt=""
       width={1024}
-      height={1024}
+      height={504}
       unoptimized
-      className={`${imgSize[variant]} bg-transparent object-contain ${objectAlign} ${toneClass[tone]} ${softShadow}`}
+      placeholder="empty"
+      className={`${imgSize[variant]} isolate bg-transparent [background:none] object-contain mix-blend-normal ${objectAlign} ${toneClass[tone]}`}
+      style={{ backgroundColor: "transparent" }}
       priority={variant === "header" || variant === "heroNav" || variant === "hero"}
       sizes={
         variant === "header"
-          ? "(max-width: 768px) 46vw, 240px"
+          ? "(max-width: 768px) 68vw, 480px"
           : variant === "heroNav"
             ? "180px"
             : variant === "hero"

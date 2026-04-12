@@ -4,10 +4,10 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import {
-  DEFAULT_DISH_PLACEHOLDER_IMAGE,
   DISH_IMAGE_ASPECT,
   isDefaultDishPlaceholderUrl,
-  isMenuUploadedImageUrl
+  isMenuUploadedImageUrl,
+  resolvedDishPlaceholderUrl
 } from "@/lib/dish-image";
 import { getCroppedImageBlob, rotateImage90Cw } from "@/lib/dish-image-crop-client";
 import { AdminField } from "./admin-field";
@@ -162,7 +162,7 @@ export function DishImageField({ itemId, imageUrl, onChange, label = "Gerichtsbi
     if (!isMenuUploadedImageUrl(imageUrl.split("?")[0] || imageUrl)) return;
     if (!window.confirm("Eigenes Bild entfernen und wieder den Platzhalter nutzen?")) return;
     setError("");
-    onChange(removeToUrl ?? DEFAULT_DISH_PLACEHOLDER_IMAGE);
+    onChange(removeToUrl ?? resolvedDishPlaceholderUrl());
   }
 
   const hasCustomUpload = isMenuUploadedImageUrl(imageUrl.split("?")[0] || imageUrl);

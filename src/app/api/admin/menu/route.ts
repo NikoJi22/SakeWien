@@ -3,17 +3,7 @@ import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
 import type { LunchStarterChoice, LunchStarterOption, MenuCategory, MenuItem } from "@/lib/menu-types";
 import { normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { readMenuFromDisk, writeMenuToDisk } from "@/lib/menu-store";
-import { menuCategories } from "@/lib/menu-data";
-import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
 import { cookies } from "next/headers";
-
-/** Gespeicherte Menüs (z. B. älterer Blob-Export) können ohne Lunch-Kategorie sein — Admin soll sie immer bearbeiten können. */
-function ensureLunchCategoryForAdmin(cats: MenuCategory[]): MenuCategory[] {
-  if (cats.some((c) => c.id === LUNCH_CATEGORY_ID)) return cats;
-  const fallback = menuCategories.find((c) => c.id === LUNCH_CATEGORY_ID);
-  if (!fallback) return cats;
-  return [...cats, JSON.parse(JSON.stringify(fallback)) as MenuCategory];
-}
 
 function isMenuCategoryArray(x: unknown): x is MenuCategory[] {
   if (!Array.isArray(x)) return false;
@@ -58,15 +48,21 @@ async function requireAdmin() {
   return verifyAdminSession(store.get(ADMIN_COOKIE)?.value);
 }
 
+const noStoreJson = { "Cache-Control": "private, no-store, must-revalidate" };
+
 export async function GET() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
     const data = await readMenuFromDisk();
-    return NextResponse.json(ensureLunchCategoryForAdmin(data));
-  } catch {
-    return NextResponse.json(ensureLunchCategoryForAdmin(menuCategories));
+    return NextResponse.json(data, { headers: noStoreJson });
+  } catch (err) {
+    console.error("[admin/menu] GET: storage read failed — not falling back to TypeScript seed (would reset images).", err);
+    return NextResponse.json(
+      { error: "menu_load_failed", message: "Could not load menu from Blob/disk. Check BLOB_READ_WRITE_TOKEN and logs." },
+      { status: 502, headers: noStoreJson }
+    );
   }
 }
 
@@ -87,9 +83,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid menu payload" }, { status: 400 });
   }
 
-  const bodyWithLunch = ensureLunchCategoryForAdmin(body);
-
-  for (const cat of bodyWithLunch) {
+  for (const cat of body) {
     for (const item of cat.items) {
       if (
         !item.id ||
@@ -112,7 +106,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const sanitized = bodyWithLunch.map((cat) => ({
+    const sanitized = body.map((cat) => ({
       ...cat,
       items: cat.items.map((item) => {
         const mi = item as MenuItem;

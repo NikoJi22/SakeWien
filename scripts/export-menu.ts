@@ -1,3 +1,9 @@
+/**
+ * Schreibt `data/menu.json` und `data/gift-config.json` aus dem **TypeScript-Seed** (`menu-data.ts`).
+ *
+ * ⚠️ Nicht in CI nach jedem Deploy laufen lassen: überschreibt lokale Dateien und setzt u. a. Stock-Bild-URLs zurück.
+ * Nur bewusst für initiale Daten oder lokale Entwicklung nutzen.
+ */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { menuCategories } from "../src/lib/menu-data";

@@ -161,8 +161,10 @@ export function AdminDashboard() {
         setGiftThresholdInput(String(g.thresholdEur));
       }
       if (siteRes.ok) {
-        const s = (await siteRes.json()) as SiteContentConfig;
-        setSiteContent(s && typeof s === "object" ? s : defaultSiteContent);
+        const raw = (await siteRes.json()) as unknown;
+        if (raw && typeof raw === "object" && !("error" in (raw as object))) {
+          setSiteContent(raw as SiteContentConfig);
+        }
       }
     } catch {
       setLoadError("Could not load data.");
@@ -704,7 +706,6 @@ export function AdminDashboard() {
                 label="Hero main image upload"
                 imageUrl={siteContent.hero.mainImage}
                 onChange={(url) => setSiteContent((s) => ({ ...s, hero: { ...s.hero, mainImage: url } }))}
-                removeToUrl={defaultSiteContent.hero.mainImage}
               />
               <AdminField label="Order card label (DE)">
                 <input
@@ -746,7 +747,6 @@ export function AdminDashboard() {
                 onChange={(url) =>
                   setSiteContent((s) => ({ ...s, cards: { ...s.cards, order: { ...s.cards.order, image: url } } }))
                 }
-                removeToUrl={defaultSiteContent.cards.order.image}
               />
               <AdminField label="Reservation card image URL" className="sm:col-span-2">
                 <input
@@ -770,7 +770,6 @@ export function AdminDashboard() {
                     cards: { ...s.cards, reservation: { ...s.cards.reservation, image: url } }
                   }))
                 }
-                removeToUrl={defaultSiteContent.cards.reservation.image}
               />
               <AdminField label="About card image URL" className="sm:col-span-2">
                 <input
@@ -788,7 +787,6 @@ export function AdminDashboard() {
                 onChange={(url) =>
                   setSiteContent((s) => ({ ...s, cards: { ...s.cards, about: { ...s.cards.about, image: url } } }))
                 }
-                removeToUrl={defaultSiteContent.cards.about.image}
               />
             </div>
             {siteStatus && <p className="text-sm font-medium text-emerald-700">{siteStatus}</p>}

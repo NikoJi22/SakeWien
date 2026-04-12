@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
 import type { SiteContentConfig } from "@/lib/menu-types";
 import { readSiteContentFromDisk, writeSiteContentToDisk } from "@/lib/menu-store";
-import { defaultSiteContent } from "@/lib/site-content-default";
 import { cookies } from "next/headers";
 
 function isLocalizedText(v: unknown): v is { en: string; de: string } {
@@ -40,14 +39,20 @@ async function requireAdmin() {
   return verifyAdminSession(store.get(ADMIN_COOKIE)?.value);
 }
 
+const noStoreJson = { "Cache-Control": "private, no-store, must-revalidate" };
+
 export async function GET() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    return NextResponse.json(await readSiteContentFromDisk());
-  } catch {
-    return NextResponse.json(defaultSiteContent);
+    return NextResponse.json(await readSiteContentFromDisk(), { headers: noStoreJson });
+  } catch (err) {
+    console.error("[admin/site-content] GET: storage read failed — not using built-in default images.", err);
+    return NextResponse.json(
+      { error: "site_content_load_failed", message: "Could not load site content from Blob/disk." },
+      { status: 502, headers: noStoreJson }
+    );
   }
 }
 

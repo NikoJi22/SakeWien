@@ -1,27 +1,24 @@
 import { NextResponse } from "next/server";
-import { menuCategories } from "@/lib/menu-data";
 import { readMenuFromDisk } from "@/lib/menu-store";
+import type { MenuCategory } from "@/lib/menu-types";
 import { isLunchMenuActive, LUNCH_CATEGORY_ID } from "@/lib/order-config";
 
 export const dynamic = "force-dynamic";
 
-function ensureLunchCategory(cats: typeof menuCategories) {
-  if (cats.some((cat) => cat.id === LUNCH_CATEGORY_ID)) return cats;
-  const defaultLunch = menuCategories.find((cat) => cat.id === LUNCH_CATEGORY_ID);
-  if (!defaultLunch) return cats;
-  return [...cats, defaultLunch];
-}
+const noStoreJson = { "Cache-Control": "private, no-store, must-revalidate" };
 
 export async function GET() {
   const lunchActive = isLunchMenuActive();
-  const applyVisibility = (cats: typeof menuCategories) => {
-    const withLunchFallback = lunchActive ? ensureLunchCategory(cats) : cats;
-    return withLunchFallback.filter((cat) => lunchActive || cat.id !== LUNCH_CATEGORY_ID);
-  };
+  const applyVisibility = (cats: MenuCategory[]) =>
+    cats.filter((cat) => lunchActive || cat.id !== LUNCH_CATEGORY_ID);
   try {
     const data = await readMenuFromDisk();
-    return NextResponse.json(applyVisibility(data));
-  } catch {
-    return NextResponse.json(applyVisibility(menuCategories));
+    return NextResponse.json(applyVisibility(data), { headers: noStoreJson });
+  } catch (err) {
+    console.error("[api/menu] Menu storage read failed (no seed fallback — fix Blob/token or disk fallback).", err);
+    return NextResponse.json(
+      { error: "menu_unavailable", message: "Menu could not be loaded from storage." },
+      { status: 503, headers: noStoreJson }
+    );
   }
 }

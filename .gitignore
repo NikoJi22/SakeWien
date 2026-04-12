@@ -25,6 +25,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Fortlaufende Bestellnummer (lokal ohne Vercel Blob)
+data/order-sequence.json
+
 # uploaded dish images (keep folder via .gitkeep)
 /public/uploads/menu/*
 !/public/uploads/menu/.gitkeep

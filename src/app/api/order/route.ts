@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { allocateNextOrderNumber } from "@/lib/order-sequence-store";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { MailerConfigError, MailerSendError, sendMail } from "@/lib/mailer";
@@ -6,7 +6,14 @@ import { normalizeToE164 } from "@/lib/phone-normalize";
 import { ORDER_PHONE_COOKIE, parseVerifiedPhoneCookie } from "@/lib/order-phone-cookie";
 import { buildOrderPdf, type OrderPdfInput } from "@/lib/order-pdf";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
-import { isPickupDateSameViennaToday } from "@/lib/vienna-calendar";
+import {
+  canAcceptNewOrdersVienna,
+  DELIVERY_TIME_ESTIMATE_DE,
+  formatDateKeyDeShort,
+  isAllowedDeliveryPostalCode,
+  validateDeliveryDateKey,
+  validatePickupNaiveIso
+} from "@/lib/order-schedule";
 
 type OrderLine = {
   id: string;
@@ -34,6 +41,8 @@ type OrderBody = {
   address?: string;
   deliveryAddress?: DeliveryAddressPayload;
   pickupTime?: string;
+  /** YYYY-MM-DD — Lieferwunschtag */
+  deliveryDate?: string;
   deliveryTime?: string;
   paymentMethod?: string;
   comment?: string;
@@ -41,7 +50,13 @@ type OrderBody = {
   subtotalEur: number;
   giftEligible?: boolean;
   giftMessage?: string;
-  cutlery?: { chopsticksCount?: number; woodenCutleryCount?: number; unitPriceEur?: number; totalEur?: number } | null;
+  cutlery?: {
+    chopsticksCount?: number;
+    woodSpoonCount?: number;
+    woodForkCount?: number;
+    unitPriceEur?: number;
+    totalEur?: number;
+  } | null;
   lines: OrderLine[];
 };
 
@@ -118,11 +133,6 @@ function formatOrderDateTimeVienna(isoOrText: string | undefined): string | unde
   }).format(d);
 }
 
-function newOrderId(): string {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  return `BV-${dateStr}-${randomBytes(3).toString("hex").toUpperCase()}`;
-}
-
 function sanitizePdfFilename(orderId: string): string {
   const safe = orderId.replace(/[^a-zA-Z0-9-]/g, "-");
   return `bestellung-${safe}.pdf`;
@@ -154,6 +164,11 @@ export async function POST(request: Request) {
     if (!linesAreValid(body.lines)) {
       console.error("[order] rejected: invalid or empty line items (cart)");
       return NextResponse.json({ error: "empty_cart" }, { status: 400 });
+    }
+
+    if (!canAcceptNewOrdersVienna()) {
+      console.error("[order] rejected: after order cutoff (Vienna)");
+      return NextResponse.json({ error: "orders_closed_cutoff" }, { status: 400 });
     }
 
     const customerName = String(body.name ?? "").trim();
@@ -202,25 +217,39 @@ export async function POST(request: Request) {
       if (!addr.ok) {
         return NextResponse.json({ error: addr.error }, { status: 400 });
       }
+      const pc = normalizePlz(String(body.deliveryAddress?.postalCode ?? ""));
+      if (!isAllowedDeliveryPostalCode(pc)) {
+        return NextResponse.json({ error: "delivery_outside_area" }, { status: 400 });
+      }
       deliveryAddressLine = addr.formatted;
+      const deliveryDateKey = String(body.deliveryDate ?? "").trim();
+      const dVal = validateDeliveryDateKey(deliveryDateKey);
+      if (!dVal.ok) {
+        return NextResponse.json({ error: dVal.error }, { status: 400 });
+      }
     }
-    if (body.fulfillment === "pickup" && body.pickupTime) {
-      if (!isPickupDateSameViennaToday(String(body.pickupTime))) {
-        return NextResponse.json({ error: "pickup_same_day_only" }, { status: 400 });
+    if (body.fulfillment === "pickup") {
+      const pVal = validatePickupNaiveIso(String(body.pickupTime ?? ""));
+      if (!pVal.ok) {
+        return NextResponse.json({ error: pVal.error }, { status: 400 });
       }
     }
 
-    const orderId = newOrderId();
+    const orderId = await allocateNextOrderNumber();
     const itemsSubtotalEur = body.lines.reduce((s, l) => s + Number(l.lineTotalEur || 0), 0);
     const grandTotalEur = Number(body.subtotalEur || 0);
 
     const chopsticks = Number(body.cutlery?.chopsticksCount || 0);
-    const wooden = Number(body.cutlery?.woodenCutleryCount || 0);
+    const woodSpoon = Number(body.cutlery?.woodSpoonCount || 0);
+    const woodFork = Number(body.cutlery?.woodForkCount || 0);
     const cutleryTotalEur = Number(body.cutlery?.totalEur || 0);
     const cutleryPdf =
-      chopsticks > 0 || wooden > 0
-        ? { chopsticks, wooden, totalEur: cutleryTotalEur }
+      chopsticks > 0 || woodSpoon > 0 || woodFork > 0
+        ? { chopsticks, woodSpoon, woodFork, totalEur: cutleryTotalEur }
         : null;
+
+    const deliveryDateKey =
+      body.fulfillment === "delivery" ? String(body.deliveryDate ?? "").trim() : "";
 
     const pdfInput: OrderPdfInput = {
       orderId,
@@ -231,7 +260,9 @@ export async function POST(request: Request) {
       email: String(body.email ?? "").trim() || undefined,
       deliveryAddressLine: body.fulfillment === "delivery" ? deliveryAddressLine : undefined,
       pickupTime: body.fulfillment === "pickup" ? formatOrderDateTimeVienna(body.pickupTime) : undefined,
-      deliveryTime: body.fulfillment === "delivery" ? formatOrderDateTimeVienna(body.deliveryTime) : undefined,
+      deliveryDayLabel:
+        body.fulfillment === "delivery" && deliveryDateKey ? formatDateKeyDeShort(deliveryDateKey) : undefined,
+      deliveryTimeEstimate: body.fulfillment === "delivery" ? DELIVERY_TIME_ESTIMATE_DE : undefined,
       comment: String(body.comment ?? "").trim() || undefined,
       lines: body.lines.map((l) => ({
         name: l.name,
@@ -256,6 +287,11 @@ export async function POST(request: Request) {
     }
 
     const subject = `Neue Bestellung ${orderId}`;
+    const scheduleLine =
+      body.fulfillment === "pickup"
+        ? `Abholung: ${formatOrderDateTimeVienna(body.pickupTime) ?? "—"}`
+        : `Lieferung: ${formatDateKeyDeShort(deliveryDateKey)} — ${DELIVERY_TIME_ESTIMATE_DE}`;
+
     const emailLines = [
       subject,
       "",
@@ -263,6 +299,7 @@ export async function POST(request: Request) {
       `Zeit (Wien): ${formatOrderDateTimeVienna(new Date().toISOString())}`,
       `Kunde: ${customerName}`,
       `Telefon: ${orderPhone ?? "—"}`,
+      scheduleLine,
       "",
       "Details siehe PDF-Anhang."
     ];

@@ -2,18 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Kunstlogo: kein Hintergrund-Container, kein Filter-„Recolor“ der ganzen Bitmap (bei PNG mit schwarzer Fläche → sonst einfarbiger Block). */
+/* Optional: `markGold` / `markWhite` — transparentes PNG: kein Screen-Blend (war für Legacy-Schwarzfläche). */
 @layer components {
-  /**
-   * Auf hellem Navbar-/Card-Hintergrund: schwarze Pixel wirken wie transparent (Screen),
-   * Linien und Schrift bleiben sichtbar. Bei echtem PNG mit Alpha weiterhin unkritisch.
-   */
-  .sake-logo-on-light {
-    mix-blend-mode: screen;
-  }
-  /** Wasserzeichen auf Fotos — weich, ohne invert-Filter-Block */
+  .sake-logo-on-light,
   .sake-logo-hero-watermark {
-    mix-blend-mode: screen;
+    mix-blend-mode: normal;
   }
 }
 

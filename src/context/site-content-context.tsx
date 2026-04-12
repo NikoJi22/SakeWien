@@ -25,10 +25,11 @@ export function SiteContentProvider({ children }: { children: React.ReactNode })
       const res = await fetch("/api/site-content", { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to load site content");
       const data = (await res.json()) as SiteContentConfig;
-      setSiteContent(data && typeof data === "object" ? data : defaultSiteContent);
+      /** Kein Fallback auf `defaultSiteContent` bei unerwarteter Form — vermeidet Unsplash nach Deploy. */
+      setSiteContent((prev) => (data && typeof data === "object" ? data : prev));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load site content");
-      setSiteContent(defaultSiteContent);
+      /** Kein Zurücksetzen auf `defaultSiteContent` (Unsplash) — vermeidet „Deploy springt auf alte Bilder“. */
     } finally {
       setLoading(false);
     }

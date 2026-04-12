@@ -25,6 +25,49 @@ function isProductionRuntime(): boolean {
   return process.env.NODE_ENV === "production";
 }
 
+/** Ohne Blob in Production würde Next das gebündelte `data/*.json` aus dem Git-Image lesen — oft veraltete Seed-/Unsplash-URLs. */
+function assertBlobInProduction(): void {
+  if (isProductionRuntime() && !hasBlobStorage()) {
+    throw new Error(
+      "BLOB_READ_WRITE_TOKEN is required in production; bundled data/*.json is not used as the live source of truth."
+    );
+  }
+}
+
+/** In Production: nur wenn gesetzt — sonst riskiert Fallback veraltete `data/*.json` aus dem Repo. */
+function allowDiskFallbackAfterBlobReadError(): boolean {
+  if (!isProductionRuntime()) return true;
+  return Boolean(process.env.BLOB_READ_FALLBACK_TO_DISK?.trim());
+}
+
+async function readLocalMenuJson(): Promise<MenuCategory[] | null> {
+  try {
+    const raw = await readFile(MENU_FILE, "utf-8");
+    const data = JSON.parse(raw) as MenuCategory[];
+    return Array.isArray(data) ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+async function readLocalGiftJson(): Promise<GiftConfig | null> {
+  try {
+    const raw = await readFile(GIFT_FILE, "utf-8");
+    return JSON.parse(raw) as GiftConfig;
+  } catch {
+    return null;
+  }
+}
+
+async function readLocalSiteContentJson(): Promise<SiteContentConfig | null> {
+  try {
+    const raw = await readFile(SITE_CONTENT_FILE, "utf-8");
+    return JSON.parse(raw) as SiteContentConfig;
+  } catch {
+    return null;
+  }
+}
+
 async function readJsonFromBlob<T>(pathname: string): Promise<T> {
   const blobMeta = await head(pathname, { token: getBlobToken() });
   const res = await fetch(blobMeta.url, { cache: "no-store" });
@@ -43,10 +86,22 @@ async function writeJsonToBlob(pathname: string, data: unknown): Promise<void> {
 }
 
 export async function readMenuFromDisk(): Promise<MenuCategory[]> {
+  assertBlobInProduction();
   if (hasBlobStorage()) {
-    const data = await readJsonFromBlob<MenuCategory[]>(MENU_BLOB_PATH);
-    if (!Array.isArray(data)) throw new Error("Invalid menu blob shape");
-    return data;
+    try {
+      const data = await readJsonFromBlob<MenuCategory[]>(MENU_BLOB_PATH);
+      if (!Array.isArray(data)) throw new Error("Invalid menu blob shape");
+      return data;
+    } catch (err) {
+      if (allowDiskFallbackAfterBlobReadError()) {
+        const local = await readLocalMenuJson();
+        if (local) {
+          console.warn("[menu-store] Menu blob read failed; using data/menu.json fallback.", err);
+          return local;
+        }
+      }
+      throw err;
+    }
   }
   const raw = await readFile(MENU_FILE, "utf-8");
   const data = JSON.parse(raw) as MenuCategory[];
@@ -67,8 +122,20 @@ export async function writeMenuToDisk(categories: MenuCategory[]): Promise<void>
 }
 
 export async function readGiftFromDisk(): Promise<GiftConfig> {
+  assertBlobInProduction();
   if (hasBlobStorage()) {
-    return await readJsonFromBlob<GiftConfig>(GIFT_BLOB_PATH);
+    try {
+      return await readJsonFromBlob<GiftConfig>(GIFT_BLOB_PATH);
+    } catch (err) {
+      if (allowDiskFallbackAfterBlobReadError()) {
+        const local = await readLocalGiftJson();
+        if (local) {
+          console.warn("[menu-store] Gift blob read failed; using data/gift-config.json fallback.", err);
+          return local;
+        }
+      }
+      throw err;
+    }
   }
   const raw = await readFile(GIFT_FILE, "utf-8");
   return JSON.parse(raw) as GiftConfig;
@@ -87,8 +154,20 @@ export async function writeGiftToDisk(config: GiftConfig): Promise<void> {
 }
 
 export async function readSiteContentFromDisk(): Promise<SiteContentConfig> {
+  assertBlobInProduction();
   if (hasBlobStorage()) {
-    return await readJsonFromBlob<SiteContentConfig>(SITE_CONTENT_BLOB_PATH);
+    try {
+      return await readJsonFromBlob<SiteContentConfig>(SITE_CONTENT_BLOB_PATH);
+    } catch (err) {
+      if (allowDiskFallbackAfterBlobReadError()) {
+        const local = await readLocalSiteContentJson();
+        if (local) {
+          console.warn("[menu-store] Site-content blob read failed; using data/site-content.json fallback.", err);
+          return local;
+        }
+      }
+      throw err;
+    }
   }
   const raw = await readFile(SITE_CONTENT_FILE, "utf-8");
   return JSON.parse(raw) as SiteContentConfig;

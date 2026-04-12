@@ -23,7 +23,7 @@ export default function AboutPage() {
 
       <PageShell className="pb-10 sm:pb-12 lg:pb-14">
         <div className="mb-10 flex justify-center sm:mb-12">
-          <SiteLogo variant="aboutFeature" lightUiTone="subtleContrast" className="w-full max-w-lg" />
+          <SiteLogo variant="aboutFeature" className="w-full max-w-lg" />
         </div>
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-brand-line bg-brand-card shadow-[0_1px_3px_rgba(31,35,38,0.05)]">

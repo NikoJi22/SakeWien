@@ -55,4 +55,4 @@ export type SiteContentConfig = {
   };
 };
 
-export type OrderCutleryType = "chopsticks" | "wooden";
+export type OrderCutleryType = "chopsticks" | "woodSpoon" | "woodFork";

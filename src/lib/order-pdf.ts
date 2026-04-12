@@ -1,19 +1,20 @@
 import { PDFDocument, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
+import { DELIVERY_TIME_ESTIMATE_DE, OPENING_HOURS_PDF_DE } from "@/lib/order-schedule";
 
 /** Rechtsträger (Fußzeile / intern) */
 const COMPANY_LEGAL = "Sake Pan Jun Tao KG";
 const COMPANY_STREET = "Kaiserstraße 81/6";
 const COMPANY_CITY = "1070 Wien";
 
-/** Kassenbon: Anzeigename (ohne Logo, thermotauglich) */
+/** Kassenbon: Anzeigename (ohne Logo, thermotauglich) — im PDF immer GROSSBUCHSTABEN */
 const headerRestaurantName = () => process.env.ORDER_PDF_RESTAURANT_NAME?.trim() || "Sake";
 
-const headerRestaurantPhone = () =>
-  process.env.RESTAURANT_PHONE?.trim() || process.env.ORDER_PDF_PHONE?.trim() || "";
+/** Unter der Adresse im Kopf (Thermo); optional ORDER_PDF_HEADER_PHONE */
+const headerRestaurantPhoneLine = () =>
+  process.env.ORDER_PDF_HEADER_PHONE?.trim() || "01 5223551";
 
-/** z. B. Mo–So 11:00–22:00 · Di Ruhetag — optional ORDER_PDF_OPENING_HOURS (eine Zeile) */
-const openingHoursLine = () =>
-  process.env.ORDER_PDF_OPENING_HOURS?.trim() || "Mo–So 11:00–22:00 Uhr · Dienstag Ruhetag";
+/** optional ORDER_PDF_OPENING_HOURS (eine Zeile) */
+const openingHoursLine = () => process.env.ORDER_PDF_OPENING_HOURS?.trim() || OPENING_HOURS_PDF_DE;
 
 /** Hinweis Lieferbezirke (fest, thermotauglich; optional ORDER_PDF_DELIVERY_DISTRICTS) */
 const deliveryDistrictsNotice = () =>
@@ -36,10 +37,13 @@ export type OrderPdfInput = {
   email?: string;
   deliveryAddressLine?: string;
   pickupTime?: string;
-  deliveryTime?: string;
+  /** Lieferung: gewünschter Tag (bereits formatiert, z. B. 12.04.2026) */
+  deliveryDayLabel?: string;
+  /** Lieferung: Hinweis zur Lieferdauer */
+  deliveryTimeEstimate?: string;
   comment?: string;
   lines: OrderPdfLine[];
-  cutlery: { chopsticks: number; wooden: number; totalEur: number } | null;
+  cutlery: { chopsticks: number; woodSpoon: number; woodFork: number; totalEur: number } | null;
   giftEligible: boolean;
   giftMessage?: string;
   itemsSubtotalEur: number;
@@ -86,7 +90,8 @@ const PAGE_H = 841.89;
 
 const MARGIN_X = 10;
 const MARGIN_TOP = 14;
-const MARGIN_BOTTOM = 16;
+/** Extra Abstand unten — Kassadruck schneidet sonst oft ab */
+const MARGIN_BOTTOM = 60;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 5;
@@ -158,13 +163,11 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   };
 
   // ——— Kassenkopf (zentriert, sofort Kontakt) ———
-  drawCenter(headerRestaurantName(), 14, true);
+  const titleName = headerRestaurantName().toUpperCase();
+  drawCenter(titleName, 19, true);
   drawCenterWrapped(COMPANY_STREET, 11, false);
   drawCenterWrapped(COMPANY_CITY, 11, false);
-  const tel = headerRestaurantPhone();
-  if (tel) {
-    drawCenter(`Tel. ${tel}`, 11, true);
-  }
+  drawCenter(headerRestaurantPhoneLine(), 11, true);
   y -= GAP_MD;
 
   // ——— Abhol- / Lieferzeit: mittig, lesbar, nicht übergroß (Thermo ~80 mm) ———
@@ -198,7 +201,8 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   if (input.fulfillment === "pickup") {
     drawCenterTimeBlock("ABHOLZEIT", input.pickupTime);
   } else {
-    drawCenterTimeBlock("LIEFERZEIT", input.deliveryTime);
+    drawCenterTimeBlock("GEWÜNSCHTER LIEFERTAG", input.deliveryDayLabel);
+    drawCenterTimeBlock("LIEFERHINWEIS", input.deliveryTimeEstimate || DELIVERY_TIME_ESTIMATE_DE);
   }
 
   // ——— Bestelldaten ———
@@ -241,12 +245,16 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
     y = ty - GAP_SM;
   }
 
-  if (input.cutlery && (input.cutlery.chopsticks > 0 || input.cutlery.wooden > 0)) {
+  if (
+    input.cutlery &&
+    (input.cutlery.chopsticks > 0 || input.cutlery.woodSpoon > 0 || input.cutlery.woodFork > 0)
+  ) {
     y -= GAP_SM;
     drawLeft("Besteck / Extras", { size: 11, bold: true });
     const parts: string[] = [];
     if (input.cutlery.chopsticks > 0) parts.push(`Stäbchen × ${input.cutlery.chopsticks}`);
-    if (input.cutlery.wooden > 0) parts.push(`Holzbesteck × ${input.cutlery.wooden}`);
+    if (input.cutlery.woodSpoon > 0) parts.push(`Holzlöffel × ${input.cutlery.woodSpoon}`);
+    if (input.cutlery.woodFork > 0) parts.push(`Holzgabel × ${input.cutlery.woodFork}`);
     drawLeftWrapped(parts.join(", "), 10);
     if (input.cutlery.totalEur > 0) {
       ({ page, y } = ensureSpace(page, y, LINE_H + 4, pdfDoc));

@@ -6,8 +6,8 @@ export type { MenuCategory, MenuItem, MenuItemFlags } from "./menu-types";
 export { formatPriceEur, labelMenuItem };
 
 /**
- * Speisekarte — abgestimmt auf `sake-vienna_speisekarte.pdf` im Projektroot.
- * Export: `npm run export-menu` → `data/menu.json`
+ * TypeScript-Referenz-Speisekarte (lokal / `npm run export-menu` → `data/menu.json`).
+ * Production liest nur Vercel Blob — diese Datei wird dort nicht nachgeladen (kein Lunch- o. Bild-Fallback aus dem Seed).
  */
 
 const I = {
