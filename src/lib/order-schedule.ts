@@ -165,11 +165,7 @@ export function minutesToHHmm(total: number): string {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
-function ceilMinutesToStep(m: number, step: number): number {
-  return Math.min(Math.ceil(m / step) * step, 24 * 60 - 1);
-}
-
-/** Mindest-Uhrzeit am gewählten Kalendertag (Wien): ≥ 11:30 und ≥ aufgerundete Jetzt-Zeit (gleicher Tag). */
+/** Mindest-Uhrzeit am gewählten Kalendertag (Wien): ≥ 11:30 und ≥ aktuelle Uhrzeit (gleicher Tag, minutengenau). */
 export function minPickupTimeHHmmForDateKey(dateKey: string, now: Date = new Date()): string {
   const todayKey = viennaCalendarDateKey(now);
   const floor = earliestSlotMinutes();
@@ -177,7 +173,7 @@ export function minPickupTimeHHmmForDateKey(dateKey: string, now: Date = new Dat
     return minutesToHHmm(floor);
   }
   const nowM = viennaMinutesSinceMidnight(now);
-  const need = Math.max(floor, ceilMinutesToStep(nowM, 5));
+  const need = Math.max(floor, nowM);
   return minutesToHHmm(Math.min(need, latestSlotMinutes()));
 }
 

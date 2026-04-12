@@ -89,15 +89,17 @@ const PAGE_W = (80 * 72) / 25.4;
 const PAGE_H = 841.89;
 
 const MARGIN_X = 10;
-/** Gleicher Außenabstand oben und unten (Mindestzone + Thermo-Schnitt) */
-const MARGIN_OUTER = 32;
+/** Oben: knapper Bon-Anfang (kein großer Weißraum). */
+const MARGIN_TOP = 24;
+/** Unten: etwas mehr als oben, Thermo-/Schnittzone — ohne übertriebenen Leerraum. */
+const MARGIN_BOTTOM = 34;
 const LINE_H = 13;
 const GAP_SM = 2;
-const GAP_MD = 5;
+const GAP_MD = 4;
 /** Abhol-/Lieferzeit: kompakter Kassenbon, Label klar getrennt von der Uhrzeit */
 const FULFILLMENT_TIME_LABEL_PT = 10;
 const FULFILLMENT_TIME_VALUE_PT = 14;
-const FULFILLMENT_TIME_GAP_AFTER_LABEL = 12;
+const FULFILLMENT_TIME_GAP_AFTER_LABEL = 8;
 
 function ensureSpace(
   page: PDFPage,
@@ -105,9 +107,9 @@ function ensureSpace(
   need: number,
   pdfDoc: PDFDocument
 ): { page: PDFPage; y: number } {
-  if (y - need >= MARGIN_OUTER) return { page, y };
+  if (y - need >= MARGIN_BOTTOM) return { page, y };
   const newPage = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  return { page: newPage, y: PAGE_H - MARGIN_OUTER };
+  return { page: newPage, y: PAGE_H - MARGIN_TOP };
 }
 
 function drawTextRight(page: PDFPage, y: number, text: string, size: number, font: PDFFont): void {
@@ -115,25 +117,24 @@ function drawTextRight(page: PDFPage, y: number, text: string, size: number, fon
   page.drawText(text, { x: PAGE_W - MARGIN_X - w, y, size, font });
 }
 
-/** Erste Zeile: gleicher Abstand wie unten `MARGIN_OUTER` + optionaler Feinversatz für vertikale Zentrierung */
-function initialY(verticalShift: number): number {
-  return PAGE_H - MARGIN_OUTER + verticalShift;
+/** Erste Textzeile: knapp unter dem oberen Rand (Bon von oben lesbar, nicht vertikal „schwebend“). */
+function initialY(): number {
+  return PAGE_H - MARGIN_TOP;
 }
 
 /**
- * Komplettes Bon-Layout. `verticalShift` nur beim zweiten Durchlauf setzen (Symmetrie).
+ * Komplettes Bon-Layout — oben ausgerichtet, ohne vertikale Mittelzentrierung.
  * @returns End-`y` (unterste Textzeile / Cursor) und Seitenanzahl
  */
 async function renderReceiptContent(
   pdfDoc: PDFDocument,
-  input: OrderPdfInput,
-  verticalShift: number
+  input: OrderPdfInput
 ): Promise<{ finalY: number; pageCount: number }> {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  let y = initialY(verticalShift);
+  let y = initialY();
 
   const contentW = PAGE_W - MARGIN_X * 2;
 
@@ -202,11 +203,11 @@ async function renderReceiptContent(
 
   // ——— Kassenkopf ———
   const titleName = headerRestaurantName().toUpperCase();
-  drawCenter(titleName, 19, true);
+  drawCenter(titleName, 18, true);
   drawCenterWrapped(COMPANY_STREET, 11, false);
   drawCenterWrapped(COMPANY_CITY, 11, false);
   drawCenter(headerRestaurantPhoneLine(), 11, true);
-  y -= GAP_MD;
+  y -= GAP_SM;
 
   if (input.fulfillment === "pickup") {
     drawCenterTimeBlock("ABHOLZEIT", input.pickupTime);
@@ -323,22 +324,8 @@ async function renderReceiptContent(
 }
 
 export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
-  const probeDoc = await PDFDocument.create();
-  const yProbeStart = initialY(0);
-  const { finalY: yProbeEnd, pageCount } = await renderReceiptContent(probeDoc, input, 0);
-
-  /** Nur einseitig: Block vertikal verschieben, damit Weißraum oben ≈ unten (ohne Kopf zu quetschen / Fuß zu verlieren). */
-  let verticalShift = 0;
-  if (pageCount === 1) {
-    const rawShift = (PAGE_H - yProbeEnd - yProbeStart) / 2;
-    const shiftMin = MARGIN_OUTER - yProbeEnd;
-    const shiftMax = MARGIN_OUTER - 4;
-    verticalShift = Math.min(Math.max(rawShift, shiftMin), shiftMax);
-  }
-
   const pdfDoc = await PDFDocument.create();
-  await renderReceiptContent(pdfDoc, input, verticalShift);
-
+  await renderReceiptContent(pdfDoc, input);
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);
 }

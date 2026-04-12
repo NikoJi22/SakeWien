@@ -989,7 +989,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                 value={pickupClock}
                 min={pickupTimeMin}
                 max={pickupTimeMax}
-                step={300}
+                step={60}
                 onChange={(e) => setPickupClock(e.target.value)}
                 className={inputClass}
               />
