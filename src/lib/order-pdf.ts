@@ -89,8 +89,8 @@ const PAGE_W = (80 * 72) / 25.4;
 const PAGE_H = 841.89;
 
 const MARGIN_X = 10;
-/** Oberer und unterer Außenabstand identisch (PDF-Punkte; bei 72 dpi entspricht 1 pt ≈ 1 px). */
-const MARGIN_Y = 40;
+/** Fester gleicher Rand oben und unten (PDF-Punkte ≈ px bei 72 dpi) — kein dynamisches Zentrieren. */
+const MARGIN_Y = 30;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 4;
@@ -116,20 +116,18 @@ function drawTextRight(page: PDFPage, y: number, text: string, size: number, fon
 }
 
 /**
- * Komplettes Bon-Layout.
- * `firstBaselineY`: erste Zeile (Höhe); bei einseitigem Bon so gewählt, dass Weißraum oben = unten.
+ * Komplettes Bon-Layout: oben fester Rand `MARGIN_Y`, Inhalt nach unten, Umbruch bei `MARGIN_Y` zum unteren Rand.
  * @returns End-`y` (unterste Textzeile / Cursor) und Seitenanzahl
  */
 async function renderReceiptContent(
   pdfDoc: PDFDocument,
-  input: OrderPdfInput,
-  firstBaselineY: number
+  input: OrderPdfInput
 ): Promise<{ finalY: number; pageCount: number }> {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  let y = firstBaselineY;
+  let y = PAGE_H - MARGIN_Y;
 
   const contentW = PAGE_W - MARGIN_X * 2;
 
@@ -305,11 +303,9 @@ async function renderReceiptContent(
   page.drawText(totalStr, { x: PAGE_W - MARGIN_X - tw, y, size: totalSize, font: fontBold });
   y -= totalSize + GAP_SM;
 
-  y -= GAP_SM;
   ({ page, y } = ensureSpace(page, y, LINE_H * 4 + 24, pdfDoc));
   drawLeft("LIEFERGEBIET", { size: 10, bold: true });
   drawLeftWrapped(deliveryDistrictsNotice(), 9);
-  y -= GAP_SM;
   drawLeft("ÖFFNUNGSZEITEN", { size: 10, bold: true });
   drawLeftWrapped(openingHoursLine(), 9);
   drawLeftWrapped(COMPANY_LEGAL, 7);
@@ -318,21 +314,8 @@ async function renderReceiptContent(
 }
 
 export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
-  const innerTop = PAGE_H - MARGIN_Y;
-  const innerBottom = MARGIN_Y;
-
-  const probeDoc = await PDFDocument.create();
-  const { finalY: probeFinalY, pageCount } = await renderReceiptContent(probeDoc, input, innerTop);
-
-  /** Einseitig: vertikal im Innenbereich zentrieren → identischer Weißraum oben und unten (jeweils MARGIN_Y bis Text). */
-  let firstY = innerTop;
-  if (pageCount === 1 && probeFinalY >= innerBottom) {
-    const slack = probeFinalY - innerBottom;
-    firstY = innerTop - slack / 2;
-  }
-
   const pdfDoc = await PDFDocument.create();
-  await renderReceiptContent(pdfDoc, input, firstY);
+  await renderReceiptContent(pdfDoc, input);
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);
 }
