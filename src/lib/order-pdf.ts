@@ -84,15 +84,19 @@ function wrapLine(text: string, font: PDFFont, size: number, maxW: number): stri
   return out;
 }
 
-/** 80 mm Breite (Thermo/Kassenbon); Standardhöhe — bei langen Bestellungen neue Seite */
-const PAGE_W = (80 * 72) / 25.4;
-const PAGE_H = 841.89;
+/** 80 mm Breite (Thermo/Kassenbon) — fest, keine A4-Breite */
+const RECEIPT_W = (80 * 72) / 25.4;
+/**
+ * Nur für die Höhen-Messung: eine künstlich hohe „Rolle“, damit ohne Seitenumbruch alles Platz hat.
+ * Kein A4, kein Paging — danach wird exakt eine Seite mit `dynamicHeight` erzeugt.
+ */
+const RECEIPT_PROBE_HEIGHT_PT = 400_000;
 
 const MARGIN_X = 10;
 /** Fester Rand oben bis erste Inhaltszeile (PDF-Punkte ≈ px bei 72 dpi). */
-const MARGIN_Y = 30;
-/** Fix: Abstand von der Basislinie „Sake Pan Jun Tao KG“ bis zum unteren Seitenrand (nicht dynamisch verteilt). */
-const MARGIN_BELOW_LEGAL_KG_PT = 30;
+const MARGIN_TOP = 30;
+/** Fester Rand unter dem letzten Inhalt (untere Kante des Bons). */
+const MARGIN_BOTTOM = 30;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 4;
@@ -101,50 +105,47 @@ const FULFILLMENT_TIME_LABEL_PT = 10;
 const FULFILLMENT_TIME_VALUE_PT = 14;
 const FULFILLMENT_TIME_GAP_AFTER_LABEL = 8;
 
-function ensureSpace(
-  page: PDFPage,
-  y: number,
-  need: number,
-  pdfDoc: PDFDocument
-): { page: PDFPage; y: number } {
-  if (y - need >= MARGIN_Y) return { page, y };
-  const newPage = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  return { page: newPage, y: PAGE_H - MARGIN_Y };
+/** Kein Seitenumbruch: ein Bon = eine Seite. Bei extrem langem Inhalt Messhöhe erhöhen. */
+function ensureSpace(page: PDFPage, y: number, need: number): { page: PDFPage; y: number } {
+  if (y - need >= MARGIN_BOTTOM) return { page, y };
+  throw new Error(
+    `[order-pdf] Bon-Inhalt übersteigt RECEIPT_PROBE_HEIGHT_PT (${RECEIPT_PROBE_HEIGHT_PT}). Messhöhe erhöhen oder Inhalt kürzen.`
+  );
 }
 
 function drawTextRight(page: PDFPage, y: number, text: string, size: number, font: PDFFont): void {
   const w = font.widthOfTextAtSize(text, size);
-  page.drawText(text, { x: PAGE_W - MARGIN_X - w, y, size, font });
+  page.drawText(text, { x: RECEIPT_W - MARGIN_X - w, y, size, font });
 }
 
 type RenderReceiptOpts = {
-  /** Seitenhöhe (pt); Standard volle A4-Höhe. Bei einseitigem Bon: gekürzt, sodass unter KG genau `MARGIN_BELOW_LEGAL_KG_PT` bleibt. */
-  pageHeight?: number;
+  /** Bon-Höhe in PDF-Punkten (nur Messlauf: `RECEIPT_PROBE_HEIGHT_PT`, final: berechnete Höhe). */
+  pageHeight: number;
 };
 
 /**
- * Komplettes Bon-Layout: oben `MARGIN_Y`, Inhalt nach unten, Umbruch bei `MARGIN_Y` zum unteren Rand.
- * @returns End-`y`, Seitenanzahl, Basislinie der letzten Zeile von `COMPANY_LEGAL` (0 wenn nicht gesetzt)
+ * Ein langer Thermo-/Kassenbon: eine Seite, feste Breite, `pageHeight` bestimmt die Länge.
+ * @returns `finalY` = Cursor unter dem letzten Inhalt (PDF-Bottom-Origin)
  */
 async function renderReceiptContent(
   pdfDoc: PDFDocument,
   input: OrderPdfInput,
-  opts?: RenderReceiptOpts
-): Promise<{ finalY: number; pageCount: number; kgLastBaselineY: number }> {
+  opts: RenderReceiptOpts
+): Promise<{ finalY: number }> {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  const pageHeight = opts?.pageHeight ?? PAGE_H;
-  let page = pdfDoc.addPage([PAGE_W, pageHeight]);
-  let y = pageHeight - MARGIN_Y;
+  const pageHeight = opts.pageHeight;
+  let page = pdfDoc.addPage([RECEIPT_W, pageHeight]);
+  let y = pageHeight - MARGIN_TOP;
 
-  const contentW = PAGE_W - MARGIN_X * 2;
+  const contentW = RECEIPT_W - MARGIN_X * 2;
 
   const drawCenter = (text: string, size: number, useBold = false) => {
     const f = useBold ? fontBold : font;
     const w = f.widthOfTextAtSize(text, size);
-    ({ page, y } = ensureSpace(page, y, size + GAP_SM + 2, pdfDoc));
-    page.drawText(text, { x: (PAGE_W - w) / 2, y, size, font: f });
+    ({ page, y } = ensureSpace(page, y, size + GAP_SM + 2));
+    page.drawText(text, { x: (RECEIPT_W - w) / 2, y, size, font: f });
     y -= size + GAP_SM;
   };
 
@@ -152,9 +153,9 @@ async function renderReceiptContent(
     const f = useBold ? fontBold : font;
     const lines = wrapLine(text, f, size, contentW);
     for (const ln of lines) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 1, pdfDoc));
+      ({ page, y } = ensureSpace(page, y, LINE_H + 1));
       const w = f.widthOfTextAtSize(ln, size);
-      page.drawText(ln, { x: (PAGE_W - w) / 2, y, size, font: f });
+      page.drawText(ln, { x: (RECEIPT_W - w) / 2, y, size, font: f });
       y -= LINE_H;
     }
   };
@@ -162,7 +163,7 @@ async function renderReceiptContent(
   const drawLeft = (text: string, opts?: { size?: number; bold?: boolean }) => {
     const size = opts?.size ?? 11;
     const f = opts?.bold ? fontBold : font;
-    ({ page, y } = ensureSpace(page, y, size + GAP_SM + 1, pdfDoc));
+    ({ page, y } = ensureSpace(page, y, size + GAP_SM + 1));
     page.drawText(text, { x: MARGIN_X, y, size, font: f });
     y -= size + GAP_SM;
   };
@@ -170,7 +171,7 @@ async function renderReceiptContent(
   const drawLeftWrapped = (text: string, size = 10) => {
     const lines = wrapLine(text, font, size, contentW);
     for (const ln of lines) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 1, pdfDoc));
+      ({ page, y } = ensureSpace(page, y, LINE_H + 1));
       page.drawText(ln, { x: MARGIN_X, y, size, font });
       y -= LINE_H;
     }
@@ -187,17 +188,17 @@ async function renderReceiptContent(
       timeLines.length * timeSize +
       Math.max(0, timeLines.length - 1) * 5 +
       GAP_SM;
-    ({ page, y } = ensureSpace(page, y, blockH + GAP_MD, pdfDoc));
+    ({ page, y } = ensureSpace(page, y, blockH + GAP_MD));
 
     const lw = fontBold.widthOfTextAtSize(label, labelSize);
-    page.drawText(label, { x: (PAGE_W - lw) / 2, y, size: labelSize, font: fontBold });
+    page.drawText(label, { x: (RECEIPT_W - lw) / 2, y, size: labelSize, font: fontBold });
     y -= labelSize + FULFILLMENT_TIME_GAP_AFTER_LABEL;
 
     for (let i = 0; i < timeLines.length; i++) {
       const ln = timeLines[i]!;
-      ({ page, y } = ensureSpace(page, y, timeSize + 4, pdfDoc));
+      ({ page, y } = ensureSpace(page, y, timeSize + 4));
       const tw = fontBold.widthOfTextAtSize(ln, timeSize);
-      page.drawText(ln, { x: (PAGE_W - tw) / 2, y, size: timeSize, font: fontBold });
+      page.drawText(ln, { x: (RECEIPT_W - tw) / 2, y, size: timeSize, font: fontBold });
       y -= timeSize + (i < timeLines.length - 1 ? 5 : GAP_SM);
     }
     y -= GAP_MD;
@@ -234,7 +235,7 @@ async function renderReceiptContent(
   }
 
   y -= GAP_MD;
-  ({ page, y } = ensureSpace(page, y, LINE_H * 2 + 8, pdfDoc));
+  ({ page, y } = ensureSpace(page, y, LINE_H * 2 + 8));
   drawLeft("POSITIONEN", { size: 12, bold: true });
   y -= GAP_SM;
 
@@ -246,7 +247,7 @@ async function renderReceiptContent(
     const leftLabel = `${line.quantity}× ${line.name}`;
     const nameLines = wrapLine(leftLabel, font, rowFont, descMaxW);
     const rowH = nameLines.length * LINE_H + GAP_SM + 4;
-    ({ page, y } = ensureSpace(page, y, rowH, pdfDoc));
+    ({ page, y } = ensureSpace(page, y, rowH));
     const rowTop = y;
     drawTextRight(page, rowTop, formatEur(line.lineTotalEur), rowFont, fontBold);
     let ty = rowTop;
@@ -269,7 +270,7 @@ async function renderReceiptContent(
     if (input.cutlery.woodFork > 0) parts.push(`Holzgabel × ${input.cutlery.woodFork}`);
     drawLeftWrapped(parts.join(", "), 10);
     if (input.cutlery.totalEur > 0) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 4, pdfDoc));
+      ({ page, y } = ensureSpace(page, y, LINE_H + 4));
       drawTextRight(page, y, `Besteck: ${formatEur(input.cutlery.totalEur)}`, 10, font);
       y -= LINE_H + 2;
     }
@@ -288,7 +289,7 @@ async function renderReceiptContent(
   }
 
   y -= GAP_MD;
-  ({ page, y } = ensureSpace(page, y, 56, pdfDoc));
+  ({ page, y } = ensureSpace(page, y, 56));
 
   const fee = Number(input.deliveryFeeEur || 0);
   drawTextRight(page, y, `Zwischensumme: ${formatEur(input.itemsSubtotalEur)}`, 11, font);
@@ -305,44 +306,33 @@ async function renderReceiptContent(
   }
 
   y -= GAP_SM;
-  ({ page, y } = ensureSpace(page, y, 28, pdfDoc));
+  ({ page, y } = ensureSpace(page, y, 28));
   const totalStr = `GESAMT: ${formatEur(input.grandTotalEur)}`;
   const totalSize = 15;
   const tw = fontBold.widthOfTextAtSize(totalStr, totalSize);
-  page.drawText(totalStr, { x: PAGE_W - MARGIN_X - tw, y, size: totalSize, font: fontBold });
+  page.drawText(totalStr, { x: RECEIPT_W - MARGIN_X - tw, y, size: totalSize, font: fontBold });
   y -= totalSize + GAP_SM;
 
-  ({ page, y } = ensureSpace(page, y, LINE_H * 4 + 24, pdfDoc));
+  ({ page, y } = ensureSpace(page, y, LINE_H * 4 + 24));
   drawLeft("LIEFERGEBIET", { size: 10, bold: true });
   drawLeftWrapped(deliveryDistrictsNotice(), 9);
   drawLeft("ÖFFNUNGSZEITEN", { size: 10, bold: true });
   drawLeftWrapped(openingHoursLine(), 9);
+  drawLeftWrapped(COMPANY_LEGAL, 7);
 
-  let kgLastBaselineY = 0;
-  const legalLines = wrapLine(COMPANY_LEGAL, font, 7, contentW);
-  for (const ln of legalLines) {
-    ({ page, y } = ensureSpace(page, y, LINE_H + 1, pdfDoc));
-    page.drawText(ln, { x: MARGIN_X, y, size: 7, font });
-    kgLastBaselineY = y;
-    y -= LINE_H;
-  }
-
-  return { finalY: y, pageCount: pdfDoc.getPageCount(), kgLastBaselineY };
+  return { finalY: y };
 }
 
 export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   const probeDoc = await PDFDocument.create();
-  const probe = await renderReceiptContent(probeDoc, input);
+  const probe = await renderReceiptContent(probeDoc, input, { pageHeight: RECEIPT_PROBE_HEIGHT_PT });
 
-  const firstY = PAGE_H - MARGIN_Y;
-  let pageHeight = PAGE_H;
-  if (probe.pageCount === 1 && probe.kgLastBaselineY > 0) {
-    pageHeight = MARGIN_Y + (firstY - probe.kgLastBaselineY) + MARGIN_BELOW_LEGAL_KG_PT;
-    pageHeight = Math.min(PAGE_H, Math.max(pageHeight, MARGIN_Y + MARGIN_BELOW_LEGAL_KG_PT + 24));
-  }
+  const startY = RECEIPT_PROBE_HEIGHT_PT - MARGIN_TOP;
+  const contentSpanPt = startY - probe.finalY;
+  const dynamicHeight = Math.max(MARGIN_TOP + contentSpanPt + MARGIN_BOTTOM, MARGIN_TOP + MARGIN_BOTTOM + 48);
 
   const pdfDoc = await PDFDocument.create();
-  await renderReceiptContent(pdfDoc, input, { pageHeight });
+  await renderReceiptContent(pdfDoc, input, { pageHeight: dynamicHeight });
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);
 }
