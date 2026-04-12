@@ -89,8 +89,10 @@ const PAGE_W = (80 * 72) / 25.4;
 const PAGE_H = 841.89;
 
 const MARGIN_X = 10;
-/** Fester gleicher Rand oben und unten (PDF-Punkte ≈ px bei 72 dpi) — kein dynamisches Zentrieren. */
+/** Fester Rand oben bis erste Inhaltszeile (PDF-Punkte ≈ px bei 72 dpi). */
 const MARGIN_Y = 30;
+/** Fix: Abstand von der Basislinie „Sake Pan Jun Tao KG“ bis zum unteren Seitenrand (nicht dynamisch verteilt). */
+const MARGIN_BELOW_LEGAL_KG_PT = 30;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 4;
@@ -115,19 +117,26 @@ function drawTextRight(page: PDFPage, y: number, text: string, size: number, fon
   page.drawText(text, { x: PAGE_W - MARGIN_X - w, y, size, font });
 }
 
+type RenderReceiptOpts = {
+  /** Seitenhöhe (pt); Standard volle A4-Höhe. Bei einseitigem Bon: gekürzt, sodass unter KG genau `MARGIN_BELOW_LEGAL_KG_PT` bleibt. */
+  pageHeight?: number;
+};
+
 /**
- * Komplettes Bon-Layout: oben fester Rand `MARGIN_Y`, Inhalt nach unten, Umbruch bei `MARGIN_Y` zum unteren Rand.
- * @returns End-`y` (unterste Textzeile / Cursor) und Seitenanzahl
+ * Komplettes Bon-Layout: oben `MARGIN_Y`, Inhalt nach unten, Umbruch bei `MARGIN_Y` zum unteren Rand.
+ * @returns End-`y`, Seitenanzahl, Basislinie der letzten Zeile von `COMPANY_LEGAL` (0 wenn nicht gesetzt)
  */
 async function renderReceiptContent(
   pdfDoc: PDFDocument,
-  input: OrderPdfInput
-): Promise<{ finalY: number; pageCount: number }> {
+  input: OrderPdfInput,
+  opts?: RenderReceiptOpts
+): Promise<{ finalY: number; pageCount: number; kgLastBaselineY: number }> {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-  let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  let y = PAGE_H - MARGIN_Y;
+  const pageHeight = opts?.pageHeight ?? PAGE_H;
+  let page = pdfDoc.addPage([PAGE_W, pageHeight]);
+  let y = pageHeight - MARGIN_Y;
 
   const contentW = PAGE_W - MARGIN_X * 2;
 
@@ -308,14 +317,32 @@ async function renderReceiptContent(
   drawLeftWrapped(deliveryDistrictsNotice(), 9);
   drawLeft("ÖFFNUNGSZEITEN", { size: 10, bold: true });
   drawLeftWrapped(openingHoursLine(), 9);
-  drawLeftWrapped(COMPANY_LEGAL, 7);
 
-  return { finalY: y, pageCount: pdfDoc.getPageCount() };
+  let kgLastBaselineY = 0;
+  const legalLines = wrapLine(COMPANY_LEGAL, font, 7, contentW);
+  for (const ln of legalLines) {
+    ({ page, y } = ensureSpace(page, y, LINE_H + 1, pdfDoc));
+    page.drawText(ln, { x: MARGIN_X, y, size: 7, font });
+    kgLastBaselineY = y;
+    y -= LINE_H;
+  }
+
+  return { finalY: y, pageCount: pdfDoc.getPageCount(), kgLastBaselineY };
 }
 
 export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
+  const probeDoc = await PDFDocument.create();
+  const probe = await renderReceiptContent(probeDoc, input);
+
+  const firstY = PAGE_H - MARGIN_Y;
+  let pageHeight = PAGE_H;
+  if (probe.pageCount === 1 && probe.kgLastBaselineY > 0) {
+    pageHeight = MARGIN_Y + (firstY - probe.kgLastBaselineY) + MARGIN_BELOW_LEGAL_KG_PT;
+    pageHeight = Math.min(PAGE_H, Math.max(pageHeight, MARGIN_Y + MARGIN_BELOW_LEGAL_KG_PT + 24));
+  }
+
   const pdfDoc = await PDFDocument.create();
-  await renderReceiptContent(pdfDoc, input);
+  await renderReceiptContent(pdfDoc, input, { pageHeight });
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);
 }
