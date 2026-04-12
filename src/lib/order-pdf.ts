@@ -89,12 +89,15 @@ const PAGE_W = (80 * 72) / 25.4;
 const PAGE_H = 841.89;
 
 const MARGIN_X = 10;
-const MARGIN_TOP = 14;
-/** Extra Abstand unten — Kassadruck schneidet sonst oft ab */
-const MARGIN_BOTTOM = 60;
+/** Mehr Luft unterhalb des Seitenanfangs — Kopf („SAKE“) klebt nicht am Rand */
+const MARGIN_TOP = 26;
+/** Unten: genug für Thermo/Schnitt, aber ohne riesigen Leerblock unter dem Inhalt */
+const MARGIN_BOTTOM = 30;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 5;
+/** Zusätzliche Luft direkt unter dem oberen Seitenrand (vor dem Titel) */
+const HEADER_TOP_EXTRA = 6;
 /** Abhol-/Lieferzeit: kompakter Kassenbon, Label klar getrennt von der Uhrzeit */
 const FULFILLMENT_TIME_LABEL_PT = 10;
 const FULFILLMENT_TIME_VALUE_PT = 14;
@@ -108,7 +111,7 @@ function ensureSpace(
 ): { page: PDFPage; y: number } {
   if (y - need >= MARGIN_BOTTOM) return { page, y };
   const newPage = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  return { page: newPage, y: PAGE_H - MARGIN_TOP };
+  return { page: newPage, y: PAGE_H - MARGIN_TOP - HEADER_TOP_EXTRA };
 }
 
 function drawTextRight(page: PDFPage, y: number, text: string, size: number, font: PDFFont): void {
@@ -122,7 +125,7 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  let y = PAGE_H - MARGIN_TOP;
+  let y = PAGE_H - MARGIN_TOP - HEADER_TOP_EXTRA;
 
   const contentW = PAGE_W - MARGIN_X * 2;
 
@@ -276,7 +279,7 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   }
 
   y -= GAP_MD;
-  ({ page, y } = ensureSpace(page, y, 72, pdfDoc));
+  ({ page, y } = ensureSpace(page, y, 56, pdfDoc));
 
   const fee = Number(input.deliveryFeeEur || 0);
   drawTextRight(page, y, `Zwischensumme: ${formatEur(input.itemsSubtotalEur)}`, 11, font);
@@ -298,14 +301,14 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   const totalSize = 15;
   const tw = fontBold.widthOfTextAtSize(totalStr, totalSize);
   page.drawText(totalStr, { x: PAGE_W - MARGIN_X - tw, y, size: totalSize, font: fontBold });
-  y -= totalSize + GAP_MD;
+  y -= totalSize + GAP_SM;
 
   // ——— Fuß: Liefergebiete + Öffnungszeiten (keine Website) ———
-  y -= GAP_MD;
-  ({ page, y } = ensureSpace(page, y, LINE_H * 6, pdfDoc));
+  y -= GAP_SM;
+  ({ page, y } = ensureSpace(page, y, LINE_H * 4 + 24, pdfDoc));
   drawLeft("LIEFERGEBIET", { size: 10, bold: true });
   drawLeftWrapped(deliveryDistrictsNotice(), 9);
-  y -= GAP_MD;
+  y -= GAP_SM;
   drawLeft("ÖFFNUNGSZEITEN", { size: 10, bold: true });
   drawLeftWrapped(openingHoursLine(), 9);
   y -= GAP_SM;

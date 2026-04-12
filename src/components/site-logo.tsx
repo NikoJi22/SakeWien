@@ -23,9 +23,10 @@ type SiteLogoProps = {
 
 /** Kein Kasten, kein Badge, kein Hintergrund — nur das Bild. */
 const shell: Record<LogoVariant, string> = {
+  /** Unterseiten: kompakteres Logo in der festen Leiste */
   header:
-    "inline-flex items-center justify-start bg-transparent py-1.5 pl-0 pr-2 sm:py-2 sm:pr-4 md:pr-5",
-  /** Kompakt: Hero-Pille / schmale Leiste */
+    "inline-flex items-center justify-start bg-transparent py-1 pl-0 pr-2 sm:py-1 sm:pr-4 md:pr-5",
+  /** Startseite (Hero-Pille): größeres Logo als im Interior-Header */
   heroNav: "inline-flex shrink-0 items-center justify-start bg-transparent py-0 pr-1.5 sm:pr-2",
   hero: "inline-flex items-center justify-start bg-transparent py-1 pr-2 sm:pr-3",
   footer: "inline-flex items-center justify-center bg-transparent py-2",
@@ -36,9 +37,9 @@ const shell: Record<LogoVariant, string> = {
 
 const imgSize: Record<LogoVariant, string> = {
   header:
-    "h-14 w-auto max-w-[min(320px,68vw)] sm:h-16 sm:max-w-[min(380px,58vw)] md:h-[4.5rem] md:max-w-[min(440px,50vw)] lg:h-[5rem] lg:max-w-[min(480px,44vw)]",
+    "h-10 w-auto max-w-[min(200px,48vw)] sm:h-11 sm:max-w-[min(220px,42vw)] md:h-12 md:max-w-[min(240px,36vw)] lg:h-[3.25rem] lg:max-w-[min(260px,32vw)]",
   heroNav:
-    "h-8 w-auto max-w-[min(140px,34vw)] sm:h-9 sm:max-w-[min(160px,30vw)] md:max-w-[180px]",
+    "h-12 w-auto max-w-[min(260px,58vw)] sm:h-14 sm:max-w-[min(300px,50vw)] md:h-16 md:max-w-[min(340px,44vw)] lg:h-[4.25rem] lg:max-w-[min(380px,40vw)]",
   hero: "h-[3.35rem] w-auto max-w-[min(320px,52vw)] sm:h-[4.1rem] sm:max-w-[min(380px,46vw)] md:h-[4.85rem] md:max-w-[min(420px,40vw)]",
   footer: "h-20 w-auto max-w-[min(320px,85vw)] sm:h-24 md:h-28",
   heroWatermark:
@@ -90,9 +91,9 @@ export function SiteLogo({
       priority={variant === "header" || variant === "heroNav" || variant === "hero"}
       sizes={
         variant === "header"
-          ? "(max-width: 768px) 68vw, 480px"
+          ? "(max-width: 768px) 48vw, 260px"
           : variant === "heroNav"
-            ? "180px"
+            ? "(max-width: 768px) 58vw, 380px"
             : variant === "hero"
               ? "(max-width: 768px) 52vw, 420px"
               : variant === "heroWatermark" || variant === "aboutFeature" || variant === "heroBand"
