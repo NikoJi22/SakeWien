@@ -95,7 +95,7 @@ const RECEIPT_PROBE_HEIGHT_PT = 16_000;
  * Zusätzliche Höhe auf dem finalen Bon: Messung (`finalY`) und tatsächliches Layout weichen leicht ab
  * (ensureSpace-Reserven, `LINE_H` vs. Schriftgröße) — ohne Puffer schlägt der zweite Render fehl.
  */
-const RECEIPT_HEIGHT_BUFFER_PT = 120;
+const RECEIPT_HEIGHT_BUFFER_PT = 32;
 
 const MARGIN_X = 10;
 /** Fester Rand oben bis erste Inhaltszeile (PDF-Punkte ≈ px bei 72 dpi). */
@@ -105,6 +105,11 @@ const MARGIN_BOTTOM = 30;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 4;
+
+/** Zeilenabstand nach Schriftgröße — festes `LINE_H` für alle Größen überschätzt die Bon-Höhe massiv. */
+function wrappedLineStepPt(fontSizePt: number): number {
+  return Math.ceil(fontSizePt + 5);
+}
 /** Abhol-/Lieferzeit: kompakter Kassenbon, Label klar getrennt von der Uhrzeit */
 const FULFILLMENT_TIME_LABEL_PT = 10;
 const FULFILLMENT_TIME_VALUE_PT = 14;
@@ -156,12 +161,13 @@ async function renderReceiptContent(
 
   const drawCenterWrapped = (text: string, size: number, useBold = false) => {
     const f = useBold ? fontBold : font;
+    const step = wrappedLineStepPt(size);
     const lines = wrapLine(text, f, size, contentW);
     for (const ln of lines) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 1));
+      ({ page, y } = ensureSpace(page, y, step + 1));
       const w = f.widthOfTextAtSize(ln, size);
       page.drawText(ln, { x: (RECEIPT_W - w) / 2, y, size, font: f });
-      y -= LINE_H;
+      y -= step;
     }
   };
 
@@ -174,11 +180,12 @@ async function renderReceiptContent(
   };
 
   const drawLeftWrapped = (text: string, size = 10) => {
+    const step = wrappedLineStepPt(size);
     const lines = wrapLine(text, font, size, contentW);
     for (const ln of lines) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 1));
+      ({ page, y } = ensureSpace(page, y, step + 1));
       page.drawText(ln, { x: MARGIN_X, y, size, font });
-      y -= LINE_H;
+      y -= step;
     }
   };
 
@@ -248,17 +255,18 @@ async function renderReceiptContent(
   const priceColW = 52;
   const descMaxW = contentW - priceColW - 6;
 
+  const rowStep = wrappedLineStepPt(rowFont);
   for (const line of input.lines) {
     const leftLabel = `${line.quantity}× ${line.name}`;
     const nameLines = wrapLine(leftLabel, font, rowFont, descMaxW);
-    const rowH = nameLines.length * LINE_H + GAP_SM + 4;
+    const rowH = nameLines.length * rowStep + GAP_SM + 4;
     ({ page, y } = ensureSpace(page, y, rowH));
     const rowTop = y;
     drawTextRight(page, rowTop, formatEur(line.lineTotalEur), rowFont, fontBold);
     let ty = rowTop;
     for (const nl of nameLines) {
       page.drawText(nl, { x: MARGIN_X, y: ty, size: rowFont, font });
-      ty -= LINE_H;
+      ty -= rowStep;
     }
     y = ty - GAP_SM;
   }
@@ -275,9 +283,10 @@ async function renderReceiptContent(
     if (input.cutlery.woodFork > 0) parts.push(`Holzgabel × ${input.cutlery.woodFork}`);
     drawLeftWrapped(parts.join(", "), 10);
     if (input.cutlery.totalEur > 0) {
-      ({ page, y } = ensureSpace(page, y, LINE_H + 4));
+      const cStep = wrappedLineStepPt(10);
+      ({ page, y } = ensureSpace(page, y, cStep + 4));
       drawTextRight(page, y, `Besteck: ${formatEur(input.cutlery.totalEur)}`, 10, font);
-      y -= LINE_H + 2;
+      y -= cStep + 2;
     }
   }
 
