@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, type DragEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem, SiteContentConfig } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
@@ -121,6 +121,8 @@ export function AdminDashboard() {
   const [dragOverCategoryBeforeIndex, setDragOverCategoryBeforeIndex] = useState<number | null>(null);
   const [giftThresholdInput, setGiftThresholdInput] = useState("45");
   const [dishPriceDraft, setDishPriceDraft] = useState<Record<string, string>>({});
+  /** Ignore stale `load()` results (parallel fetches / responses finishing after a save). */
+  const loadRequestId = useRef(0);
 
   useEffect(() => {
     try {
@@ -140,6 +142,7 @@ export function AdminDashboard() {
   }, []);
 
   const load = useCallback(async () => {
+    const thisId = ++loadRequestId.current;
     setLoadError("");
     try {
       const [menuRes, giftRes, siteRes] = await Promise.all([
@@ -148,25 +151,30 @@ export function AdminDashboard() {
         fetch("/api/gift", { cache: "no-store" }),
         fetch("/api/site-content", { cache: "no-store" })
       ]);
+      if (thisId !== loadRequestId.current) return;
       if (!menuRes.ok) throw new Error("Menu load failed");
       const menuData = (await menuRes.json()) as MenuCategory[];
       const list = cloneMenu(Array.isArray(menuData) ? menuData : []);
+      if (thisId !== loadRequestId.current) return;
       setCategories(list);
       if (list.some((c) => c.id === LUNCH_CATEGORY_ID)) {
         setExpandedCat((prev) => ({ ...prev, [LUNCH_CATEGORY_ID]: true }));
       }
       if (giftRes.ok) {
         const g = (await giftRes.json()) as GiftConfig;
+        if (thisId !== loadRequestId.current) return;
         setGift(g);
         setGiftThresholdInput(String(g.thresholdEur));
       }
       if (siteRes.ok) {
         const raw = (await siteRes.json()) as unknown;
+        if (thisId !== loadRequestId.current) return;
         if (raw && typeof raw === "object" && !("error" in (raw as object))) {
           setSiteContent(raw as SiteContentConfig);
         }
       }
     } catch {
+      if (thisId !== loadRequestId.current) return;
       setLoadError("Could not load data.");
     }
   }, []);
@@ -255,11 +263,11 @@ export function AdminDashboard() {
         }
         return;
       }
+      loadRequestId.current += 1;
       setCategories(nextMenu);
       setDishPriceDraft({});
       setMenuStatus("Menu saved.");
       window.dispatchEvent(new Event("sake-menu-updated"));
-      void load();
     } catch (error) {
       console.error("[admin] Save menu network error", error);
       setMenuStatus("Netzwerkfehler beim Speichern.");
@@ -292,6 +300,7 @@ export function AdminDashboard() {
         setGiftStatus(typeof data.error === "string" ? data.error : "Save failed");
         return;
       }
+      loadRequestId.current += 1;
       setGift(payload);
       setGiftThresholdInput(String(thrParsed));
       setGiftStatus("Gift settings saved.");
@@ -315,6 +324,7 @@ export function AdminDashboard() {
         setSiteStatus(typeof data.error === "string" ? data.error : "Save failed");
         return;
       }
+      loadRequestId.current += 1;
       setSiteStatus("Website content saved.");
     } finally {
       setSavingSite(false);
