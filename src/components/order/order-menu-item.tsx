@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MenuItem } from "@/lib/menu-types";
-import { cartLineKey, itemRequiresLunchStarter } from "@/lib/cart-line-key";
+import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey } from "@/lib/cart-line-key";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getDiscountedPriceEur } from "@/lib/menu-pricing";
 import { useCart } from "@/context/cart-context";
@@ -55,6 +55,21 @@ export function OrderMenuItem({
     }
     setStarterId((cur) => (opts.some((o) => o.id === cur) ? cur : opts[0].id));
   }, [item.id, item.lunchStarterChoice?.options]);
+
+  /** Warenkorb-Zeile nutzt gewählten Starter in der Key — UI-Radio sonst ≠ Key → Menge 0, Minus wirkungslos */
+  useEffect(() => {
+    if (!needsStarter) return;
+    for (const [k, v] of Object.entries(quantities)) {
+      if (v <= 0) continue;
+      const p = parseCartLineKey(k);
+      if (p.itemId !== item.id || !p.starterOptionId) continue;
+      const opts = item.lunchStarterChoice?.options;
+      if (opts?.some((o) => o.id === p.starterOptionId)) {
+        setStarterId(p.starterOptionId);
+      }
+      break;
+    }
+  }, [quantities, item.id, item.lunchStarterChoice?.options, needsStarter]);
 
   const lineKey = useMemo(
     () =>
@@ -206,7 +221,7 @@ export function OrderMenuItem({
               <button
                 type="button"
                 onClick={() => removeOne(lineKey)}
-                disabled={qty <= 0 || isSoldOut}
+                disabled={qty <= 0}
                 className="flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-lg"
                 aria-label="Decrease"
               >

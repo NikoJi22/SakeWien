@@ -36,7 +36,7 @@ export function OrderCartDrawer() {
         aria-labelledby={titleId}
       >
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-brand-line bg-brand-canvas/70 px-4 py-4 pt-5 sm:px-6">
-          <h2 id={titleId} className="font-serif text-xl font-bold tracking-wide text-brand-ink sm:text-2xl">
+          <h2 id={titleId} className="font-serif text-lg font-bold tracking-wide text-brand-ink sm:text-xl">
             {t.order.yourOrder}
           </h2>
           <button

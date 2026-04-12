@@ -16,7 +16,7 @@ const headerRestaurantPhoneLine = () =>
 /** optional ORDER_PDF_OPENING_HOURS (eine Zeile) */
 const openingHoursLine = () => process.env.ORDER_PDF_OPENING_HOURS?.trim() || OPENING_HOURS_PDF_DE;
 
-/** Hinweis Lieferbezirke (fest, thermotauglich; optional ORDER_PDF_DELIVERY_DISTRICTS) */
+/** Hinweis Liefergebiete (fest, thermotauglich; optional ORDER_PDF_DELIVERY_DISTRICTS) */
 const deliveryDistrictsNotice = () =>
   process.env.ORDER_PDF_DELIVERY_DISTRICTS?.trim() ||
   "Lieferung nur in den Wiener Bezirken 6, 7, 8, 15 und 16. In alle anderen Bezirke liefern wir nicht.";
@@ -89,15 +89,11 @@ const PAGE_W = (80 * 72) / 25.4;
 const PAGE_H = 841.89;
 
 const MARGIN_X = 10;
-/** Mehr Luft unterhalb des Seitenanfangs — Kopf („SAKE“) klebt nicht am Rand */
-const MARGIN_TOP = 26;
-/** Unten: genug für Thermo/Schnitt, aber ohne riesigen Leerblock unter dem Inhalt */
-const MARGIN_BOTTOM = 30;
+/** Gleicher Außenabstand oben und unten (Mindestzone + Thermo-Schnitt) */
+const MARGIN_OUTER = 32;
 const LINE_H = 13;
 const GAP_SM = 2;
 const GAP_MD = 5;
-/** Zusätzliche Luft direkt unter dem oberen Seitenrand (vor dem Titel) */
-const HEADER_TOP_EXTRA = 6;
 /** Abhol-/Lieferzeit: kompakter Kassenbon, Label klar getrennt von der Uhrzeit */
 const FULFILLMENT_TIME_LABEL_PT = 10;
 const FULFILLMENT_TIME_VALUE_PT = 14;
@@ -109,9 +105,9 @@ function ensureSpace(
   need: number,
   pdfDoc: PDFDocument
 ): { page: PDFPage; y: number } {
-  if (y - need >= MARGIN_BOTTOM) return { page, y };
+  if (y - need >= MARGIN_OUTER) return { page, y };
   const newPage = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  return { page: newPage, y: PAGE_H - MARGIN_TOP - HEADER_TOP_EXTRA };
+  return { page: newPage, y: PAGE_H - MARGIN_OUTER };
 }
 
 function drawTextRight(page: PDFPage, y: number, text: string, size: number, font: PDFFont): void {
@@ -119,13 +115,25 @@ function drawTextRight(page: PDFPage, y: number, text: string, size: number, fon
   page.drawText(text, { x: PAGE_W - MARGIN_X - w, y, size, font });
 }
 
-export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
-  const pdfDoc = await PDFDocument.create();
+/** Erste Zeile: gleicher Abstand wie unten `MARGIN_OUTER` + optionaler Feinversatz für vertikale Zentrierung */
+function initialY(verticalShift: number): number {
+  return PAGE_H - MARGIN_OUTER + verticalShift;
+}
+
+/**
+ * Komplettes Bon-Layout. `verticalShift` nur beim zweiten Durchlauf setzen (Symmetrie).
+ * @returns End-`y` (unterste Textzeile / Cursor) und Seitenanzahl
+ */
+async function renderReceiptContent(
+  pdfDoc: PDFDocument,
+  input: OrderPdfInput,
+  verticalShift: number
+): Promise<{ finalY: number; pageCount: number }> {
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   let page = pdfDoc.addPage([PAGE_W, PAGE_H]);
-  let y = PAGE_H - MARGIN_TOP - HEADER_TOP_EXTRA;
+  let y = initialY(verticalShift);
 
   const contentW = PAGE_W - MARGIN_X * 2;
 
@@ -165,15 +173,6 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
     }
   };
 
-  // ——— Kassenkopf (zentriert, sofort Kontakt) ———
-  const titleName = headerRestaurantName().toUpperCase();
-  drawCenter(titleName, 19, true);
-  drawCenterWrapped(COMPANY_STREET, 11, false);
-  drawCenterWrapped(COMPANY_CITY, 11, false);
-  drawCenter(headerRestaurantPhoneLine(), 11, true);
-  y -= GAP_MD;
-
-  // ——— Abhol- / Lieferzeit: mittig, lesbar, nicht übergroß (Thermo ~80 mm) ———
   const drawCenterTimeBlock = (label: string, timeRaw: string | undefined) => {
     const labelSize = FULFILLMENT_TIME_LABEL_PT;
     const timeSize = FULFILLMENT_TIME_VALUE_PT;
@@ -201,6 +200,14 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
     y -= GAP_MD;
   };
 
+  // ——— Kassenkopf ———
+  const titleName = headerRestaurantName().toUpperCase();
+  drawCenter(titleName, 19, true);
+  drawCenterWrapped(COMPANY_STREET, 11, false);
+  drawCenterWrapped(COMPANY_CITY, 11, false);
+  drawCenter(headerRestaurantPhoneLine(), 11, true);
+  y -= GAP_MD;
+
   if (input.fulfillment === "pickup") {
     drawCenterTimeBlock("ABHOLZEIT", input.pickupTime);
   } else {
@@ -208,7 +215,6 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
     drawCenterTimeBlock("LIEFERHINWEIS", input.deliveryTimeEstimate || DELIVERY_TIME_ESTIMATE_DE);
   }
 
-  // ——— Bestelldaten ———
   drawLeft(`Bestellnr.: ${input.orderId}`, { size: 12, bold: true });
   drawLeft(`Datum (Wien): ${formatViennaDateTime(input.createdAt)}`, { size: 11 });
   drawLeft(`Art: ${fulfillmentLabel(input.fulfillment)}`, { size: 11, bold: true });
@@ -303,7 +309,6 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   page.drawText(totalStr, { x: PAGE_W - MARGIN_X - tw, y, size: totalSize, font: fontBold });
   y -= totalSize + GAP_SM;
 
-  // ——— Fuß: Liefergebiete + Öffnungszeiten (keine Website) ———
   y -= GAP_SM;
   ({ page, y } = ensureSpace(page, y, LINE_H * 4 + 24, pdfDoc));
   drawLeft("LIEFERGEBIET", { size: 10, bold: true });
@@ -313,6 +318,26 @@ export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
   drawLeftWrapped(openingHoursLine(), 9);
   y -= GAP_SM;
   drawLeftWrapped(COMPANY_LEGAL, 7);
+
+  return { finalY: y, pageCount: pdfDoc.getPageCount() };
+}
+
+export async function buildOrderPdf(input: OrderPdfInput): Promise<Buffer> {
+  const probeDoc = await PDFDocument.create();
+  const yProbeStart = initialY(0);
+  const { finalY: yProbeEnd, pageCount } = await renderReceiptContent(probeDoc, input, 0);
+
+  /** Nur einseitig: Block vertikal verschieben, damit Weißraum oben ≈ unten (ohne Kopf zu quetschen / Fuß zu verlieren). */
+  let verticalShift = 0;
+  if (pageCount === 1) {
+    const rawShift = (PAGE_H - yProbeEnd - yProbeStart) / 2;
+    const shiftMin = MARGIN_OUTER - yProbeEnd;
+    const shiftMax = MARGIN_OUTER - 4;
+    verticalShift = Math.min(Math.max(rawShift, shiftMin), shiftMax);
+  }
+
+  const pdfDoc = await PDFDocument.create();
+  await renderReceiptContent(pdfDoc, input, verticalShift);
 
   const bytes = await pdfDoc.save();
   return Buffer.from(bytes);

@@ -149,6 +149,10 @@ type TranslationSchema = {
     /** Brief confirmation after + without opening drawer */
     addedToCart: string;
     itemsInCart: string;
+    /** Zeile im Warenkorb / Kasse komplett entfernen */
+    removeFromCart: string;
+    decreaseQty: string;
+    increaseQty: string;
     emailOptional: string;
     smsVerifyTitle: string;
     /** Shown before any SMS was sent: code is requested via “Place order” */
@@ -372,6 +376,9 @@ export const translations: Record<Language, TranslationSchema> = {
       openCart: "Cart",
       addedToCart: "Added to cart",
       itemsInCart: "items",
+      removeFromCart: "Remove",
+      decreaseQty: "Decrease quantity",
+      increaseQty: "Increase quantity",
       emailOptional: "Email (optional)",
       smsVerifyTitle: "Verify your phone",
       smsVerifyHintSubmit: "Enter your phone number, tap “Send code”, then enter the SMS code below and confirm.",
@@ -589,6 +596,9 @@ export const translations: Record<Language, TranslationSchema> = {
       openCart: "Warenkorb",
       addedToCart: "Zum Warenkorb hinzugefügt",
       itemsInCart: "Artikel",
+      removeFromCart: "Entfernen",
+      decreaseQty: "Menge verringern",
+      increaseQty: "Menge erhöhen",
       emailOptional: "E-Mail (optional)",
       smsVerifyTitle: "Handy-Verifizierung",
       smsVerifyHintSubmit:

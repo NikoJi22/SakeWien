@@ -174,7 +174,7 @@ type OrderCheckoutProps = {
 
 export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const { language, t } = useLanguage();
-  const { lines, subtotalEur, itemCount, clear } = useCart();
+  const { lines, subtotalEur, itemCount, clear, removeOne, addOne, setQuantity } = useCart();
   const { config: giftConfig } = useGiftConfig();
   const { close: closeCartDrawer } = useOrderCartDrawer();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -577,12 +577,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const borderB = "border-b border-brand-line";
   const labelMuted = "text-xs font-medium text-brand-subtle";
   const sectionTitle =
-    "font-serif text-[1.65rem] font-bold leading-tight tracking-wide text-brand-ink sm:text-[1.85rem]";
-  const metaLine = "mt-2 text-sm font-medium text-brand-body sm:text-base";
+    "font-serif text-[1.35rem] font-bold leading-tight tracking-wide text-brand-ink sm:text-[1.5rem]";
+  const metaLine = "mt-2 text-sm font-medium text-brand-body";
   const emptyCart = "text-sm text-brand-subtle";
   const lineName = "text-brand-ink";
-  const lineQty = "text-brand-faint";
-  const linePrice = "shrink-0 tabular-nums font-bold text-brand-price";
+  const linePrice = "shrink-0 tabular-nums text-sm font-semibold text-brand-price";
   const subRowLabel = "text-brand-body";
   const subRowVal = "font-semibold tabular-nums text-brand-ink";
   const giftBox = "rounded-xl border border-brand-line bg-brand-muted/45 px-4 py-3 text-sm text-brand-ink-secondary";
@@ -625,13 +624,17 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         {lines.length === 0 ? (
           <p className={emptyCart}>{t.order.emptyCart}</p>
         ) : (
-          <ul className="space-y-5 sm:space-y-6">
+          <ul className="space-y-4 sm:space-y-5">
             {lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => {
               const L = labelMenuItem(item, language);
+              const soldOut = !!item.isSoldOut;
               return (
-                <li key={lineKey} className="flex justify-between gap-3 text-base">
-                  <span className={lineName}>
-                    <span className="block text-lg font-medium">{L.name}</span>
+                <li
+                  key={lineKey}
+                  className="flex flex-col gap-2 border-b border-brand-line/60 pb-4 last:border-b-0 last:pb-0 lg:flex-row lg:items-start lg:justify-between lg:gap-4 lg:pb-5"
+                >
+                  <div className={`min-w-0 flex-1 ${lineName}`}>
+                    <span className="block text-sm font-medium leading-snug lg:text-base">{L.name}</span>
                     {starterChoice && item.lunchStarterChoice && (
                       <span className="mt-0.5 block text-xs font-normal text-brand-body">
                         {item.lunchStarterChoice.label[language]}: {starterChoice.name[language]}
@@ -647,9 +650,61 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                           .join(", ")}
                       </span>
                     )}
-                    <span className={lineQty}> × {quantity}</span>
-                  </span>
-                  <span className={linePrice}>{formatPriceEur(getEffectivePriceEur(item) * quantity, language)}</span>
+                  </div>
+                  <div className="flex w-full min-w-0 items-center justify-between gap-3 lg:w-auto lg:shrink-0 lg:justify-end lg:gap-2.5">
+                    <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-px rounded-full border border-brand-line bg-brand-canvas p-px">
+                        <button
+                          type="button"
+                          onClick={() => removeOne(lineKey)}
+                          disabled={quantity <= 0}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 lg:h-8 lg:w-8 lg:text-base"
+                          aria-label={t.order.decreaseQty}
+                        >
+                          −
+                        </button>
+                        <span className="min-w-[1.5rem] px-0.5 text-center text-xs font-bold tabular-nums text-brand-ink lg:min-w-[1.75rem] lg:text-sm">
+                          {quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            addOne(item.id, {
+                              starterOptionId: starterChoice?.id ?? null,
+                              wasabi: sushiExtras?.wasabi,
+                              ginger: sushiExtras?.ginger
+                            })
+                          }
+                          disabled={soldOut}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 lg:h-8 lg:w-8 lg:text-base"
+                          aria-label={t.order.increaseQty}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setQuantity(lineKey, 0)}
+                        className="rounded-full p-1.5 text-brand-subtle transition hover:bg-brand-surface-hover hover:text-brand-danger lg:p-2"
+                        aria-label={t.order.removeFromCart}
+                        title={t.order.removeFromCart}
+                      >
+                        <svg
+                          className="h-4 w-4 lg:h-[1.125rem] lg:w-[1.125rem]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          aria-hidden
+                        >
+                          <path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6" strokeLinecap="round" />
+                        </svg>
+                      </button>
+                    </div>
+                    <span className={`${linePrice} shrink-0 text-right`}>
+                      {formatPriceEur(getEffectivePriceEur(item) * quantity, language)}
+                    </span>
+                  </div>
                 </li>
               );
             })}
