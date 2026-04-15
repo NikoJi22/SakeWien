@@ -6,7 +6,7 @@ import { useLanguage } from "@/context/language-context";
 function Pill({ children, className }: { children: React.ReactNode; className: string }) {
   return (
     <span
-      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${className}`}
+      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] ${className}`}
     >
       {children}
     </span>
@@ -20,13 +20,13 @@ export function MenuDietBadges({ item, className = "" }: { item: MenuItem; class
   return (
     <div className={`flex flex-wrap gap-1.5 ${className}`}>
       {item.vegan && (
-        <Pill className="border-brand-line bg-brand-muted/50 text-brand-primary">{t.order.vegan}</Pill>
+        <Pill className="border-emerald-300 bg-emerald-100 text-emerald-800">{t.order.vegan}</Pill>
       )}
       {item.vegetarian && !item.vegan && (
-        <Pill className="border-brand-line bg-brand-canvas text-brand-primary">{t.order.vegetarian}</Pill>
+        <Pill className="border-green-200 bg-green-50 text-green-800">{t.order.vegetarian}</Pill>
       )}
       {item.spicy && (
-        <Pill className="border-brand-line bg-brand-canvas text-brand-primary">{t.order.spicy}</Pill>
+        <Pill className="border-red-200 bg-red-50 text-red-700">{t.order.spicy}</Pill>
       )}
     </div>
   );

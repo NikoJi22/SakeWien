@@ -22,12 +22,12 @@ export function PageHeader({ title, subtitle, eyebrow = "SAKE · Vienna", varian
           {eyebrow}
         </p>
         <h1
-          className={`font-serif text-[clamp(1.75rem,4vw,2.75rem)] font-light leading-tight tracking-[0.06em] ${isLight ? "text-brand-ink" : "text-[#ebe3d6]"}`}
+          className={`font-serif text-[clamp(2.1rem,4.8vw,3.25rem)] font-light leading-tight tracking-[0.06em] ${isLight ? "text-brand-ink" : "text-[#ebe3d6]"}`}
         >
           {title}
         </h1>
         <p
-          className={`mt-5 max-w-2xl text-sm leading-relaxed sm:text-base ${isLight ? "text-brand-body" : "text-white/55"}`}
+          className={`mt-5 max-w-2xl text-base leading-relaxed sm:text-lg ${isLight ? "text-brand-body" : "text-white/55"}`}
         >
           {subtitle}
         </p>

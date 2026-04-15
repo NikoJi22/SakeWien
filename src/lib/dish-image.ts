@@ -1,6 +1,7 @@
+import { SITE_LOGO_MARK_PATH } from "@/lib/site-logo-asset";
+
 /** Default menu photo when no upload exists (legacy; avoid for new deployments — prefer `NEXT_PUBLIC_DISH_PLACEHOLDER_URL`). */
-export const DEFAULT_DISH_PLACEHOLDER_IMAGE =
-  "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80";
+export const DEFAULT_DISH_PLACEHOLDER_IMAGE = SITE_LOGO_MARK_PATH;
 
 /** Platzhalter nach „Bild löschen“: eigene Cloudinary-URL per Env, sonst Legacy-Unsplash. */
 export function resolvedDishPlaceholderUrl(): string {

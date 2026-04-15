@@ -10,7 +10,7 @@ import { getDiscountedPriceEur } from "@/lib/menu-pricing";
 import { MenuAllergenChips, MenuDietBadges } from "./menu-diet-allergen";
 
 function Badge({ children, className }: { children: React.ReactNode; className: string }) {
-  return <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${className}`}>{children}</span>;
+  return <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${className}`}>{children}</span>;
 }
 
 type Props = {
@@ -31,7 +31,7 @@ export function MenuItemCard({ item, variant = "default" }: Props) {
         spotlight ? "border-brand-primary/22 ring-1 ring-brand-primary/10" : "border-brand-primary/[0.07]"
       }`}
     >
-      <div className={`relative overflow-hidden sm:h-56 ${spotlight ? "h-56" : "h-52"}`}>
+      <div className={`relative overflow-hidden sm:h-48 ${spotlight ? "h-48" : "h-44"}`}>
         <Image
           src={item.image}
           alt={L.name}
@@ -49,20 +49,20 @@ export function MenuItemCard({ item, variant = "default" }: Props) {
       </div>
       <div className="space-y-3 p-6 sm:p-7">
         <div className="flex items-start justify-between gap-4">
-          <h3 className="font-serif text-lg font-bold leading-snug tracking-wide text-brand-ink">{L.name}</h3>
+          <h3 className="font-serif text-xl font-bold leading-snug tracking-wide text-brand-ink sm:text-[1.4rem]">{L.name}</h3>
           <span className="shrink-0 pt-0.5 tabular-nums leading-none">
             {discountedPrice !== null ? (
               <span className="flex flex-col items-end">
-                <span className="text-xs text-brand-subtle line-through">{L.price}</span>
-                <span className="text-lg font-bold text-brand-price sm:text-xl">{formatPriceEur(discountedPrice, language)}</span>
+                <span className="text-sm text-brand-subtle line-through">{L.price}</span>
+                <span className="text-xl font-bold text-brand-price sm:text-2xl">{formatPriceEur(discountedPrice, language)}</span>
               </span>
             ) : (
-              <span className="text-lg font-bold text-brand-price sm:text-xl">{L.price}</span>
+              <span className="text-xl font-bold text-brand-price sm:text-2xl">{L.price}</span>
             )}
           </span>
         </div>
         <MenuDietBadges item={item} />
-        <p className="text-sm leading-relaxed text-brand-body">{L.description}</p>
+        <p className="text-base leading-relaxed text-brand-body sm:text-[1.05rem]">{L.description}</p>
         {itemRequiresLunchStarter(item) && item.lunchStarterChoice && (
           <p className="text-xs leading-relaxed text-brand-subtle">
             {item.lunchStarterChoice.label[language]}:{" "}

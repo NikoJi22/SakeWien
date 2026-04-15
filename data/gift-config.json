@@ -1,7 +1,15 @@
 {
-  "thresholdEur": 45,
   "message": {
     "en": "You unlocked a complimentary miso soup with your order.",
     "de": "Sie erhalten eine kostenlose Misosuppe zu Ihrer Bestellung."
-  }
+  },
+  "freeItemIds": [
+    "soup-hot-sour",
+    "soup-miso",
+    "soup-vegetable"
+  ],
+  "tier1ThresholdEur": 35,
+  "tier1GiftCount": 1,
+  "tier2ThresholdEur": 70,
+  "tier2GiftCount": 2
 }

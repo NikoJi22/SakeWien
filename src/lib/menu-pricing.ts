@@ -45,6 +45,21 @@ export function getDiscountedPriceEur(item: MenuItem): number | null {
   return round2(Math.max(0, next));
 }
 
-export function getEffectivePriceEur(item: MenuItem): number {
-  return getDiscountedPriceEur(item) ?? item.priceEur;
+export function resolveOrderChoiceBasePriceEur(item: MenuItem, orderChoiceId?: string | null): number {
+  const opt = orderChoiceId
+    ? item.orderChoiceGroup?.options?.find((o) => o.id === orderChoiceId)
+    : undefined;
+  if (typeof opt?.priceEur === "number" && Number.isFinite(opt.priceEur) && opt.priceEur >= 0) {
+    return opt.priceEur;
+  }
+  return item.priceEur;
+}
+
+export function getEffectivePriceEur(item: MenuItem, orderChoiceId?: string | null): number {
+  const basePriceEur = resolveOrderChoiceBasePriceEur(item, orderChoiceId);
+  if (!item.isSpecialDeal) return basePriceEur;
+  const deal = parseSpecialDealLabel(item.specialDealLabel);
+  if (!deal) return basePriceEur;
+  const next = deal.kind === "percent" ? basePriceEur - (basePriceEur * deal.value) / 100 : basePriceEur - deal.value;
+  return round2(Math.max(0, next));
 }

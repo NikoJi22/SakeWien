@@ -6,6 +6,9 @@ import { normalizeToE164 } from "@/lib/phone-normalize";
 import { ORDER_PHONE_COOKIE, parseVerifiedPhoneCookie } from "@/lib/order-phone-cookie";
 import { buildOrderPdf, type OrderPdfInput } from "@/lib/order-pdf";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
+import { maxFreeGiftsForSubtotal, normalizeGiftConfig } from "@/lib/gift-config";
+import { readGiftFromDisk, readMenuFromDisk, readSiteContentFromDisk } from "@/lib/menu-store";
+import { isVacationModeActive, normalizeSiteContentConfig } from "@/lib/site-content";
 import {
   canAcceptNewOrdersVienna,
   DELIVERY_TIME_ESTIMATE_DE,
@@ -50,6 +53,7 @@ type OrderBody = {
   subtotalEur: number;
   giftEligible?: boolean;
   giftMessage?: string;
+  giftItemIds?: string[];
   cutlery?: {
     chopsticksCount?: number;
     woodSpoonCount?: number;
@@ -166,6 +170,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "empty_cart" }, { status: 400 });
     }
 
+    try {
+      const siteContent = normalizeSiteContentConfig(await readSiteContentFromDisk());
+      if (isVacationModeActive(siteContent.ordering.vacationMode)) {
+        console.error("[order] rejected: vacation mode active");
+        return NextResponse.json({ error: "orders_closed_vacation" }, { status: 400 });
+      }
+    } catch (err) {
+      console.warn("[order] vacation mode check skipped: site-content unavailable", err);
+    }
+
     if (!canAcceptNewOrdersVienna()) {
       console.error("[order] rejected: after order cutoff (Vienna)");
       return NextResponse.json({ error: "orders_closed_cutoff" }, { status: 400 });
@@ -203,10 +217,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "phone_mismatch" }, { status: 403 });
       }
     }
-    /** Pickup: phone not required; optional valid number is stored if sent */
-    else if (rawPhone) {
+    else if (body.fulfillment === "pickup") {
       const normalized = normalizeToE164(rawPhone);
-      if (normalized) orderPhone = normalized;
+      if (!normalized) {
+        console.error("[order] rejected pickup: missing or invalid phone number");
+        return NextResponse.json({ error: "invalid_customer_phone" }, { status: 400 });
+      }
+      orderPhone = normalized;
     }
     if (body.fulfillment === "delivery" && Number(body.subtotalEur || 0) < DELIVERY_MIN_ORDER_EUR) {
       return NextResponse.json({ error: "delivery_min_order" }, { status: 400 });
@@ -238,6 +255,31 @@ export async function POST(request: Request) {
     const orderId = await allocateNextOrderNumber();
     const itemsSubtotalEur = body.lines.reduce((s, l) => s + Number(l.lineTotalEur || 0), 0);
     const grandTotalEur = Number(body.subtotalEur || 0);
+    const requestedGiftIds = Array.isArray(body.giftItemIds)
+      ? body.giftItemIds.filter((id): id is string => typeof id === "string").map((id) => id.trim()).filter(Boolean)
+      : [];
+    let selectedFreeGiftItems: string[] = [];
+    if (requestedGiftIds.length > 0) {
+      try {
+        const giftConfig = normalizeGiftConfig(await readGiftFromDisk());
+        const maxAllowedGiftCount = maxFreeGiftsForSubtotal(itemsSubtotalEur, giftConfig);
+        const allowedIds = new Set(giftConfig.freeItemIds);
+        if (requestedGiftIds.length > maxAllowedGiftCount || requestedGiftIds.some((id) => !allowedIds.has(id))) {
+          return NextResponse.json({ error: "invalid_gift_selection" }, { status: 400 });
+        }
+        const categories = await readMenuFromDisk();
+        const language = body.language === "en" ? "en" : "de";
+        const nameById = new Map(
+          categories.flatMap((category) =>
+            category.items.map((item) => [item.id, item.name[language] || item.name.de || item.name.en || item.id] as const)
+          )
+        );
+        selectedFreeGiftItems = requestedGiftIds.map((id) => nameById.get(id) || id);
+      } catch (err) {
+        console.error("[order] failed to validate gift selections", err);
+        return NextResponse.json({ error: "invalid_gift_selection" }, { status: 400 });
+      }
+    }
 
     const chopsticks = Number(body.cutlery?.chopsticksCount || 0);
     const woodSpoon = Number(body.cutlery?.woodSpoonCount || 0);
@@ -273,6 +315,7 @@ export async function POST(request: Request) {
       cutlery: cutleryPdf,
       giftEligible: !!body.giftEligible,
       giftMessage: body.giftEligible ? String(body.giftMessage ?? "").trim() || undefined : undefined,
+      freeGiftItems: selectedFreeGiftItems,
       itemsSubtotalEur,
       grandTotalEur,
       deliveryFeeEur: undefined
@@ -300,6 +343,7 @@ export async function POST(request: Request) {
       `Kunde: ${customerName}`,
       `Telefon: ${orderPhone ?? "—"}`,
       scheduleLine,
+      selectedFreeGiftItems.length > 0 ? `Gratisartikel: ${selectedFreeGiftItems.join(", ")}` : "Gratisartikel: —",
       "",
       "Details siehe PDF-Anhang."
     ];

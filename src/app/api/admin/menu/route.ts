@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
 import type { LunchStarterChoice, LunchStarterOption, MenuCategory, MenuItem } from "@/lib/menu-types";
 import { normalizeAllergenCodes } from "@/lib/allergen-codes";
+import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
 import { readMenuFromDisk, writeMenuToDisk } from "@/lib/menu-store";
 import { cookies } from "next/headers";
 
@@ -48,6 +49,15 @@ async function requireAdmin() {
   return verifyAdminSession(store.get(ADMIN_COOKIE)?.value);
 }
 
+function normalizeMenuItemImage(raw: unknown): string {
+  if (typeof raw !== "string") return DEFAULT_DISH_PLACEHOLDER_IMAGE;
+  const t = raw.trim();
+  if (!t) return DEFAULT_DISH_PLACEHOLDER_IMAGE;
+  if (/^https?:\/\//i.test(t)) return t;
+  if (t.startsWith("/")) return t;
+  return DEFAULT_DISH_PLACEHOLDER_IMAGE;
+}
+
 const noStoreJson = { "Cache-Control": "private, no-store, must-revalidate" };
 
 export async function GET() {
@@ -85,22 +95,13 @@ export async function POST(request: Request) {
 
   for (const cat of body) {
     for (const item of cat.items) {
-      if (
-        !item.id ||
-        !item.name ||
-        typeof item.priceEur !== "number" ||
-        !item.image ||
-        !item.description
-      ) {
+      if (!item.id || !item.name || typeof item.priceEur !== "number" || !item.description) {
         return NextResponse.json({ error: `Invalid item in category ${cat.id}` }, { status: 400 });
       }
       if (item.allergens !== undefined) {
         if (!Array.isArray(item.allergens) || !item.allergens.every((x) => typeof x === "string")) {
           return NextResponse.json({ error: `Invalid allergens for item ${item.id}` }, { status: 400 });
         }
-      }
-      if (typeof item.image !== "string" || !/^https?:\/\//i.test(item.image)) {
-        return NextResponse.json({ error: `Invalid image URL for item ${item.id}` }, { status: 400 });
       }
     }
   }
@@ -120,6 +121,7 @@ export async function POST(request: Request) {
               : 0;
         return {
           ...mi,
+          image: normalizeMenuItemImage(mi.image),
           ...(allergens?.length ? { allergens } : { allergens: undefined }),
           spicyLevel,
           lunchStarterChoice

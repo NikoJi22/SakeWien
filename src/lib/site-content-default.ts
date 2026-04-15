@@ -5,6 +5,13 @@ export const defaultSiteContent: SiteContentConfig = {
     title: { de: "Sushi Sensation", en: "Sushi Sensation" },
     mainImage: "https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=2200&q=85"
   },
+  ordering: {
+    vacationMode: {
+      active: false,
+      startDate: "",
+      endDate: ""
+    }
+  },
   cards: {
     order: {
       label: { de: "Jetzt bestellen", en: "Order now" },

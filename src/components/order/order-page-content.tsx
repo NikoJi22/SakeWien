@@ -15,7 +15,6 @@ import { OrderMobileBar } from "./order-mobile-bar";
 import { OrderCartDrawer } from "./order-cart-drawer";
 import { emptyMenuAttributeFilter, filterBestsellersAndNewSections, itemMatchesMenuFilters } from "@/lib/menu-filter";
 import { MENU_NAV_BESTSELLERS, MENU_NAV_NEW } from "@/lib/menu-scroll";
-import { categoryHasSushiExtras } from "@/lib/menu-sushi-order-categories";
 
 /** Desktop: 2 Karten pro Zeile, gleiche Zeilenhöhe · Mobile/Tablet: 1 Spalte */
 const orderMenuGridClass =
@@ -45,14 +44,6 @@ export function OrderPageContent() {
         .filter((c) => c.items.length > 0),
     [categories, filter]
   );
-  const sushiLikeIds = useMemo(() => {
-    const ids = new Set<string>();
-    categories
-      .filter((c) => categoryHasSushiExtras(c.id))
-      .forEach((c) => c.items.forEach((i) => ids.add(i.id)));
-    return ids;
-  }, [categories]);
-
   const leadingNav = useMemo(() => {
     const items: { id: string; label: string }[] = [];
     if (filteredDeals.length > 0) items.push({ id: "special-deals", label: "Aktionen" });
@@ -93,7 +84,6 @@ export function OrderPageContent() {
                           item={item}
                           spotlight
                           starterGroupId="special-deals"
-                          allowSushiExtras={sushiLikeIds.has(item.id)}
                         />
                       ))}
                     </div>
@@ -108,7 +98,6 @@ export function OrderPageContent() {
                           item={item}
                           spotlight
                           starterGroupId="bestsellers"
-                          allowSushiExtras={sushiLikeIds.has(item.id)}
                         />
                       ))}
                     </div>
@@ -123,7 +112,6 @@ export function OrderPageContent() {
                           item={item}
                           spotlight
                           starterGroupId="new-dishes"
-                          allowSushiExtras={sushiLikeIds.has(item.id)}
                         />
                       ))}
                     </div>
@@ -137,7 +125,6 @@ export function OrderPageContent() {
                           key={`${category.id}-${item.id}`}
                           item={item}
                           starterGroupId={category.id}
-                          allowSushiExtras={categoryHasSushiExtras(category.id)}
                         />
                       ))}
                     </div>

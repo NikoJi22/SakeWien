@@ -14,7 +14,7 @@ import { emptyMenuAttributeFilter, filterBestsellersAndNewSections, itemMatchesM
 import { MENU_NAV_BESTSELLERS, MENU_NAV_NEW } from "@/lib/menu-scroll";
 import { brandBtnSecondary } from "@/lib/brand-actions";
 
-const pillClass = `inline-flex items-center justify-center rounded-full px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] ${brandBtnSecondary}`;
+const pillClass = `inline-flex items-center justify-center rounded-full px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.2em] sm:text-sm ${brandBtnSecondary}`;
 
 export default function MenuPage() {
   const { t, language } = useLanguage();
@@ -46,7 +46,7 @@ export default function MenuPage() {
             {t.page.bestsellersTitle}
           </Link>
         </div>
-        <p className="mb-6 text-xs text-brand-subtle sm:mb-8">{t.menu.lunchHoursHint}</p>
+        <p className="mb-6 text-sm text-brand-subtle sm:mb-8">{t.menu.lunchHoursHint}</p>
         <div className="mb-6 space-y-4 sm:mb-8">
           <MenuAttributeFilters value={filter} onChange={setFilter} />
           <MenuAllergenLegend />

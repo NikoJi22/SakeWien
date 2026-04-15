@@ -3,7 +3,9 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/context/cart-context";
 import { useGiftConfig } from "@/context/gift-config-context";
+import { useMenuData } from "@/context/menu-data-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
+import { useSiteContent } from "@/context/site-content-context";
 import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
@@ -21,6 +23,8 @@ import {
 } from "@/lib/order-schedule";
 import { normalizeToE164 } from "@/lib/phone-normalize";
 import { brandBtnPrimary, brandBtnSecondary } from "@/lib/brand-actions";
+import { maxFreeGiftsForSubtotal } from "@/lib/gift-config";
+import { isVacationModeActive } from "@/lib/site-content";
 import type { translations } from "@/lib/translations";
 
 type OrderCopy = (typeof translations)["en"]["order"];
@@ -32,6 +36,7 @@ const ORDER_SUBMIT_ERROR_CODES = new Set([
   "delivery_min_order",
   "delivery_address_incomplete",
   "delivery_address_invalid_plz",
+  "orders_closed_vacation",
   "orders_closed_cutoff",
   "pickup_invalid_datetime",
   "pickup_closed_tuesday",
@@ -46,6 +51,7 @@ const ORDER_SUBMIT_ERROR_CODES = new Set([
   "invalid_customer_phone",
   "invalid_json",
   "invalid_payload",
+  "invalid_gift_selection",
   "mail_failed",
   "smtp_not_configured",
   "smtp_send_failed",
@@ -70,6 +76,8 @@ function messageForOrderSubmitError(code: string | undefined, o: OrderCopy, http
       return o.errDeliveryAddressPlz;
     case "orders_closed_cutoff":
       return o.errOrdersClosedCutoff;
+    case "orders_closed_vacation":
+      return o.errOrdersClosedVacation;
     case "pickup_invalid_datetime":
       return o.errPickupInvalidDatetime;
     case "pickup_closed_tuesday":
@@ -96,6 +104,8 @@ function messageForOrderSubmitError(code: string | undefined, o: OrderCopy, http
       return o.errInvalidJsonBody;
     case "invalid_payload":
       return o.errEmptyCartPayload;
+    case "invalid_gift_selection":
+      return o.errInvalidGiftSelection;
     case "mail_failed":
       return o.errSmtpSendFailed;
     case "smtp_not_configured":
@@ -176,6 +186,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const { language, t } = useLanguage();
   const { lines, subtotalEur, itemCount, clear, removeOne, addOne, setQuantity } = useCart();
   const { config: giftConfig } = useGiftConfig();
+  const { itemById } = useMenuData();
+  const { siteContent } = useSiteContent();
   const { close: closeCartDrawer } = useOrderCartDrawer();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [fulfillment, setFulfillment] = useState<"pickup" | "delivery">("pickup");
@@ -197,6 +209,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [showOtpSection, setShowOtpSection] = useState(false);
   const [smsInfo, setSmsInfo] = useState<string | null>(null);
   const [lastPlacedOrderId, setLastPlacedOrderId] = useState<string | null>(null);
+  const [freeGiftSelections, setFreeGiftSelections] = useState<string[]>([]);
   const cutleryFeeEur = (chopsticksCount + woodSpoonCount + woodForkCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
   const isDeliveryMinMet = fulfillment === "pickup" || subtotalEur >= DELIVERY_MIN_ORDER_EUR;
@@ -219,8 +232,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
   const canOrderNow = useMemo(() => {
     void schedulePulse;
-    return canAcceptNewOrdersVienna();
-  }, [schedulePulse]);
+    return canAcceptNewOrdersVienna() && !isVacationModeActive(siteContent.ordering.vacationMode);
+  }, [schedulePulse, siteContent.ordering.vacationMode]);
   const minDateKey = earliestFulfillmentDateKeyVienna();
   const maxDateKey = latestFulfillmentDateKeyVienna();
   const pickupTimeMin = minPickupTimeHHmmForDateKey(fulfillmentDate);
@@ -250,9 +263,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   }, [fulfillmentDate]);
 
   useEffect(() => {
-    if (fulfillment !== "pickup") return;
+    if (fulfillment !== "delivery") return;
     setPhoneVerified(false);
-    setPhone("");
     setOtp("");
     setShowOtpSection(false);
     setSendLoading(false);
@@ -262,9 +274,41 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     setSubmitError(null);
   }, [fulfillment]);
 
-  const giftUnlocked = subtotalEur >= giftConfig.thresholdEur;
+  const allowedFreeGiftCount = maxFreeGiftsForSubtotal(subtotalEur, giftConfig);
+  const giftUnlocked = allowedFreeGiftCount > 0;
   const giftMessage = giftConfig.message[language];
+  const selectableFreeGiftItems = useMemo(
+    () =>
+      giftConfig.freeItemIds.map((id) => {
+        const item = itemById[id];
+        return {
+          id,
+          label: item ? item.name[language] || item.name.de || item.name.en || item.id : id
+        };
+      }),
+    [giftConfig.freeItemIds, itemById, language]
+  );
+  const selectedFreeGiftRows = useMemo(
+    () =>
+      freeGiftSelections
+        .slice(0, allowedFreeGiftCount)
+        .map((id, slotIdx) => {
+          const entry = selectableFreeGiftItems.find((e) => e.id === id);
+          return { slotIdx, id, label: entry?.label ?? id };
+        })
+        .filter((row) => row.id),
+    [allowedFreeGiftCount, freeGiftSelections, selectableFreeGiftItems]
+  );
   const isDrawer = variant === "drawer";
+
+  useEffect(() => {
+    setFreeGiftSelections((prev) => {
+      if (prev.length === 0) return prev;
+      const validIds = new Set(selectableFreeGiftItems.map((entry) => entry.id));
+      const next = prev.slice(0, allowedFreeGiftCount).map((id) => (validIds.has(id) ? id : ""));
+      return next.length === prev.length && next.every((id, idx) => id === prev[idx]) ? prev : next;
+    });
+  }, [allowedFreeGiftCount, selectableFreeGiftItems]);
 
   useEffect(() => {
     if (lines.length > 0) return;
@@ -363,9 +407,21 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       setSubmitError(t.order.errEmptyCartPayload);
       return;
     }
+    if (giftUnlocked) {
+      for (let i = 0; i < allowedFreeGiftCount; i++) {
+        if (!freeGiftSelections[i]?.trim()) {
+          setSubmitError(t.order.errInvalidGiftSelection);
+          return;
+        }
+      }
+    }
 
     if (!canAcceptNewOrdersVienna()) {
       setSubmitError(t.order.errOrdersClosedCutoff);
+      return;
+    }
+    if (isVacationModeActive(siteContent.ordering.vacationMode)) {
+      setSubmitError(t.order.errOrdersClosedVacation);
       return;
     }
 
@@ -406,6 +462,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       return;
     }
 
+    if (isPickup && !normalizedPhone) {
+      setSubmitError(t.order.errInvalidPhone);
+      return;
+    }
+
     if (fulfillment === "delivery") {
       const street = String(fd.get("deliveryStreet") ?? "").trim();
       const houseNumber = String(fd.get("deliveryHouseNumber") ?? "").trim();
@@ -443,7 +504,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     const payload = {
       fulfillment,
       name: String(fd.get("name") ?? ""),
-      phone: isDelivery ? normalizedPhone ?? phone.trim() : "",
+      phone: normalizedPhone ?? phone.trim(),
       email: String(fd.get("email") ?? ""),
       deliveryAddress:
         fulfillment === "delivery"
@@ -464,6 +525,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       subtotalEur: totalEur,
       giftEligible: giftUnlocked,
       giftMessage: giftUnlocked ? giftMessage : "",
+      giftItemIds: freeGiftSelections.slice(0, allowedFreeGiftCount),
       cutlery:
         chopsticksCount + woodSpoonCount + woodForkCount > 0
           ? {
@@ -474,23 +536,14 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
               totalEur: cutleryFeeEur
             }
           : null,
-      lines: lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => ({
+      lines: lines.map(({ lineKey, item, quantity, starterChoice, orderChoice }) => ({
         id: lineKey,
         name: `${starterChoice
           ? `${item.name[language]} — ${item.lunchStarterChoice!.label[language]}: ${starterChoice.name[language]}`
-          : item.name[language]}${
-          sushiExtras?.wasabi || sushiExtras?.ginger
-            ? ` (${[
-                sushiExtras.wasabi ? t.order.wasabi : "",
-                sushiExtras.ginger ? t.order.ginger : ""
-              ]
-                .filter(Boolean)
-                .join(", ")})`
-            : ""
-        }`,
+          : item.name[language]}${orderChoice ? ` — ${item.orderChoiceGroup?.label[language]}: ${orderChoice.name[language]}` : ""}`,
         quantity,
-        unitPriceEur: getEffectivePriceEur(item),
-        lineTotalEur: getEffectivePriceEur(item) * quantity
+        unitPriceEur: getEffectivePriceEur(item, orderChoice?.id),
+        lineTotalEur: getEffectivePriceEur(item, orderChoice?.id) * quantity
       }))
     };
 
@@ -625,7 +678,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <p className={emptyCart}>{t.order.emptyCart}</p>
         ) : (
           <ul className="space-y-4 sm:space-y-5">
-            {lines.map(({ lineKey, item, quantity, starterChoice, sushiExtras }) => {
+            {lines.map(({ lineKey, item, quantity, starterChoice, orderChoice, sushiExtras }) => {
               const L = labelMenuItem(item, language);
               const soldOut = !!item.isSoldOut;
               return (
@@ -638,6 +691,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                     {starterChoice && item.lunchStarterChoice && (
                       <span className="mt-0.5 block text-xs font-normal text-brand-body">
                         {item.lunchStarterChoice.label[language]}: {starterChoice.name[language]}
+                      </span>
+                    )}
+                    {orderChoice && (
+                      <span className="mt-0.5 block text-xs font-normal text-brand-body">
+                        {item.orderChoiceGroup?.label[language]}: {orderChoice.name[language]}
                       </span>
                     )}
                     {(sushiExtras?.wasabi || sushiExtras?.ginger) && (
@@ -671,8 +729,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                           onClick={() =>
                             addOne(item.id, {
                               starterOptionId: starterChoice?.id ?? null,
-                              wasabi: sushiExtras?.wasabi,
-                              ginger: sushiExtras?.ginger
+                              orderChoiceId: orderChoice?.id ?? null
                             })
                           }
                           disabled={soldOut}
@@ -702,7 +759,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                       </button>
                     </div>
                     <span className={`${linePrice} shrink-0 text-right`}>
-                      {formatPriceEur(getEffectivePriceEur(item) * quantity, language)}
+                      {formatPriceEur(getEffectivePriceEur(item, orderChoice?.id) * quantity, language)}
                     </span>
                   </div>
                 </li>
@@ -818,6 +875,55 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <div className={giftBox}>
             <p className={giftTitle}>{t.order.giftUnlocked}</p>
             <p className={giftText}>{giftMessage}</p>
+            <p className={giftHint}>
+              {t.order.freeGiftTiersHint
+                .replace("%T1%", String(giftConfig.tier1ThresholdEur))
+                .replace("%C1%", String(giftConfig.tier1GiftCount))
+                .replace("%T2%", String(giftConfig.tier2ThresholdEur))
+                .replace("%C2%", String(giftConfig.tier2GiftCount))}
+            </p>
+            {selectableFreeGiftItems.length > 0 ? (
+              <div className="mt-3 space-y-2">
+                {Array.from({ length: allowedFreeGiftCount }, (_, idx) => {
+                  const value = freeGiftSelections[idx] ?? "";
+                  return (
+                    <label key={`gift-slot-${idx}`} className="block text-xs text-brand-body">
+                      <span className="mb-1 block">
+                        {t.order.freeGiftSelectLabel} {idx + 1}
+                      </span>
+                      <select
+                        value={value}
+                        onChange={(e) =>
+                          setFreeGiftSelections((prev) => {
+                            const next = [...prev];
+                            while (next.length < allowedFreeGiftCount) next.push("");
+                            next[idx] = e.target.value.trim();
+                            return next.slice(0, allowedFreeGiftCount);
+                          })
+                        }
+                        className="w-full rounded-lg border border-brand-line bg-brand-card px-3 py-2 text-sm text-brand-ink outline-none focus:border-brand-primary"
+                      >
+                        <option value="">{t.order.freeGiftSelectPlaceholder}</option>
+                        {selectableFreeGiftItems.map((entry) => (
+                          <option key={entry.id} value={entry.id}>
+                            {entry.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  );
+                })}
+                {selectedFreeGiftRows.length > 0 && (
+                  <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs text-brand-body">
+                    {selectedFreeGiftRows.map((row) => (
+                      <li key={`gift-selected-${row.slotIdx}-${row.id}`}>{row.label}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <p className="mt-2 text-xs text-brand-subtle">{t.order.freeGiftNotConfigured}</p>
+            )}
           </div>
         ) : (
           <p className={giftHint}>{t.order.giftHint}</p>
@@ -963,12 +1069,34 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
         {!canOrderNow && (
           <p className="rounded-xl border border-brand-danger/30 bg-brand-danger/5 px-4 py-3 text-sm font-medium text-brand-danger">
-            {t.order.ordersClosedMessage}
+            {isVacationModeActive(siteContent.ordering.vacationMode)
+              ? t.order.ordersClosedVacationMessage
+              : t.order.ordersClosedMessage}
           </p>
         )}
 
         {isPickup ? (
           <div className="space-y-4">
+            <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
+              <span>{t.order.pickupPhoneCustomerLabel}</span>
+              <input
+                type="tel"
+                required
+                autoComplete="tel"
+                inputMode="tel"
+                placeholder={t.order.smsPhonePlaceholder}
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  setSubmitError(null);
+                }}
+                onBlur={() => {
+                  if (normalizeToE164(phone)) setPhone(normalizeToE164(phone)!);
+                }}
+                className={inputClass}
+              />
+              <span className="text-xs text-brand-subtle">{t.order.pickupPhoneCustomerHint}</span>
+            </label>
             <label className={`flex flex-col gap-1.5 ${labelMuted}`}>
               <span>{t.order.pickupDateLabel}</span>
               <input

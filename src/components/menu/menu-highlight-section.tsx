@@ -20,7 +20,7 @@ export function MenuHighlightSection({ navId, title, children, variant = "amber"
   return (
     <section id={menuSectionId(navId)} className="scroll-mt-[8.5rem] rounded-3xl border border-brand-line p-5 sm:p-7 lg:p-8">
       <div className={`rounded-2xl border p-4 sm:p-6 ${ring}`}>
-        <h2 className="mb-6 font-serif text-xl font-semibold tracking-wide text-brand-ink sm:text-2xl">{title}</h2>
+        <h2 className="mb-6 font-serif text-2xl font-semibold tracking-wide text-brand-ink sm:text-[1.95rem]">{title}</h2>
         {children}
       </div>
     </section>

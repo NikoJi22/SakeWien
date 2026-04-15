@@ -218,7 +218,7 @@ export function CategoryNav({ categories, language, className = "", leadingItems
                   role="tab"
                   aria-selected={active}
                   onClick={() => goTo(l.id)}
-                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full px-4 py-2 text-sm transition-colors duration-200 ease-out active:cursor-grabbing ${
+                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full px-4 py-2 text-base transition-colors duration-200 ease-out active:cursor-grabbing ${
                     active ? brandChipActive : brandChipInactive
                   }`}
                 >
@@ -237,7 +237,7 @@ export function CategoryNav({ categories, language, className = "", leadingItems
                   role="tab"
                   aria-selected={active}
                   onClick={() => goTo(cat.id)}
-                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full px-4 py-2 text-sm transition-colors duration-200 ease-out active:cursor-grabbing ${
+                  className={`shrink-0 cursor-grab whitespace-nowrap rounded-full px-4 py-2 text-base transition-colors duration-200 ease-out active:cursor-grabbing ${
                     active ? brandChipActive : brandChipInactive
                   }`}
                 >

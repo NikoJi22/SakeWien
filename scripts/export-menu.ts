@@ -17,11 +17,15 @@ writeFileSync(
   join(dataDir, "gift-config.json"),
   JSON.stringify(
     {
-      thresholdEur: 45,
       message: {
         en: "You unlocked a complimentary miso soup with your order.",
         de: "Sie erhalten eine kostenlose Misosuppe zu Ihrer Bestellung."
-      }
+      },
+      tier1ThresholdEur: 35,
+      tier1GiftCount: 1,
+      tier2ThresholdEur: 70,
+      tier2GiftCount: 2,
+      freeItemIds: [] as string[]
     },
     null,
     2

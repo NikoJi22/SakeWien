@@ -4,20 +4,21 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { useMenuData } from "@/context/menu-data-context";
 import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey, resolveStarterOption } from "@/lib/cart-line-key";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
-import type { LunchStarterOption, MenuItem } from "@/lib/menu-types";
+import type { LunchStarterOption, MenuItem, OrderChoiceOption } from "@/lib/menu-types";
 
 export type CartLine = {
   lineKey: string;
   item: MenuItem;
   quantity: number;
   starterChoice?: LunchStarterOption;
+  orderChoice?: OrderChoiceOption;
   sushiExtras?: { wasabi: boolean; ginger: boolean };
 };
 
 type CartContextValue = {
   quantities: Record<string, number>;
   setQuantity: (lineKey: string, quantity: number) => void;
-  addOne: (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean }) => void;
+  addOne: (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean; orderChoiceId?: string | null }) => void;
   removeOne: (lineKey: string) => void;
   lines: CartLine[];
   itemCount: number;
@@ -44,16 +45,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addOne = useCallback(
-    (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean }) => {
+    (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean; orderChoiceId?: string | null }) => {
       setQuantities((prev) => {
         const item = itemById[itemId];
         if (!item) return prev;
         const starterOptionId = opts?.starterOptionId ?? null;
+        const orderChoiceId = opts?.orderChoiceId ?? null;
         const needStarter = itemRequiresLunchStarter(item);
         if (needStarter && !starterOptionId) return prev;
+        const requiredOrderChoice = !!item.orderChoiceGroup?.required && (item.orderChoiceGroup.options?.length ?? 0) > 0;
+        if (requiredOrderChoice && !orderChoiceId) return prev;
         const key = cartLineKey(itemId, needStarter ? starterOptionId! : null, {
           wasabi: opts?.wasabi,
-          ginger: opts?.ginger
+          ginger: opts?.ginger,
+          orderChoiceId
         });
         return { ...prev, [key]: (prev[key] ?? 0) + 1 };
       });
@@ -79,20 +84,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     let subtotalEur = 0;
     for (const [key, qty] of Object.entries(quantities)) {
       if (qty <= 0) continue;
-      const { itemId, starterOptionId, extras } = parseCartLineKey(key);
+      const { itemId, starterOptionId, orderChoiceId, extras } = parseCartLineKey(key);
       const item = itemById[itemId];
       if (!item) continue;
+      const fallbackChoice =
+        !orderChoiceId && item.orderChoiceGroup?.required && item.orderChoiceGroup.options.length > 0
+          ? item.orderChoiceGroup.options[0]
+          : undefined;
+      const orderChoice = orderChoiceId
+        ? item.orderChoiceGroup?.options?.find((o) => o.id === orderChoiceId) ?? fallbackChoice
+        : fallbackChoice;
       if (itemRequiresLunchStarter(item)) {
         if (!starterOptionId) continue;
         const opt = resolveStarterOption(item, starterOptionId);
         if (!opt) continue;
-        lines.push({ lineKey: key, item, quantity: qty, starterChoice: opt, sushiExtras: extras });
+        lines.push({ lineKey: key, item, quantity: qty, starterChoice: opt, orderChoice, sushiExtras: extras });
       } else {
         if (starterOptionId) continue;
-        lines.push({ lineKey: key, item, quantity: qty, sushiExtras: extras });
+        lines.push({ lineKey: key, item, quantity: qty, orderChoice, sushiExtras: extras });
       }
       itemCount += qty;
-      subtotalEur += getEffectivePriceEur(item) * qty;
+      subtotalEur += getEffectivePriceEur(item, orderChoice?.id) * qty;
     }
     return { lines, itemCount, subtotalEur };
   }, [quantities, itemById]);

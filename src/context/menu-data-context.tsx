@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { buildMenuIndex } from "@/lib/menu-helpers";
 import type { MenuCategory, MenuItem } from "@/lib/menu-types";
+import { transformMenuForOrdering } from "@/lib/order-menu-transform";
 
 type MenuDataContextValue = {
   categories: MenuCategory[];
@@ -28,7 +29,7 @@ export function MenuDataProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch("/api/menu", { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to load menu");
       const data = (await res.json()) as MenuCategory[];
-      setCategories(Array.isArray(data) ? data : []);
+      setCategories(Array.isArray(data) ? transformMenuForOrdering(data) : []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load menu");
       setCategories([]);

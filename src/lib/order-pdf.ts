@@ -1,8 +1,6 @@
 import { PDFDocument, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import { DELIVERY_TIME_ESTIMATE_DE, OPENING_HOURS_PDF_DE } from "@/lib/order-schedule";
 
-/** Rechtsträger (Fußzeile / intern) */
-const COMPANY_LEGAL = "Sake Pan Jun Tao KG";
 const COMPANY_STREET = "Kaiserstraße 81/6";
 const COMPANY_CITY = "1070 Wien";
 
@@ -20,6 +18,15 @@ const openingHoursLine = () => process.env.ORDER_PDF_OPENING_HOURS?.trim() || OP
 const deliveryDistrictsNotice = () =>
   process.env.ORDER_PDF_DELIVERY_DISTRICTS?.trim() ||
   "Lieferung nur in den Wiener Bezirken 6, 7, 8, 15 und 16. In alle anderen Bezirke liefern wir nicht.";
+
+/** Fußzeile: Website (ORDER_PDF_WEBSITE), sonst Vercel-URL, sonst leer */
+function footerWebsiteLines(): string[] {
+  const fromEnv = process.env.ORDER_PDF_WEBSITE?.trim();
+  if (fromEnv) return [fromEnv];
+  const vercel = process.env.VERCEL_URL?.trim();
+  if (vercel) return [`https://${vercel.replace(/^https?:\/\//, "")}`];
+  return [];
+}
 
 export type OrderPdfLine = {
   name: string;
@@ -46,6 +53,7 @@ export type OrderPdfInput = {
   cutlery: { chopsticks: number; woodSpoon: number; woodFork: number; totalEur: number } | null;
   giftEligible: boolean;
   giftMessage?: string;
+  freeGiftItems?: string[];
   itemsSubtotalEur: number;
   grandTotalEur: number;
   deliveryFeeEur?: number;
@@ -294,6 +302,9 @@ async function renderReceiptContent(
     y -= GAP_SM;
     drawLeft("Bonus / Geschenk", { size: 11, bold: true });
     drawLeftWrapped(input.giftMessage?.trim() || "Aktiv (Schwellenwert erreicht)", 10);
+    if (input.freeGiftItems?.length) {
+      drawLeftWrapped(`Gratisartikel: ${input.freeGiftItems.join(", ")}`, 10);
+    }
   }
 
   if (input.comment?.trim()) {
@@ -332,7 +343,13 @@ async function renderReceiptContent(
   drawLeftWrapped(deliveryDistrictsNotice(), 9);
   drawLeft("ÖFFNUNGSZEITEN", { size: 10, bold: true });
   drawLeftWrapped(openingHoursLine(), 9);
-  drawLeftWrapped(COMPANY_LEGAL, 7);
+  const siteLines = footerWebsiteLines();
+  if (siteLines.length > 0) {
+    drawLeft("WEBSITE", { size: 10, bold: true });
+    for (const line of siteLines) {
+      drawLeftWrapped(line, 9);
+    }
+  }
 
   return { finalY: y };
 }

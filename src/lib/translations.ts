@@ -112,9 +112,21 @@ type TranslationSchema = {
     spicy: string;
     giftUnlocked: string;
     giftHint: string;
+    freeGiftHintOne: string;
+    freeGiftHintTwo: string;
+    /** Placeholders %T1%, %C1%, %T2%, %C2% for tier thresholds and gift counts. */
+    freeGiftTiersHint: string;
+    freeGiftSelectLabel: string;
+    freeGiftSelectPlaceholder: string;
+    freeGiftNotConfigured: string;
     fulfillment: string;
     pickupTime: string;
     pickupDateLabel: string;
+    pickupPhoneInfoTitle: string;
+    pickupPhoneInfoValue: string;
+    /** Customer’s number for pickup orders (required). */
+    pickupPhoneCustomerLabel: string;
+    pickupPhoneCustomerHint: string;
     pickupSlotHint: string;
     deliveryDateLabel: string;
     deliveryTime: string;
@@ -128,7 +140,9 @@ type TranslationSchema = {
     openingHoursClosed: string;
     openingHoursFootnote: string;
     ordersClosedMessage: string;
+    ordersClosedVacationMessage: string;
     errOrdersClosedCutoff: string;
+    errOrdersClosedVacation: string;
     errPickupInvalidDatetime: string;
     errPickupClosedTuesday: string;
     errPickupDateOutOfRange: string;
@@ -188,6 +202,7 @@ type TranslationSchema = {
     errSmsProviderFailed: string;
     errMissingCustomerName: string;
     errInvalidCustomerPhone: string;
+    errInvalidGiftSelection: string;
     errEmptyCartPayload: string;
     errInvalidJsonBody: string;
     paymentHeading: string;
@@ -339,9 +354,19 @@ export const translations: Record<Language, TranslationSchema> = {
       spicy: "Spicy",
       giftUnlocked: "Bonus unlocked",
       giftHint: "Spend more to unlock a complimentary gift.",
+      freeGiftHintOne: "From €35 you can choose 1 free item.",
+      freeGiftHintTwo: "From €70 you can choose 2 free items.",
+      freeGiftTiersHint: "From €%T1%: up to %C1% free item(s). From €%T2%: up to %C2%. You may pick the same item more than once when multiple gifts apply.",
+      freeGiftSelectLabel: "Free item",
+      freeGiftSelectPlaceholder: "Please choose",
+      freeGiftNotConfigured: "No free items are configured yet.",
       fulfillment: "Pickup or delivery",
       pickupTime: "Pickup time",
       pickupDateLabel: "Pickup date",
+      pickupPhoneInfoTitle: "Pickup phone:",
+      pickupPhoneInfoValue: "+43 1 234 56 78",
+      pickupPhoneCustomerLabel: "Your phone number (required)",
+      pickupPhoneCustomerHint: "We use this number to reach you about your pickup order.",
       pickupSlotHint:
         "Times are Vienna local time. Earliest slot 11:30; last slot 21:30. Tuesdays we are closed — choose another day.",
       deliveryDateLabel: "Preferred delivery day",
@@ -356,8 +381,12 @@ export const translations: Record<Language, TranslationSchema> = {
       openingHoursFootnote: "Vienna local time.",
       ordersClosedMessage:
         "We are not accepting new online orders after 9:15 p.m. Vienna time until midnight. Please try again tomorrow.",
+      ordersClosedVacationMessage:
+        "Online ordering is currently unavailable due to vacation mode. Please check back after the vacation period.",
       errOrdersClosedCutoff:
         "Online ordering is closed for today after 9:15 p.m. Vienna time. Please try again tomorrow from 12:00 a.m.",
+      errOrdersClosedVacation:
+        "Online ordering is currently unavailable due to vacation mode. Please try again after the vacation period.",
       errPickupInvalidDatetime: "Please choose a valid pickup date and time.",
       errPickupClosedTuesday: "We are closed on Tuesdays — please pick another day for pickup.",
       errPickupDateOutOfRange: "The pickup date is outside the allowed booking window.",
@@ -412,6 +441,7 @@ export const translations: Record<Language, TranslationSchema> = {
       errSmsProviderFailed: "The SMS service returned an error. Please try again in a moment.",
       errMissingCustomerName: "Please enter your name.",
       errInvalidCustomerPhone: "Please enter a valid phone number with country code (e.g. +43…).",
+      errInvalidGiftSelection: "Your free gift selection is invalid. Please choose again.",
       errEmptyCartPayload: "Your order data was incomplete. Please refresh the page and add items again.",
       errInvalidJsonBody: "Invalid request. Please refresh the page and try again.",
       paymentHeading: "Payment",
@@ -558,9 +588,20 @@ export const translations: Record<Language, TranslationSchema> = {
       spicy: "Scharf",
       giftUnlocked: "Bonus freigeschaltet",
       giftHint: "Mehr bestellen, um ein Gratis-Geschenk zu erhalten.",
+      freeGiftHintOne: "Ab 35€ darf 1 Gratisartikel ausgewählt werden.",
+      freeGiftHintTwo: "Ab 70€ dürfen 2 Gratisartikel ausgewählt werden.",
+      freeGiftTiersHint:
+        "Ab %T1%€: bis zu %C1% Gratisartikel. Ab %T2%€: bis zu %C2%. Bei mehreren Gratisartikeln dürfen Sie dieselbe Auswahl mehrfach wählen (z. B. A + A).",
+      freeGiftSelectLabel: "Gratisartikel",
+      freeGiftSelectPlaceholder: "Bitte auswählen",
+      freeGiftNotConfigured: "Aktuell sind keine Gratisartikel konfiguriert.",
       fulfillment: "Abholung oder Lieferung",
       pickupTime: "Abholzeit",
       pickupDateLabel: "Abholdatum",
+      pickupPhoneInfoTitle: "Telefon für Abholung:",
+      pickupPhoneInfoValue: "+43 1 234 56 78",
+      pickupPhoneCustomerLabel: "Ihre Telefonnummer (Pflichtfeld)",
+      pickupPhoneCustomerHint: "Wir nutzen diese Nummer, um Sie bei der Abholung zu erreichen.",
       pickupSlotHint:
         "Angaben in Wiener Ortszeit. Früheste Abholung 11:30 Uhr, letzter Slot 21:30 Uhr. Dienstag geschlossen — bitte anderen Tag wählen.",
       deliveryDateLabel: "Gewünschter Liefertermin",
@@ -576,8 +617,12 @@ export const translations: Record<Language, TranslationSchema> = {
       openingHoursFootnote: "Angaben in Ortszeit Wien.",
       ordersClosedMessage:
         "Ab 21:15 Uhr (Wiener Zeit) ist für heute keine neue Online-Bestellung mehr möglich. Bitte ab Mitternacht erneut versuchen.",
+      ordersClosedVacationMessage:
+        "Online-Bestellungen sind aktuell wegen Urlaubsmodus deaktiviert. Bitte nach dem Urlaubszeitraum erneut versuchen.",
       errOrdersClosedCutoff:
         "Online-Bestellungen sind heute ab 21:15 Uhr Wiener Zeit nicht mehr möglich. Bitte ab Mitternacht erneut versuchen.",
+      errOrdersClosedVacation:
+        "Online-Bestellungen sind aktuell wegen Urlaubsmodus deaktiviert. Bitte nach dem Urlaubszeitraum erneut versuchen.",
       errPickupInvalidDatetime: "Bitte gültiges Abholdatum und eine gültige Uhrzeit wählen.",
       errPickupClosedTuesday: "Dienstags haben wir geschlossen — bitte wählen Sie einen anderen Abholtag.",
       errPickupDateOutOfRange: "Das Abholdatum liegt außerhalb des erlaubten Zeitraums.",
@@ -634,6 +679,7 @@ export const translations: Record<Language, TranslationSchema> = {
       errSmsProviderFailed: "Der SMS-Dienst hat einen Fehler gemeldet. Bitte in Kürze erneut versuchen.",
       errMissingCustomerName: "Bitte geben Sie Ihren Namen ein.",
       errInvalidCustomerPhone: "Bitte geben Sie eine gültige Telefonnummer mit Ländervorwahl ein (z. B. +43 …).",
+      errInvalidGiftSelection: "Die Auswahl der Gratisartikel ist ungültig. Bitte erneut auswählen.",
       errEmptyCartPayload: "Die Bestelldaten waren unvollständig. Bitte Seite neu laden und erneut bestellen.",
       errInvalidJsonBody: "Ungültige Anfrage. Bitte Seite neu laden und erneut versuchen.",
       paymentHeading: "Bezahlung",

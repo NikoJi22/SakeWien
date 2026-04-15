@@ -7,16 +7,54 @@ import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-cod
 import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
 import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
 import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
+import { normalizeGiftConfig } from "@/lib/gift-config";
 import { defaultSiteContent } from "@/lib/site-content-default";
+import { normalizeSiteContentConfig } from "@/lib/site-content";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 import { DishImageField } from "./dish-image-field";
 
 const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
 const DRAG_PAYLOAD_TYPE = "application/x-sake-menu-item";
 const CATEGORY_DRAG_PAYLOAD_TYPE = "application/x-sake-menu-category";
+const AUTOSAVE_DELAY_MS = 8000;
 
 function cloneMenu(c: MenuCategory[]): MenuCategory[] {
   return JSON.parse(JSON.stringify(c)) as MenuCategory[];
+}
+
+/** Shallow-copy one category (for title edits — avoids full-menu JSON clone per keystroke). */
+function replaceCategoryAt(
+  prev: MenuCategory[],
+  catIndex: number,
+  mapCat: (c: MenuCategory) => MenuCategory
+): MenuCategory[] {
+  const cat = prev[catIndex];
+  if (!cat) return prev;
+  const mapped = mapCat(cat);
+  if (mapped === cat) return prev;
+  const next = [...prev];
+  next[catIndex] = mapped;
+  return next;
+}
+
+/** Shallow-copy path to one dish (avoids full-menu `cloneMenu` on every field change). */
+function replaceItemAt(
+  prev: MenuCategory[],
+  catIndex: number,
+  itemIndex: number,
+  mapItem: (item: MenuItem) => MenuItem
+): MenuCategory[] {
+  const cat = prev[catIndex];
+  if (!cat) return prev;
+  const item = cat.items[itemIndex];
+  if (!item) return prev;
+  const newItem = mapItem(item);
+  if (newItem === item) return prev;
+  const nextItems = [...cat.items];
+  nextItems[itemIndex] = newItem;
+  const nextCats = [...prev];
+  nextCats[catIndex] = { ...cat, items: nextItems };
+  return nextCats;
 }
 
 /** Insert `fromIndex` before `beforeIndex` (0…n, where n = append at end). Indices refer to the array before the move. */
@@ -98,10 +136,7 @@ function parseAdminPriceEur(raw: string): number | "empty" | "invalid" {
 export function AdminDashboard() {
   const router = useRouter();
   const [categories, setCategories] = useState<MenuCategory[]>([]);
-  const [gift, setGift] = useState<GiftConfig>({
-    thresholdEur: 45,
-    message: { en: "", de: "" }
-  });
+  const [gift, setGift] = useState<GiftConfig>(() => normalizeGiftConfig({}));
   const [siteContent, setSiteContent] = useState<SiteContentConfig>(defaultSiteContent);
   const [loadError, setLoadError] = useState("");
   const [menuStatus, setMenuStatus] = useState("");
@@ -119,10 +154,27 @@ export function AdminDashboard() {
   const [dragOverBefore, setDragOverBefore] = useState<{ catIndex: number; beforeIndex: number } | null>(null);
   const [draggingCategoryIndex, setDraggingCategoryIndex] = useState<number | null>(null);
   const [dragOverCategoryBeforeIndex, setDragOverCategoryBeforeIndex] = useState<number | null>(null);
-  const [giftThresholdInput, setGiftThresholdInput] = useState("45");
   const [dishPriceDraft, setDishPriceDraft] = useState<Record<string, string>>({});
   /** Ignore stale `load()` results (parallel fetches / responses finishing after a save). */
   const loadRequestId = useRef(0);
+  /** Avoid auto-save before first successful data hydration. */
+  const hydratedRef = useRef(true);
+  const menuSigRef = useRef("");
+  const giftSigRef = useRef("");
+  const siteSigRef = useRef("");
+
+  const categoriesRef = useRef(categories);
+  categoriesRef.current = categories;
+  const dishPriceDraftRef = useRef(dishPriceDraft);
+  dishPriceDraftRef.current = dishPriceDraft;
+  const giftRef = useRef(gift);
+  giftRef.current = gift;
+  const siteContentRef = useRef(siteContent);
+  siteContentRef.current = siteContent;
+  const hasDishPriceDraft = useMemo(
+    () => Object.values(dishPriceDraft).some((v) => v.trim().length > 0),
+    [dishPriceDraft]
+  );
 
   useEffect(() => {
     try {
@@ -146,7 +198,7 @@ export function AdminDashboard() {
     setLoadError("");
     try {
       const [menuRes, giftRes, siteRes] = await Promise.all([
-        /** Volle Karte inkl. Mittagsmenü — `/api/menu` blendet Lunch außerhalb der Zeiten aus. */
+        /** Volle Karte inkl. Mittagsmenü — gleiche Daten wie öffentliches `/api/menu`. */
         fetch("/api/admin/menu", { cache: "no-store", credentials: "same-origin" }),
         fetch("/api/gift", { cache: "no-store" }),
         fetch("/api/site-content", { cache: "no-store" })
@@ -163,16 +215,17 @@ export function AdminDashboard() {
       if (giftRes.ok) {
         const g = (await giftRes.json()) as GiftConfig;
         if (thisId !== loadRequestId.current) return;
-        setGift(g);
-        setGiftThresholdInput(String(g.thresholdEur));
+        const normalizedGift = normalizeGiftConfig(g);
+        setGift(normalizedGift);
       }
       if (siteRes.ok) {
         const raw = (await siteRes.json()) as unknown;
         if (thisId !== loadRequestId.current) return;
         if (raw && typeof raw === "object" && !("error" in (raw as object))) {
-          setSiteContent(raw as SiteContentConfig);
+          setSiteContent(normalizeSiteContentConfig(raw as SiteContentConfig));
         }
       }
+      hydratedRef.current = true;
     } catch {
       if (thisId !== loadRequestId.current) return;
       setLoadError("Could not load data.");
@@ -189,6 +242,18 @@ export function AdminDashboard() {
         .map((cat, ci) => ({ cat, ci }))
         .filter(({ cat }) => categoryMatchesSearch(cat, search)),
     [categories, search]
+  );
+
+  const giftSelectableItems = useMemo(
+    () =>
+      categories.flatMap((category) =>
+        category.items.map((item) => ({
+          id: item.id,
+          nameDe: item.name.de || item.name.en || item.id,
+          categoryDe: category.title.de || category.title.en || category.id
+        }))
+      ),
+    [categories]
   );
 
   const toggleCat = useCallback((id: string) => {
@@ -221,23 +286,25 @@ export function AdminDashboard() {
     });
   }, []);
 
-  async function saveMenu() {
+  const saveMenu = useCallback(async (mode: "manual" | "auto" = "manual") => {
     setMenuStatus("");
     setSavingMenu(true);
     try {
-      const nextMenu = cloneMenu(categories);
+      const categoriesSnap = categoriesRef.current;
+      const draftSnap = dishPriceDraftRef.current;
+      const nextMenu = cloneMenu(categoriesSnap);
       for (const cat of nextMenu) {
         for (const item of cat.items) {
-          const draft = dishPriceDraft[item.id];
+          const draft = draftSnap[item.id];
           if (draft === undefined) continue;
           const p = parseAdminPriceEur(draft);
           if (p === "empty") {
-            setMenuStatus("Bitte alle Preisfelder ausfüllen.");
+            if (mode === "manual") setMenuStatus("Bitte alle Preisfelder ausfüllen.");
             setSavingMenu(false);
             return;
           }
           if (p === "invalid") {
-            setMenuStatus("Ungültiger Preis bei einem Gericht.");
+            if (mode === "manual") setMenuStatus("Ungültiger Preis bei einem Gericht.");
             setSavingMenu(false);
             return;
           }
@@ -253,41 +320,41 @@ export function AdminDashboard() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         if (res.status === 400) {
-          setMenuStatus(typeof data.error === "string" ? `Validierungsfehler: ${data.error}` : "Validierungsfehler.");
+          if (mode === "manual") {
+            setMenuStatus(typeof data.error === "string" ? `Validierungsfehler: ${data.error}` : "Validierungsfehler.");
+          }
         } else if (res.status === 401) {
-          setMenuStatus("Nicht autorisiert. Bitte neu einloggen.");
+          if (mode === "manual") setMenuStatus("Nicht autorisiert. Bitte neu einloggen.");
         } else if (res.status >= 500) {
-          setMenuStatus(typeof data.error === "string" ? `Schreibfehler: ${data.error}` : "Schreibfehler auf dem Server.");
+          if (mode === "manual") {
+            setMenuStatus(typeof data.error === "string" ? `Schreibfehler: ${data.error}` : "Schreibfehler auf dem Server.");
+          }
         } else {
-          setMenuStatus(typeof data.error === "string" ? data.error : "Save failed");
+          if (mode === "manual") setMenuStatus(typeof data.error === "string" ? data.error : "Save failed");
         }
         return;
       }
       loadRequestId.current += 1;
       setCategories(nextMenu);
       setDishPriceDraft({});
-      setMenuStatus("Menu saved.");
+      menuSigRef.current = JSON.stringify(nextMenu);
+      setMenuStatus(mode === "auto" ? "Auto-saved menu." : "Menu saved.");
       window.dispatchEvent(new Event("sake-menu-updated"));
     } catch (error) {
       console.error("[admin] Save menu network error", error);
-      setMenuStatus("Netzwerkfehler beim Speichern.");
+      if (mode === "manual") setMenuStatus("Netzwerkfehler beim Speichern.");
     } finally {
       setSavingMenu(false);
     }
-  }
+  }, []);
 
-  async function saveGift() {
+  const saveGift = useCallback(async (mode: "manual" | "auto" = "manual") => {
     setGiftStatus("");
-    const thrParsed = parseAdminPriceEur(giftThresholdInput);
-    if (thrParsed === "empty") {
-      setGiftStatus("Bitte Schwellenwert eintragen.");
+    const payload = normalizeGiftConfig(giftRef.current);
+    if (mode === "manual" && payload.tier2ThresholdEur < payload.tier1ThresholdEur) {
+      setGiftStatus("Die zweite Schwelle sollte nicht unter der ersten liegen.");
       return;
     }
-    if (thrParsed === "invalid") {
-      setGiftStatus("Ungültiger Schwellenwert.");
-      return;
-    }
-    const payload: GiftConfig = { ...gift, thresholdEur: thrParsed };
     setSavingGift(true);
     try {
       const res = await fetch("/api/admin/gift", {
@@ -297,39 +364,80 @@ export function AdminDashboard() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setGiftStatus(typeof data.error === "string" ? data.error : "Save failed");
+        if (mode === "manual") setGiftStatus(typeof data.error === "string" ? data.error : "Save failed");
         return;
       }
       loadRequestId.current += 1;
       setGift(payload);
-      setGiftThresholdInput(String(thrParsed));
-      setGiftStatus("Gift settings saved.");
+      giftSigRef.current = JSON.stringify(payload);
+      setGiftStatus(mode === "auto" ? "Auto-saved gift settings." : "Gift settings saved.");
       window.dispatchEvent(new Event("sake-gift-updated"));
     } finally {
       setSavingGift(false);
     }
-  }
+  }, []);
 
-  async function saveSiteContent() {
+  const saveSiteContent = useCallback(async (mode: "manual" | "auto" = "manual") => {
     setSiteStatus("");
     setSavingSite(true);
     try {
+      const normalized = normalizeSiteContentConfig(siteContentRef.current);
       const res = await fetch("/api/admin/site-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(siteContent)
+        body: JSON.stringify(normalized)
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setSiteStatus(typeof data.error === "string" ? data.error : "Save failed");
+        if (mode === "manual") setSiteStatus(typeof data.error === "string" ? data.error : "Save failed");
         return;
       }
       loadRequestId.current += 1;
-      setSiteStatus("Website content saved.");
+      setSiteContent(normalized);
+      siteSigRef.current = JSON.stringify(normalized);
+      setSiteStatus(mode === "auto" ? "Auto-saved website content." : "Website content saved.");
     } finally {
       setSavingSite(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    menuSigRef.current = JSON.stringify(categories);
+    giftSigRef.current = JSON.stringify(gift);
+    siteSigRef.current = JSON.stringify(siteContent);
+    hydratedRef.current = false;
+  }, [categories, gift, siteContent]);
+
+  useEffect(() => {
+    if (hydratedRef.current || savingMenu || hasDishPriceDraft) return;
+    const t = window.setTimeout(() => {
+      const sig = JSON.stringify(categoriesRef.current);
+      if (sig === menuSigRef.current) return;
+      void saveMenu("auto");
+    }, AUTOSAVE_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [categories, hasDishPriceDraft, saveMenu, savingMenu]);
+
+  useEffect(() => {
+    if (hydratedRef.current || savingGift) return;
+    const t = window.setTimeout(() => {
+      const sig = JSON.stringify(giftRef.current);
+      if (sig === giftSigRef.current) return;
+      void saveGift("auto");
+    }, AUTOSAVE_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [gift, saveGift, savingGift]);
+
+  useEffect(() => {
+    if (hydratedRef.current || savingSite) return;
+    const t = window.setTimeout(() => {
+      const sig = JSON.stringify(siteContentRef.current);
+      if (sig === siteSigRef.current) return;
+      void saveSiteContent("auto");
+    }, AUTOSAVE_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [siteContent, saveSiteContent, savingSite]);
 
   async function logout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -338,38 +446,31 @@ export function AdminDashboard() {
   }
 
   function updateItem(catIndex: number, itemIndex: number, patch: Partial<Pick<MenuItem, "name" | "description">>) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const item = next[catIndex].items[itemIndex];
-      if (!item) return prev;
-      if (patch.name) item.name = { ...item.name, ...patch.name };
-      if (patch.description) item.description = { ...item.description, ...patch.description };
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => ({
+        ...item,
+        name: patch.name ? { ...item.name, ...patch.name } : item.name,
+        description: patch.description ? { ...item.description, ...patch.description } : item.description
+      }))
+    );
   }
 
   function setItemField(catIndex: number, itemIndex: number, key: keyof MenuItem, value: unknown) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const item = next[catIndex].items[itemIndex];
-      if (!item) return prev;
-      (item as Record<string, unknown>)[key] = value;
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => ({ ...item, [key]: value }) as MenuItem)
+    );
   }
 
   function toggleItemAllergen(catIndex: number, itemIndex: number, code: string) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const item = next[catIndex].items[itemIndex];
-      if (!item) return prev;
-      const cur = new Set(normalizeAllergenCodes(item.allergens));
-      const u = code.toUpperCase();
-      if (cur.has(u)) cur.delete(u);
-      else cur.add(u);
-      item.allergens = normalizeAllergenCodes([...cur]);
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const cur = new Set(normalizeAllergenCodes(item.allergens));
+        const u = code.toUpperCase();
+        if (cur.has(u)) cur.delete(u);
+        else cur.add(u);
+        return { ...item, allergens: normalizeAllergenCodes([...cur]) };
+      })
+    );
   }
 
   function deleteItem(catIndex: number, itemIndex: number) {
@@ -387,6 +488,17 @@ export function AdminDashboard() {
       const dish = emptyDish();
       if (newDishAtTop) next[catIndex].items.unshift(dish);
       else next[catIndex].items.push(dish);
+      return next;
+    });
+    const id = categories[catIndex]?.id;
+    if (id) setExpandedCat((p) => ({ ...p, [id]: true }));
+  }
+
+  function addItemAfter(catIndex: number, afterItemIndex: number) {
+    setCategories((prev) => {
+      const next = cloneMenu(prev);
+      const dish = emptyDish();
+      next[catIndex].items.splice(afterItemIndex + 1, 0, dish);
       return next;
     });
     const id = categories[catIndex]?.id;
@@ -471,45 +583,55 @@ export function AdminDashboard() {
   }
 
   function updateCategoryTitle(catIndex: number, lang: "de" | "en", value: string) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      next[catIndex].title[lang] = value;
-      return next;
-    });
+    setCategories((prev) =>
+      replaceCategoryAt(prev, catIndex, (c) => ({
+        ...c,
+        title: { ...c.title, [lang]: value }
+      }))
+    );
   }
 
   function setLunchStarterEnabled(catIndex: number, itemIndex: number, enabled: boolean) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const dish = next[catIndex]?.items[itemIndex];
-      if (!dish) return prev;
-      if (enabled) {
-        dish.lunchStarterChoice = JSON.parse(JSON.stringify(LUNCH_STARTER_CHOICE)) as MenuItem["lunchStarterChoice"];
-      } else {
-        delete dish.lunchStarterChoice;
-      }
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (dish) => {
+        if (enabled) {
+          return {
+            ...dish,
+            lunchStarterChoice: JSON.parse(JSON.stringify(LUNCH_STARTER_CHOICE)) as MenuItem["lunchStarterChoice"]
+          };
+        }
+        const next: MenuItem = { ...dish };
+        delete next.lunchStarterChoice;
+        return next;
+      })
+    );
   }
 
   function updateLunchStarterLabelField(catIndex: number, itemIndex: number, lang: "de" | "en", value: string) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const ch = next[catIndex]?.items[itemIndex]?.lunchStarterChoice;
-      if (!ch) return prev;
-      ch.label[lang] = value;
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const ch = item.lunchStarterChoice;
+        if (!ch) return item;
+        return {
+          ...item,
+          lunchStarterChoice: {
+            ...ch,
+            label: { ...ch.label, [lang]: value }
+          }
+        };
+      })
+    );
   }
 
   function updateLunchStarterOptionId(catIndex: number, itemIndex: number, optIdx: number, id: string) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const opt = next[catIndex]?.items[itemIndex]?.lunchStarterChoice?.options[optIdx];
-      if (!opt) return prev;
-      opt.id = id;
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const ch = item.lunchStarterChoice;
+        if (!ch?.options[optIdx]) return item;
+        const options = ch.options.map((opt, i) => (i === optIdx ? { ...opt, id } : opt));
+        return { ...item, lunchStarterChoice: { ...ch, options } };
+      })
+    );
   }
 
   function updateLunchStarterOptionName(
@@ -519,39 +641,53 @@ export function AdminDashboard() {
     lang: "de" | "en",
     value: string
   ) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const opt = next[catIndex]?.items[itemIndex]?.lunchStarterChoice?.options[optIdx];
-      if (!opt) return prev;
-      opt.name[lang] = value;
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const ch = item.lunchStarterChoice;
+        const opt = ch?.options[optIdx];
+        if (!ch || !opt) return item;
+        const options = ch.options.map((o, i) =>
+          i === optIdx ? { ...o, name: { ...o.name, [lang]: value } } : o
+        );
+        return { ...item, lunchStarterChoice: { ...ch, options } };
+      })
+    );
   }
 
   function addLunchStarterOptionRow(catIndex: number, itemIndex: number) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const ch = next[catIndex]?.items[itemIndex]?.lunchStarterChoice;
-      if (!ch) return prev;
-      ch.options.push({
-        id: `ls-${crypto.randomUUID().slice(0, 8)}`,
-        name: { de: "", en: "" }
-      });
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const ch = item.lunchStarterChoice;
+        if (!ch) return item;
+        return {
+          ...item,
+          lunchStarterChoice: {
+            ...ch,
+            options: [...ch.options, { id: `ls-${crypto.randomUUID().slice(0, 8)}`, name: { de: "", en: "" } }]
+          }
+        };
+      })
+    );
   }
 
   function removeLunchStarterOptionRow(catIndex: number, itemIndex: number, optIdx: number) {
-    setCategories((prev) => {
-      const next = cloneMenu(prev);
-      const dish = next[catIndex]?.items[itemIndex];
-      const ch = dish?.lunchStarterChoice;
-      if (!ch) return prev;
-      ch.options.splice(optIdx, 1);
-      if (ch.options.length === 0 && dish) delete dish.lunchStarterChoice;
-      return next;
-    });
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const ch = item.lunchStarterChoice;
+        if (!ch) return item;
+        const options = ch.options.filter((_, i) => i !== optIdx);
+        if (options.length === 0) {
+          const next: MenuItem = { ...item };
+          delete next.lunchStarterChoice;
+          return next;
+        }
+        return { ...item, lunchStarterChoice: { ...ch, options } };
+      })
+    );
   }
+
+  const addDishButtonClass =
+    "rounded-full border border-brand-primary/70 bg-brand-primary/10 px-5 py-2.5 text-sm font-semibold tracking-wide text-brand-primary transition hover:bg-brand-primary/20";
 
   if (loadError) {
     return (
@@ -798,6 +934,63 @@ export function AdminDashboard() {
                   setSiteContent((s) => ({ ...s, cards: { ...s.cards, about: { ...s.cards.about, image: url } } }))
                 }
               />
+              <div className="sm:col-span-2 mt-1 rounded-xl border border-[#e8e8e8] bg-neutral-50 p-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">Vacation mode</p>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Wenn aktiv und der Zeitraum gültig ist, werden Online-Bestellungen blockiert.
+                </p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <label className="flex items-center gap-2 rounded-lg border border-[#e4e4e4] bg-white px-3 py-2 text-sm text-neutral-800">
+                    <input
+                      type="checkbox"
+                      checked={siteContent.ordering.vacationMode.active}
+                      onChange={(e) =>
+                        setSiteContent((s) => ({
+                          ...s,
+                          ordering: {
+                            ...s.ordering,
+                            vacationMode: { ...s.ordering.vacationMode, active: e.target.checked }
+                          }
+                        }))
+                      }
+                      className="h-4 w-4 accent-brand-primary"
+                    />
+                    Aktiv
+                  </label>
+                  <AdminField label="Startdatum">
+                    <input
+                      type="date"
+                      value={siteContent.ordering.vacationMode.startDate}
+                      onChange={(e) =>
+                        setSiteContent((s) => ({
+                          ...s,
+                          ordering: {
+                            ...s.ordering,
+                            vacationMode: { ...s.ordering.vacationMode, startDate: e.target.value }
+                          }
+                        }))
+                      }
+                      className={adminInputClass}
+                    />
+                  </AdminField>
+                  <AdminField label="Enddatum">
+                    <input
+                      type="date"
+                      value={siteContent.ordering.vacationMode.endDate}
+                      onChange={(e) =>
+                        setSiteContent((s) => ({
+                          ...s,
+                          ordering: {
+                            ...s.ordering,
+                            vacationMode: { ...s.ordering.vacationMode, endDate: e.target.value }
+                          }
+                        }))
+                      }
+                      className={adminInputClass}
+                    />
+                  </AdminField>
+                </div>
+              </div>
             </div>
             {siteStatus && <p className="text-sm font-medium text-emerald-700">{siteStatus}</p>}
             <button
@@ -815,31 +1008,105 @@ export function AdminDashboard() {
               <h2 className="font-serif text-xl text-neutral-900">Order gift</h2>
               <span className="text-[10px] uppercase tracking-wider text-neutral-400">Checkout bonus</span>
             </div>
-            <p className="text-xs text-neutral-500">Shown when the cart reaches the threshold.</p>
+            <p className="text-xs text-neutral-500">
+              Two cart subtotal tiers: from tier 1 guests get up to N free picks; from tier 2 the higher count applies. Same item can be chosen multiple times when N is greater than 1.
+            </p>
             <div className="grid gap-4 sm:grid-cols-2">
-              <AdminField label="Threshold (EUR)">
+              <AdminField label="Tier 1 — from cart subtotal (EUR)">
                 <input
-                  type="text"
+                  type="number"
                   inputMode="decimal"
-                  value={giftThresholdInput}
-                  onChange={(e) => setGiftThresholdInput(e.target.value)}
-                  onBlur={() => {
-                    const t = giftThresholdInput.trim();
-                    if (t === "") {
-                      setGiftThresholdInput(String(gift.thresholdEur));
-                      return;
-                    }
-                    const n = parseFloat(t.replace(",", "."));
-                    if (!Number.isFinite(n) || n < 0) {
-                      setGiftThresholdInput(String(gift.thresholdEur));
-                      return;
-                    }
-                    setGift((g) => ({ ...g, thresholdEur: n }));
-                    setGiftThresholdInput(String(n));
+                  min={0}
+                  step={0.5}
+                  value={gift.tier1ThresholdEur}
+                  onChange={(e) => {
+                    const n = parseFloat(e.target.value.replace(",", "."));
+                    setGift((g) => ({ ...g, tier1ThresholdEur: Number.isFinite(n) && n >= 0 ? n : g.tier1ThresholdEur }));
                   }}
                   className={adminInputClass}
                 />
               </AdminField>
+              <AdminField label="Tier 1 — max free items">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={50}
+                  step={1}
+                  value={gift.tier1GiftCount}
+                  onChange={(e) => {
+                    const n = parseInt(e.target.value, 10);
+                    setGift((g) => ({ ...g, tier1GiftCount: Number.isFinite(n) ? Math.max(0, Math.min(50, n)) : g.tier1GiftCount }));
+                  }}
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <AdminField label="Tier 2 — from cart subtotal (EUR)">
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step={0.5}
+                  value={gift.tier2ThresholdEur}
+                  onChange={(e) => {
+                    const n = parseFloat(e.target.value.replace(",", "."));
+                    setGift((g) => ({ ...g, tier2ThresholdEur: Number.isFinite(n) && n >= 0 ? n : g.tier2ThresholdEur }));
+                  }}
+                  className={adminInputClass}
+                />
+              </AdminField>
+              <AdminField label="Tier 2 — max free items">
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={50}
+                  step={1}
+                  value={gift.tier2GiftCount}
+                  onChange={(e) => {
+                    const n = parseInt(e.target.value, 10);
+                    setGift((g) => ({ ...g, tier2GiftCount: Number.isFinite(n) ? Math.max(0, Math.min(50, n)) : g.tier2GiftCount }));
+                  }}
+                  className={adminInputClass}
+                />
+              </AdminField>
+            </div>
+            <div className="space-y-2 rounded-xl border border-[#e8e8e8] bg-neutral-50 p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">Gratisartikel im Checkout</p>
+              <p className="text-xs text-neutral-500">
+                Nur hier angehakte Gerichte-IDs stehen als Gratiswahl zur Verfügung (mehrfach dieselbe ID möglich, wenn mehrere Gratis-Slots aktiv sind).
+              </p>
+              <div className="max-h-60 space-y-2 overflow-y-auto rounded-lg border border-[#ececec] bg-white p-3">
+                {giftSelectableItems.map((entry) => {
+                  const checked = gift.freeItemIds.includes(entry.id);
+                  return (
+                    <label
+                      key={entry.id}
+                      className="flex cursor-pointer items-start justify-between gap-3 rounded-md border border-[#f1f1f1] px-3 py-2 text-sm text-neutral-800 hover:bg-neutral-50"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate font-medium">{entry.nameDe}</span>
+                        <span className="block text-xs text-neutral-500">
+                          {entry.categoryDe} · <code className="rounded bg-neutral-100 px-1">{entry.id}</code>
+                        </span>
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={(e) =>
+                          setGift((prev) => ({
+                            ...prev,
+                            freeItemIds: e.target.checked
+                              ? [...prev.freeItemIds, entry.id]
+                              : prev.freeItemIds.filter((id) => id !== entry.id)
+                          }))
+                        }
+                        className="mt-1 h-4 w-4 shrink-0 accent-brand-primary"
+                      />
+                    </label>
+                  );
+                })}
+              </div>
             </div>
             <AdminField label="Message (DE)">
               <textarea
@@ -1060,13 +1327,11 @@ export function AdminDashboard() {
                           </button>
                           <div className="flex flex-wrap gap-2 sm:justify-end">
                             <span className="text-[10px] uppercase tracking-wider text-neutral-400">id: {cat.id}</span>
-                            <button
-                              type="button"
-                              onClick={() => addItem(ci)}
-                              className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
-                            >
-                              + Dish
-                            </button>
+                            {cat.items.length === 0 && (
+                              <button type="button" onClick={() => addItem(ci)} className={addDishButtonClass}>
+                                + Dish
+                              </button>
+                            )}
                             <button
                               type="button"
                               onClick={() => deleteCategory(ci)}
@@ -1431,6 +1696,11 @@ export function AdminDashboard() {
                                   })}
                                 </div>
                               </div>
+                            </div>
+                            <div className="mt-4 flex justify-center border-t border-[#eeeeee] pt-4 sm:justify-end">
+                              <button type="button" onClick={() => addItemAfter(ci, ii)} className={addDishButtonClass}>
+                                + Dish
+                              </button>
                             </div>
                           </div>
                           );

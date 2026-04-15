@@ -5,7 +5,7 @@ import { menuFilterIsActive } from "@/lib/menu-filter";
 import { useLanguage } from "@/context/language-context";
 import { brandChipActive, brandChipInactive } from "@/lib/brand-actions";
 
-const btnBase = "rounded-full px-3.5 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm";
+const btnBase = "rounded-full px-3.5 py-2 text-sm font-semibold transition sm:px-4 sm:text-base";
 
 type Props = {
   value: MenuAttributeFilter;
@@ -39,7 +39,7 @@ export function MenuAttributeFilters({ value, onChange }: Props) {
             onClick={() =>
               onChange({ vegan: false, vegetarian: false, spicy1: false, spicy2: false, bestseller: false, isNew: false, specialDeals: false })
             }
-            className="self-start text-xs font-medium text-brand-primary underline-offset-2 hover:underline sm:self-auto"
+            className="self-start text-sm font-medium text-brand-primary underline-offset-2 hover:underline sm:self-auto"
           >
             {t.menu.clearFilters}
           </button>

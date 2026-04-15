@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { orderGiftConfig } from "@/config/order-gift";
+import { normalizeGiftConfig } from "@/lib/gift-config";
 import type { GiftConfig } from "@/lib/menu-types";
 
 type GiftConfigContextValue = {
@@ -12,10 +13,10 @@ type GiftConfigContextValue = {
 
 const GiftConfigContext = createContext<GiftConfigContextValue | null>(null);
 
-const fallback: GiftConfig = {
-  thresholdEur: orderGiftConfig.thresholdEur,
-  message: { en: orderGiftConfig.message.en, de: orderGiftConfig.message.de }
-};
+const fallback: GiftConfig = normalizeGiftConfig({
+  message: { en: orderGiftConfig.message.en, de: orderGiftConfig.message.de },
+  freeItemIds: []
+});
 
 export function GiftConfigProvider({ children }: { children: React.ReactNode }) {
   const [config, setConfig] = useState<GiftConfig>(fallback);
@@ -27,7 +28,7 @@ export function GiftConfigProvider({ children }: { children: React.ReactNode }) 
       const res = await fetch("/api/gift", { cache: "no-store" });
       if (res.ok) {
         const data = (await res.json()) as GiftConfig;
-        setConfig(data);
+        setConfig(normalizeGiftConfig(data));
       } else {
         setConfig(fallback);
       }
