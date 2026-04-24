@@ -23,7 +23,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "soup-hot-sour",
@@ -37,7 +38,8 @@
         },
         "priceEur": 3.5,
         "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=900&q=80",
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "dish-44de3da7-6",
@@ -61,7 +63,8 @@
         "isSoldOut": false,
         "vegetarian": false,
         "vegan": false,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "soup-vegetable",
@@ -80,7 +83,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "soup-tom-kha",
@@ -99,7 +103,8 @@
           "G"
         ],
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -126,7 +131,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-spring-chicken",
@@ -144,7 +150,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-spring-shrimp",
@@ -163,7 +170,8 @@
           "B",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-fried-shrimp",
@@ -181,7 +189,8 @@
           "A",
           "B"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-chicken-popcorn",
@@ -199,7 +208,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-edamame",
@@ -218,7 +228,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-gyoza-veg",
@@ -238,7 +249,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-gyoza-chicken",
@@ -256,7 +268,8 @@
           "A",
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-summer-roll-duck",
@@ -274,7 +287,8 @@
           "A",
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-summer-roll-shrimp",
@@ -293,7 +307,8 @@
           "B",
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-bean-sprout",
@@ -312,7 +327,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-seaweed-salad",
@@ -332,7 +348,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-salmon-tartar-salad",
@@ -349,7 +366,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-avocado-tuna-salad",
@@ -366,7 +384,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-salmon-tartar-bowl",
@@ -383,7 +402,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "starter-tuna-bowl",
@@ -400,7 +420,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -427,7 +448,8 @@
           "A",
           "B"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "dimsum-baerlauch-ha-gao",
@@ -445,7 +467,8 @@
           "A",
           "B"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "dimsum-xiao-long-bao",
@@ -463,7 +486,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -489,7 +513,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-mittel-8",
@@ -506,7 +531,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-gross-10",
@@ -523,7 +549,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-sake-mittel-8",
@@ -540,7 +567,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-sake-gross-10",
@@ -557,7 +585,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-sake-maguro-mittel-8",
@@ -574,7 +603,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-maguro-mittel-8",
@@ -591,7 +621,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-ebi-mittel-8",
@@ -608,7 +639,8 @@
         "allergens": [
           "B"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sushi-vegan-mittel-8",
@@ -627,7 +659,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -653,7 +686,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "sashimi-gross-mix",
@@ -671,7 +705,8 @@
           "D"
         ],
         "isBestseller": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -697,7 +732,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "platter-maki-2p",
@@ -714,7 +750,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "platter-sashimi-2p",
@@ -731,7 +768,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "platter-traum-mix-4p",
@@ -748,7 +786,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -778,7 +817,8 @@
           "D",
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "roll-dragon",
@@ -797,7 +837,8 @@
           "F"
         ],
         "isBestseller": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "roll-teriyaki-chicken",
@@ -814,7 +855,8 @@
         "allergens": [
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "roll-vegan",
@@ -833,7 +875,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "roll-frisch-tuna",
@@ -852,7 +895,8 @@
           "D",
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "roll-lachs-tatar",
@@ -869,7 +913,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "roll-aburi-lachs",
@@ -886,7 +931,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "roll-lachs-philadelphia",
@@ -904,7 +950,8 @@
           "D",
           "G"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -930,7 +977,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-sake-12",
@@ -947,7 +995,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-sake-18",
@@ -964,7 +1013,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-kappa-6",
@@ -980,7 +1030,8 @@
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-kappa-12",
@@ -996,7 +1047,8 @@
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-kappa-18",
@@ -1012,7 +1064,8 @@
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-avocado-6",
@@ -1028,7 +1081,8 @@
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-avocado-12",
@@ -1044,7 +1098,8 @@
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-avocado-18",
@@ -1060,7 +1115,8 @@
         "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=900&q=80",
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-ebi-tempura-6",
@@ -1078,7 +1134,8 @@
           "A",
           "B"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-ebi-tempura-12",
@@ -1096,7 +1153,8 @@
           "A",
           "B"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-ebi-tempura-18",
@@ -1114,7 +1172,8 @@
           "A",
           "B"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-mix-klein",
@@ -1131,7 +1190,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-mix-gross",
@@ -1148,7 +1208,8 @@
         "allergens": [
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-salmon-sesame-8",
@@ -1166,7 +1227,8 @@
           "D",
           "P"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-salmon-sesame-16",
@@ -1184,7 +1246,8 @@
           "D",
           "P"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-california-8",
@@ -1203,7 +1266,8 @@
           "C"
         ],
         "isBestseller": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "maki-california-temaki",
@@ -1221,7 +1285,8 @@
           "B",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -1249,7 +1314,8 @@
           "C"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-noodles-chicken",
@@ -1267,7 +1333,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-noodles-crispy-chicken",
@@ -1285,7 +1352,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-noodles-duck",
@@ -1303,7 +1371,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-noodles-salmon",
@@ -1322,7 +1391,8 @@
           "C",
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-rice-veg",
@@ -1340,7 +1410,8 @@
           "C"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-rice-chicken",
@@ -1357,7 +1428,8 @@
         "allergens": [
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-rice-crispy-chicken",
@@ -1375,7 +1447,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-rice-duck",
@@ -1392,7 +1465,8 @@
         "allergens": [
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "fnr-rice-salmon",
@@ -1410,7 +1484,8 @@
           "C",
           "D"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -1438,7 +1513,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "udon-chicken",
@@ -1455,7 +1531,8 @@
         "allergens": [
           "A"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "udon-duck",
@@ -1472,7 +1549,8 @@
         "allergens": [
           "A"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "ramen-veg",
@@ -1491,7 +1569,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "ramen-chicken",
@@ -1508,7 +1587,8 @@
         "allergens": [
           "A"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "ramen-duck",
@@ -1525,7 +1605,8 @@
         "allergens": [
           "A"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -1564,6 +1645,14 @@
           "defaultOptionId": "side-rice",
           "options": [
             {
+              "id": "side-none",
+              "name": {
+                "de": "Ohne Beilage",
+                "en": "Without side"
+              },
+              "extraPriceEur": 0
+            },
+            {
               "id": "side-rice",
               "name": {
                 "de": "Jasminreis",
@@ -1588,7 +1677,8 @@
               "extraPriceEur": 6
             }
           ]
-        }
+        },
+        "warmSideChoiceMode": "custom"
       },
       {
         "id": "warm-red-curry-tofu",
@@ -1619,6 +1709,14 @@
           "defaultOptionId": "side-rice",
           "options": [
             {
+              "id": "side-none",
+              "name": {
+                "de": "Ohne Beilage",
+                "en": "Without side"
+              },
+              "extraPriceEur": 0
+            },
+            {
               "id": "side-rice",
               "name": {
                 "de": "Jasminreis",
@@ -1643,7 +1741,8 @@
               "extraPriceEur": 5
             }
           ]
-        }
+        },
+        "warmSideChoiceMode": "custom"
       },
       {
         "id": "warm-cashew-tofu",
@@ -1663,7 +1762,8 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-wok-chicken",
@@ -1681,7 +1781,8 @@
           "F"
         ],
         "isBestseller": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-cashew-chicken",
@@ -1698,7 +1799,8 @@
         "allergens": [
           "H"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-basilikum-chicken",
@@ -1716,7 +1818,8 @@
           "F"
         ],
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-red-curry-chicken",
@@ -1734,7 +1837,8 @@
           "F"
         ],
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-red-curry-duck",
@@ -1752,7 +1856,8 @@
           "F"
         ],
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-wok-duck",
@@ -1769,7 +1874,8 @@
         "allergens": [
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-lachs-teriyaki",
@@ -1788,7 +1894,8 @@
           "F"
         ],
         "isBestseller": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "warm-red-curry-garnelen",
@@ -1806,9 +1913,53 @@
           "B"
         ],
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       }
-    ]
+    ],
+    "warmSideChoiceGroup": {
+      "label": {
+        "de": "Beilage",
+        "en": "Side"
+      },
+      "required": true,
+      "priceMode": "surcharge",
+      "defaultOptionId": "side-none",
+      "options": [
+        {
+          "id": "side-none",
+          "name": {
+            "de": "Ohne Beilage",
+            "en": "Without side"
+          },
+          "extraPriceEur": 0
+        },
+        {
+          "id": "side-rice",
+          "name": {
+            "de": "Jasminreis",
+            "en": "Jasmine rice"
+          },
+          "extraPriceEur": 2.5
+        },
+        {
+          "id": "side-noodles",
+          "name": {
+            "de": "Gebratene Nudeln mit Gemüse",
+            "en": "Fried noodles with vegetables"
+          },
+          "extraPriceEur": 5
+        },
+        {
+          "id": "side-egg-rice",
+          "name": {
+            "de": "Eierreis mit Gemüse",
+            "en": "Egg fried rice with vegetables"
+          },
+          "extraPriceEur": 5
+        }
+      ]
+    }
   },
   {
     "id": "bento",
@@ -1832,7 +1983,8 @@
         "allergens": [
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "bento-lachs",
@@ -1850,7 +2002,8 @@
           "D"
         ],
         "isBestseller": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "bento-bulgogi",
@@ -1867,7 +2020,8 @@
         "allergens": [
           "F"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -1923,7 +2077,8 @@
           ]
         },
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m2",
@@ -1972,7 +2127,8 @@
         "vegetarian": true,
         "vegan": true,
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m3",
@@ -2019,7 +2175,8 @@
           ]
         },
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m4",
@@ -2066,7 +2223,8 @@
           ]
         },
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m5",
@@ -2112,7 +2270,8 @@
             }
           ]
         },
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m6",
@@ -2159,7 +2318,8 @@
             }
           ]
         },
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m7",
@@ -2205,7 +2365,8 @@
             }
           ]
         },
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m8",
@@ -2252,7 +2413,8 @@
             }
           ]
         },
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m9",
@@ -2299,7 +2461,8 @@
             }
           ]
         },
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m10",
@@ -2346,7 +2509,8 @@
             }
           ]
         },
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m11",
@@ -2393,7 +2557,8 @@
           ]
         },
         "isBestseller": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "m12",
@@ -2439,7 +2604,8 @@
             }
           ]
         },
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -2466,7 +2632,8 @@
           "A",
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "side-eierreis",
@@ -2483,7 +2650,8 @@
         "allergens": [
           "C"
         ],
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "side-jasmin-reis",
@@ -2497,7 +2665,8 @@
         },
         "priceEur": 2.5,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "side-sushi-reis",
@@ -2511,7 +2680,8 @@
         },
         "priceEur": 3,
         "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?auto=format&fit=crop&w=900&q=80",
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "side-mochi-sesam",
@@ -2530,7 +2700,8 @@
           "P"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "side-mochi-peanut",
@@ -2549,7 +2720,8 @@
           "G"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   },
@@ -2574,7 +2746,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-cola-zero",
@@ -2590,7 +2763,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-almdudler",
@@ -2606,7 +2780,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-fanta",
@@ -2622,7 +2797,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-eistee-zitrone",
@@ -2638,7 +2814,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-eistee-pfirsich",
@@ -2654,7 +2831,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-roemer-still",
@@ -2670,7 +2848,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-roemer-prickelnd",
@@ -2686,7 +2865,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-mango-saft",
@@ -2702,7 +2882,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-lychee-saft",
@@ -2718,7 +2899,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-apfel",
@@ -2734,7 +2916,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-aloe",
@@ -2750,7 +2933,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-soda-zitrone",
@@ -2766,7 +2950,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-gruener-tee",
@@ -2782,7 +2967,8 @@
         "image": "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80",
         "vegan": true,
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-tsingtao",
@@ -2800,7 +2986,8 @@
           "A"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-ichiban-bier",
@@ -2818,7 +3005,8 @@
           "A"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-stiegl",
@@ -2836,7 +3024,8 @@
           "A"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       },
       {
         "id": "drink-ottakringer",
@@ -2854,7 +3043,8 @@
           "A"
         ],
         "vegetarian": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "warmSideChoiceMode": "global"
       }
     ]
   }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem, MenuItemVariant, SiteContentConfig } from "@/lib/menu-types";
+import type { ReusableOptionGroup } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
 import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
@@ -12,6 +13,7 @@ import { defaultSiteContent } from "@/lib/site-content-default";
 import { normalizeSiteContentConfig } from "@/lib/site-content";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 import { DishImageField } from "./dish-image-field";
+import { AdminOptionGroups } from "./admin-option-groups";
 
 const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
 const DRAG_PAYLOAD_TYPE = "application/x-sake-menu-item";
@@ -19,33 +21,6 @@ const CATEGORY_DRAG_PAYLOAD_TYPE = "application/x-sake-menu-category";
 const AUTOSAVE_DELAY_MS = 8000;
 const ALWAYS_VISIBLE_ADMIN_CATEGORY_IDS = ["lunch", "maki-cat", "sushi", "warm-dishes"] as const;
 const ALWAYS_VISIBLE_ADMIN_CATEGORY_SET = new Set<string>(ALWAYS_VISIBLE_ADMIN_CATEGORY_IDS);
-
-function ensureWarmDishNoSideOption(categories: MenuCategory[]): MenuCategory[] {
-  return categories.map((cat) => {
-    if (cat.id !== "warm-dishes") return cat;
-    return {
-      ...cat,
-      items: cat.items.map((item) => {
-        const group = item.orderChoiceGroup;
-        if (!group?.options?.length) return item;
-        const hasNoSide = group.options.some((o) => o.id === "side-none");
-        if (hasNoSide && group.defaultOptionId) return item;
-        return {
-          ...item,
-          orderChoiceGroup: {
-            ...group,
-            required: true,
-            priceMode: "surcharge",
-            defaultOptionId: group.defaultOptionId ?? "side-none",
-            options: hasNoSide
-              ? group.options
-              : [{ id: "side-none", name: { de: "Ohne Beilage", en: "Without side" }, extraPriceEur: 0 }, ...group.options]
-          }
-        };
-      })
-    };
-  });
-}
 
 function cloneMenu(c: MenuCategory[]): MenuCategory[] {
   return JSON.parse(JSON.stringify(c)) as MenuCategory[];
@@ -175,6 +150,8 @@ export function AdminDashboard() {
   const [savingGift, setSavingGift] = useState(false);
   const [savingSite, setSavingSite] = useState(false);
   const [search, setSearch] = useState("");
+  const [adminTab, setAdminTab] = useState<"overview" | "option-groups">("overview");
+  const [optionGroups, setOptionGroups] = useState<ReusableOptionGroup[]>([]);
   /** Category id → expanded (default collapsed = less scrolling) */
   const [expandedCat, setExpandedCat] = useState<Record<string, boolean>>({});
   /** New dishes: insert at top of category (stored locally in the browser). */
@@ -213,6 +190,20 @@ export function AdminDashboard() {
     }
   }, []);
 
+  useEffect(() => {
+    const run = async () => {
+      try {
+        const res = await fetch("/api/admin/option-groups", { cache: "no-store", credentials: "same-origin" });
+        if (!res.ok) return;
+        const data = (await res.json()) as ReusableOptionGroup[];
+        setOptionGroups(Array.isArray(data) ? data : []);
+      } catch {
+        /* ignore */
+      }
+    };
+    void run();
+  }, []);
+
   const setNewDishAtTopPref = useCallback((atTop: boolean) => {
     setNewDishAtTop(atTop);
     try {
@@ -235,7 +226,7 @@ export function AdminDashboard() {
       if (thisId !== loadRequestId.current) return;
       if (!menuRes.ok) throw new Error("Menu load failed");
       const menuData = (await menuRes.json()) as MenuCategory[];
-      const list = ensureWarmDishNoSideOption(cloneMenu(Array.isArray(menuData) ? menuData : []));
+      const list = cloneMenu(Array.isArray(menuData) ? menuData : []);
       if (thisId !== loadRequestId.current) return;
       setCategories(list);
       setExpandedCat((prev) => {
@@ -796,132 +787,28 @@ export function AdminDashboard() {
     );
   }
 
-  function shouldShowSideOptions(catIndex: number, item: MenuItem): boolean {
-    const catId = categories[catIndex]?.id;
-    if (catId === "warm-dishes") return true;
-    const labelDe = item.orderChoiceGroup?.label?.de?.toLowerCase() ?? "";
-    const labelEn = item.orderChoiceGroup?.label?.en?.toLowerCase() ?? "";
-    return labelDe.includes("beilage") || labelEn.includes("side");
-  }
-
-  function ensureSideChoiceGroup(catIndex: number, itemIndex: number) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        if (item.orderChoiceGroup?.options?.length) return item;
-        return {
-          ...item,
-          orderChoiceGroup: {
-            label: { de: "Beilage", en: "Side" },
-            required: true,
-            priceMode: "surcharge",
-            defaultOptionId: "side-none",
-            options: [
-              { id: "side-none", name: { de: "Ohne Beilage", en: "Without side" }, extraPriceEur: 0 },
-              { id: "side-rice", name: { de: "Jasminreis", en: "Jasmine rice" }, extraPriceEur: 2.5 },
-              { id: "side-noodles", name: { de: "Gebratene Nudeln mit Gemüse", en: "Fried noodles with vegetables" }, extraPriceEur: 5 },
-              { id: "side-egg-rice", name: { de: "Eierreis mit Gemüse", en: "Egg fried rice with vegetables" }, extraPriceEur: 5 }
-            ]
-          }
-        };
-      })
-    );
-  }
-
-  function setSideGroupLabel(catIndex: number, itemIndex: number, lang: "de" | "en", value: string) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const group = item.orderChoiceGroup;
-        if (!group) return item;
-        return { ...item, orderChoiceGroup: { ...group, label: { ...group.label, [lang]: value } } };
-      })
-    );
-  }
-
-  function setSideDefaultOption(catIndex: number, itemIndex: number, optionId: string) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const group = item.orderChoiceGroup;
-        if (!group) return item;
-        return { ...item, orderChoiceGroup: { ...group, defaultOptionId: optionId, priceMode: "surcharge", required: true } };
-      })
-    );
-  }
-
-  function updateSideOption(
+  function setDishOptionGroupEnabled(
     catIndex: number,
     itemIndex: number,
-    optionIndex: number,
-    field: "name.de" | "name.en" | "extraPriceEur",
-    value: string
+    group: ReusableOptionGroup,
+    enabled: boolean
   ) {
     setCategories((prev) =>
       replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const group = item.orderChoiceGroup;
-        if (!group?.options?.[optionIndex]) return item;
-        const options = [...group.options];
-        const target = options[optionIndex];
-        if (field === "name.de") {
-          options[optionIndex] = { ...target, name: { ...target.name, de: value } };
-        } else if (field === "name.en") {
-          options[optionIndex] = { ...target, name: { ...target.name, en: value } };
+        const inherited = (group.linkedCategoryIds ?? []).includes(prev[catIndex]?.id ?? "");
+        const explicit = new Set(item.optionGroupIds ?? []);
+        const disabled = new Set(item.disabledCategoryOptionGroupIds ?? []);
+        if (enabled) {
+          disabled.delete(group.id);
+          if (!inherited) explicit.add(group.id);
         } else {
-          const parsed = parseAdminPriceEur(value);
-          options[optionIndex] = { ...target, extraPriceEur: parsed === "invalid" || parsed === "empty" ? 0 : parsed };
+          explicit.delete(group.id);
+          if (inherited) disabled.add(group.id);
         }
         return {
           ...item,
-          orderChoiceGroup: { ...group, priceMode: "surcharge", required: true, options }
-        };
-      })
-    );
-  }
-
-  function addSideOption(catIndex: number, itemIndex: number) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const group = item.orderChoiceGroup;
-        if (!group) return item;
-        return {
-          ...item,
-          orderChoiceGroup: {
-            ...group,
-            priceMode: "surcharge",
-            required: true,
-            options: [
-              ...group.options,
-              {
-                id: `side-${crypto.randomUUID().slice(0, 8)}`,
-                name: { de: "Neue Beilage", en: "New side" },
-                extraPriceEur: 0
-              }
-            ]
-          }
-        };
-      })
-    );
-  }
-
-  function removeSideOption(catIndex: number, itemIndex: number, optionIndex: number) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const group = item.orderChoiceGroup;
-        if (!group?.options?.[optionIndex]) return item;
-        const nextOptions = group.options.filter((_, i) => i !== optionIndex);
-        const nextDefault =
-          group.defaultOptionId && nextOptions.some((o) => o.id === group.defaultOptionId)
-            ? group.defaultOptionId
-            : nextOptions[0]?.id;
-        return {
-          ...item,
-          orderChoiceGroup: nextOptions.length
-            ? {
-                ...group,
-                options: nextOptions,
-                defaultOptionId: nextDefault,
-                priceMode: "surcharge",
-                required: true
-              }
-            : undefined
+          optionGroupIds: explicit.size ? [...explicit] : undefined,
+          disabledCategoryOptionGroupIds: disabled.size ? [...disabled] : undefined
         };
       })
     );
@@ -948,6 +835,26 @@ export function AdminDashboard() {
         <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6">
           <div className="min-w-0 flex-1">
             <h1 className="font-serif text-lg tracking-wide text-neutral-900 sm:text-xl">Admin</h1>
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setAdminTab("overview")}
+                className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] ${
+                  adminTab === "overview" ? "bg-neutral-900 text-white" : "border border-[#ddd] text-neutral-600"
+                }`}
+              >
+                Übersicht
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminTab("option-groups")}
+                className={`rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] ${
+                  adminTab === "option-groups" ? "bg-neutral-900 text-white" : "border border-[#ddd] text-neutral-600"
+                }`}
+              >
+                Optionsgruppen
+              </button>
+            </div>
             <p className="hidden text-[11px] text-neutral-500 sm:block">
               Search, jump to a category, or expand one section at a time. Lunch menu (Mittagsmenü): category id{" "}
               <code className="rounded bg-neutral-100 px-1">{LUNCH_CATEGORY_ID}</code> — opens expanded after load; use sidebar or
@@ -1055,6 +962,10 @@ export function AdminDashboard() {
         </aside>
 
         <div className="min-w-0 space-y-10">
+          {adminTab === "option-groups" ? (
+            <AdminOptionGroups categories={categories} />
+          ) : (
+            <>
           <section id="admin-site-content" className="scroll-mt-28 space-y-4 rounded-2xl border border-[#eeeeee] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="font-serif text-xl text-neutral-900">Website content</h2>
@@ -1852,112 +1763,31 @@ export function AdminDashboard() {
                                   </p>
                                 )}
                               </div>
-                              {shouldShowSideOptions(ci, item) && (
-                                <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
-                                  <div className="flex items-center justify-between gap-3">
-                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Beilage Optionen</p>
-                                    <div className="flex items-center gap-3">
-                                      {!item.orderChoiceGroup?.options?.length && (
-                                        <button
-                                          type="button"
-                                          onClick={() => ensureSideChoiceGroup(ci, ii)}
-                                          className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
-                                        >
-                                          Standard-Beilagen laden
-                                        </button>
-                                      )}
-                                      {item.orderChoiceGroup?.options?.length ? (
-                                        <button
-                                          type="button"
-                                          onClick={() => addSideOption(ci, ii)}
-                                          className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
-                                        >
-                                          Beilage hinzufügen
-                                        </button>
-                                      ) : null}
-                                    </div>
-                                  </div>
+                              {optionGroups.length > 0 && (
+                                <div className="lg:col-span-2 space-y-2 rounded-xl border border-[#e5e5e5] bg-white p-4">
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Optionsgruppen für dieses Gericht</p>
                                   <p className="text-xs text-neutral-500">
-                                    Aufpreis wird zum Gerichtspreis addiert. Ohne Wert gilt automatisch 0,00 EUR.
+                                    Kategorie-verknüpfte Gruppen gelten automatisch. Hier können Sie pro Gericht zusätzlich aktivieren oder deaktivieren.
                                   </p>
-                                  {item.orderChoiceGroup?.options?.length ? (
-                                    <>
-                                      <div className="grid gap-3 sm:grid-cols-2">
-                                        <AdminField label="Gruppenlabel DE">
+                                  <div className="grid gap-2 sm:grid-cols-2">
+                                    {optionGroups.map((g) => {
+                                      const inherited = (g.linkedCategoryIds ?? []).includes(cat.id);
+                                      const explicit = (item.optionGroupIds ?? []).includes(g.id);
+                                      const disabled = (item.disabledCategoryOptionGroupIds ?? []).includes(g.id);
+                                      const enabled = inherited ? !disabled : explicit;
+                                      return (
+                                        <label key={g.id} className="flex items-center justify-between gap-2 rounded-lg border border-[#eee] px-3 py-2 text-xs text-neutral-700">
+                                          <span>{g.name.de || g.id}</span>
                                           <input
-                                            value={item.orderChoiceGroup.label.de}
-                                            onChange={(e) => setSideGroupLabel(ci, ii, "de", e.target.value)}
-                                            className={adminInputClass}
+                                            type="checkbox"
+                                            checked={enabled}
+                                            onChange={(e) => setDishOptionGroupEnabled(ci, ii, g, e.target.checked)}
+                                            className="h-4 w-4 accent-brand-primary"
                                           />
-                                        </AdminField>
-                                        <AdminField label="Gruppenlabel EN">
-                                          <input
-                                            value={item.orderChoiceGroup.label.en}
-                                            onChange={(e) => setSideGroupLabel(ci, ii, "en", e.target.value)}
-                                            className={adminInputClass}
-                                          />
-                                        </AdminField>
-                                      </div>
-                                      <div className="space-y-3">
-                                        {item.orderChoiceGroup.options.map((opt, oi) => (
-                                          <div
-                                            key={`${opt.id}-${oi}`}
-                                            className="grid gap-2 rounded-lg border border-[#eeeeee] bg-neutral-50/80 p-3 sm:grid-cols-2 lg:grid-cols-5"
-                                          >
-                                            <AdminField label="Name DE">
-                                              <input
-                                                value={opt.name.de}
-                                                onChange={(e) => updateSideOption(ci, ii, oi, "name.de", e.target.value)}
-                                                className={adminInputClass}
-                                              />
-                                            </AdminField>
-                                            <AdminField label="Name EN">
-                                              <input
-                                                value={opt.name.en}
-                                                onChange={(e) => updateSideOption(ci, ii, oi, "name.en", e.target.value)}
-                                                className={adminInputClass}
-                                              />
-                                            </AdminField>
-                                            <AdminField label="Aufpreis (EUR)">
-                                              <input
-                                                type="number"
-                                                inputMode="decimal"
-                                                min={0}
-                                                step={0.1}
-                                                value={typeof opt.extraPriceEur === "number" ? opt.extraPriceEur : 0}
-                                                onChange={(e) => updateSideOption(ci, ii, oi, "extraPriceEur", e.target.value)}
-                                                className={adminInputClass}
-                                              />
-                                            </AdminField>
-                                            <div className="flex items-end">
-                                              <button
-                                                type="button"
-                                                onClick={() => setSideDefaultOption(ci, ii, opt.id)}
-                                                className={`text-[10px] font-semibold uppercase hover:underline ${
-                                                  item.orderChoiceGroup?.defaultOptionId === opt.id ? "text-emerald-700" : "text-neutral-500"
-                                                }`}
-                                              >
-                                                {item.orderChoiceGroup?.defaultOptionId === opt.id ? "Standard-Beilage" : "Als Standard"}
-                                              </button>
-                                            </div>
-                                            <div className="flex items-end">
-                                              <button
-                                                type="button"
-                                                onClick={() => removeSideOption(ci, ii, oi)}
-                                                className="text-[10px] font-semibold uppercase text-red-400/90 hover:underline"
-                                              >
-                                                Beilage löschen
-                                              </button>
-                                            </div>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <p className="text-xs text-neutral-500">
-                                      Noch keine Beilage-Optionen vorhanden.
-                                    </p>
-                                  )}
+                                        </label>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
                               )}
                               <div className="lg:col-span-2">
@@ -2212,6 +2042,8 @@ export function AdminDashboard() {
               {savingMenu ? "Saving…" : "Save entire menu"}
             </button>
           </div>
+            </>
+          )}
         </div>
       </div>
     </div>

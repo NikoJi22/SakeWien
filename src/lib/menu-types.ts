@@ -35,6 +35,24 @@ export type MenuItemVariant = {
   priceEur: number;
 };
 
+export type ReusableOption = {
+  id: string;
+  label: { en: string; de: string };
+  extraPriceEur?: number;
+};
+
+export type ReusableOptionGroup = {
+  id: string;
+  name: { en: string; de: string };
+  required: boolean;
+  selectionType: "single" | "multiple";
+  minSelections: number;
+  maxSelections: number;
+  options: ReusableOption[];
+  linkedCategoryIds?: string[];
+  linkedDishIds?: string[];
+};
+
 export type LunchStarterOption = {
   id: string;
   name: { en: string; de: string };
@@ -58,11 +76,17 @@ export type MenuItem = {
   allergens?: string[];
   lunchStarterChoice?: LunchStarterChoice;
   orderChoiceGroup?: OrderChoiceGroup;
+  /** Warm dishes: whether this item uses the category-level side options or its own custom list. */
+  warmSideChoiceMode?: "global" | "custom";
+  optionGroupIds?: string[];
+  disabledCategoryOptionGroupIds?: string[];
 } & MenuItemFlags;
 
 export type MenuCategory = {
   id: string;
   title: { en: string; de: string };
+  /** Optional shared side-choice group for all dishes in this category (used for warm dishes). */
+  warmSideChoiceGroup?: OrderChoiceGroup;
   items: MenuItem[];
 };
 

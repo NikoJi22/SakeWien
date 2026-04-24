@@ -124,6 +124,7 @@ export function OrderPageContent() {
                         <OrderMenuItem
                           key={`${category.id}-${item.id}`}
                           item={item}
+                          categoryId={category.id}
                           starterGroupId={category.id}
                         />
                       ))}

@@ -7,6 +7,7 @@ import { GiftConfigProvider } from "@/context/gift-config-context";
 import { MenuDataProvider } from "@/context/menu-data-context";
 import { OrderCartDrawerProvider } from "@/context/order-cart-drawer-context";
 import { SiteContentProvider } from "@/context/site-content-context";
+import { OptionGroupsProvider } from "@/context/option-groups-context";
 import { ConditionalNav } from "@/components/conditional-nav";
 import { ConditionalMain } from "@/components/conditional-main";
 import { ConditionalFooter } from "@/components/conditional-footer";
@@ -42,14 +43,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LanguageProvider>
           <OrderCartDrawerProvider>
             <MenuDataProvider>
-              <GiftConfigProvider>
-                <SiteContentProvider>
-                  <ConditionalNav />
-                  <ConditionalMain>{children}</ConditionalMain>
-                  <ConditionalFooter />
-                  <MobileLanguageSwitcher />
-                </SiteContentProvider>
-              </GiftConfigProvider>
+              <OptionGroupsProvider>
+                <GiftConfigProvider>
+                  <SiteContentProvider>
+                    <ConditionalNav />
+                    <ConditionalMain>{children}</ConditionalMain>
+                    <ConditionalFooter />
+                    <MobileLanguageSwitcher />
+                  </SiteContentProvider>
+                </GiftConfigProvider>
+              </OptionGroupsProvider>
             </MenuDataProvider>
           </OrderCartDrawerProvider>
         </LanguageProvider>

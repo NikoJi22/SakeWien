@@ -6,10 +6,12 @@ import { useGiftConfig } from "@/context/gift-config-context";
 import { useMenuData } from "@/context/menu-data-context";
 import { useOrderCartDrawer } from "@/context/order-cart-drawer-context";
 import { useSiteContent } from "@/context/site-content-context";
+import { useOptionGroups } from "@/context/option-groups-context";
 import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import { getItemSelectionGroup } from "@/lib/item-selection";
+import { findCategoryByItemId, optionSelectionExtraEur, resolveReusableOptionGroupsForDish } from "@/lib/reusable-option-groups";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
 import {
   canAcceptNewOrdersVienna,
@@ -187,7 +189,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const { language, t } = useLanguage();
   const { lines, subtotalEur, itemCount, clear, removeOne, addOne, setQuantity } = useCart();
   const { config: giftConfig } = useGiftConfig();
-  const { itemById } = useMenuData();
+  const { itemById, categories } = useMenuData();
+  const { groups: reusableGroups } = useOptionGroups();
   const { siteContent } = useSiteContent();
   const { close: closeCartDrawer } = useOrderCartDrawer();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -537,15 +540,29 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
               totalEur: cutleryFeeEur
             }
           : null,
-      lines: lines.map(({ lineKey, item, quantity, starterChoice, orderChoice }) => ({
-        id: lineKey,
-        name: `${starterChoice
-          ? `${item.name[language]} — ${item.lunchStarterChoice!.label[language]}: ${starterChoice.name[language]}`
-          : item.name[language]}${orderChoice ? ` — ${getItemSelectionGroup(item)?.label[language]}: ${orderChoice.name[language]}` : ""}`,
-        quantity,
-        unitPriceEur: getEffectivePriceEur(item, orderChoice?.id),
-        lineTotalEur: getEffectivePriceEur(item, orderChoice?.id) * quantity
-      }))
+      lines: lines.map(({ lineKey, item, quantity, starterChoice, orderChoice, optionSelections }) => {
+        const category = findCategoryByItemId(categories, item.id);
+        const linkedGroups = category ? resolveReusableOptionGroupsForDish(item, category.id, reusableGroups) : [];
+        const selectedOptionLabels = linkedGroups.flatMap((g) =>
+          (optionSelections?.[g.id] ?? [])
+            .map((oid) => {
+              const opt = g.options.find((o) => o.id === oid);
+              return opt ? `${g.name[language]}: ${opt.label[language]}` : null;
+            })
+            .filter(Boolean) as string[]
+        );
+        const optionExtra = optionSelectionExtraEur(linkedGroups, optionSelections ?? {});
+        const unit = getEffectivePriceEur(item, orderChoice?.id) + optionExtra;
+        return {
+          id: lineKey,
+          name: `${starterChoice
+            ? `${item.name[language]} — ${item.lunchStarterChoice!.label[language]}: ${starterChoice.name[language]}`
+            : item.name[language]}${orderChoice ? ` — ${getItemSelectionGroup(item)?.label[language]}: ${orderChoice.name[language]}` : ""}${selectedOptionLabels.length ? ` — ${selectedOptionLabels.join(" | ")}` : ""}`,
+          quantity,
+          unitPriceEur: unit,
+          lineTotalEur: unit * quantity
+        };
+      })
     };
 
     try {
@@ -679,9 +696,20 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <p className={emptyCart}>{t.order.emptyCart}</p>
         ) : (
           <ul className="space-y-4 sm:space-y-5">
-            {lines.map(({ lineKey, item, quantity, starterChoice, orderChoice, sushiExtras }) => {
+            {lines.map(({ lineKey, item, quantity, starterChoice, orderChoice, sushiExtras, optionSelections }) => {
               const L = labelMenuItem(item, language);
               const soldOut = !!item.isSoldOut;
+              const category = findCategoryByItemId(categories, item.id);
+              const linkedGroups = category ? resolveReusableOptionGroupsForDish(item, category.id, reusableGroups) : [];
+              const selectedOptionLabels = linkedGroups.flatMap((g) =>
+                (optionSelections?.[g.id] ?? [])
+                  .map((oid) => {
+                    const opt = g.options.find((o) => o.id === oid);
+                    return opt ? `${g.name[language]}: ${opt.label[language]}` : null;
+                  })
+                  .filter(Boolean) as string[]
+              );
+              const optionsExtra = optionSelectionExtraEur(linkedGroups, optionSelections ?? {});
               return (
                 <li
                   key={lineKey}
@@ -699,6 +727,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                         {getItemSelectionGroup(item)?.label[language]}: {orderChoice.name[language]}
                       </span>
                     )}
+                    {selectedOptionLabels.map((txt, idx) => (
+                      <span key={`${lineKey}-og-${idx}`} className="mt-0.5 block text-xs font-normal text-brand-body">
+                        {txt}
+                      </span>
+                    ))}
                     {(sushiExtras?.wasabi || sushiExtras?.ginger) && (
                       <span className="mt-0.5 block text-xs font-normal text-brand-body">
                         {t.order.sushiExtras}: {[
@@ -730,7 +763,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                           onClick={() =>
                             addOne(item.id, {
                               starterOptionId: starterChoice?.id ?? null,
-                              orderChoiceId: orderChoice?.id ?? null
+                              orderChoiceId: orderChoice?.id ?? null,
+                              optionSelections
                             })
                           }
                           disabled={soldOut}
@@ -760,7 +794,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                       </button>
                     </div>
                     <span className={`${linePrice} shrink-0 text-right`}>
-                      {formatPriceEur(getEffectivePriceEur(item, orderChoice?.id) * quantity, language)}
+                      {formatPriceEur((getEffectivePriceEur(item, orderChoice?.id) + optionsExtra) * quantity, language)}
                     </span>
                   </div>
                 </li>

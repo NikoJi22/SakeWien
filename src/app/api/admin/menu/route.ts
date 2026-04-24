@@ -174,6 +174,9 @@ export async function POST(request: Request) {
   try {
     const sanitized = body.map((cat) => ({
       ...cat,
+      ...(cat.id === "warm-dishes"
+        ? { warmSideChoiceGroup: sanitizeOrderChoiceGroup((cat as { warmSideChoiceGroup?: unknown }).warmSideChoiceGroup) }
+        : {}),
       items: cat.items.map((item) => {
         const mi = item as MenuItem;
         const allergens = mi.allergens?.length ? normalizeAllergenCodes(mi.allergens) : undefined;
@@ -193,7 +196,23 @@ export async function POST(request: Request) {
           spicyLevel,
           lunchStarterChoice,
           variants,
-          orderChoiceGroup
+          orderChoiceGroup,
+          warmSideChoiceMode:
+            ((mi as { warmSideChoiceMode?: unknown }).warmSideChoiceMode === "custom" ? "custom" : "global") as
+              | "custom"
+              | "global",
+          optionGroupIds: Array.isArray((mi as { optionGroupIds?: unknown }).optionGroupIds)
+            ? ((mi as { optionGroupIds?: unknown[] }).optionGroupIds as unknown[])
+                .filter((x): x is string => typeof x === "string")
+                .map((x) => x.trim())
+                .filter(Boolean)
+            : undefined,
+          disabledCategoryOptionGroupIds: Array.isArray((mi as { disabledCategoryOptionGroupIds?: unknown }).disabledCategoryOptionGroupIds)
+            ? ((mi as { disabledCategoryOptionGroupIds?: unknown[] }).disabledCategoryOptionGroupIds as unknown[])
+                .filter((x): x is string => typeof x === "string")
+                .map((x) => x.trim())
+                .filter(Boolean)
+            : undefined
         };
       })
     }));

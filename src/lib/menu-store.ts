@@ -1,15 +1,17 @@
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { head, put } from "@vercel/blob";
-import type { GiftConfig, MenuCategory, SiteContentConfig } from "./menu-types";
+import type { GiftConfig, MenuCategory, ReusableOptionGroup, SiteContentConfig } from "./menu-types";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const MENU_FILE = path.join(DATA_DIR, "menu.json");
 const GIFT_FILE = path.join(DATA_DIR, "gift-config.json");
 const SITE_CONTENT_FILE = path.join(DATA_DIR, "site-content.json");
+const OPTION_GROUPS_FILE = path.join(DATA_DIR, "option-groups.json");
 const MENU_BLOB_PATH = "sake-vienna/menu.json";
 const GIFT_BLOB_PATH = "sake-vienna/gift-config.json";
 const SITE_CONTENT_BLOB_PATH = "sake-vienna/site-content.json";
+const OPTION_GROUPS_BLOB_PATH = "sake-vienna/option-groups.json";
 
 function hasBlobStorage(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
@@ -63,6 +65,16 @@ async function readLocalSiteContentJson(): Promise<SiteContentConfig | null> {
   try {
     const raw = await readFile(SITE_CONTENT_FILE, "utf-8");
     return JSON.parse(raw) as SiteContentConfig;
+  } catch {
+    return null;
+  }
+}
+
+async function readLocalOptionGroupsJson(): Promise<ReusableOptionGroup[] | null> {
+  try {
+    const raw = await readFile(OPTION_GROUPS_FILE, "utf-8");
+    const data = JSON.parse(raw) as ReusableOptionGroup[];
+    return Array.isArray(data) ? data : null;
   } catch {
     return null;
   }
@@ -183,4 +195,40 @@ export async function writeSiteContentToDisk(config: SiteContentConfig): Promise
   }
   await mkdir(DATA_DIR, { recursive: true });
   await writeFile(SITE_CONTENT_FILE, JSON.stringify(config, null, 2), "utf-8");
+}
+
+export async function readOptionGroupsFromDisk(): Promise<ReusableOptionGroup[]> {
+  assertBlobInProduction();
+  if (hasBlobStorage()) {
+    try {
+      const data = await readJsonFromBlob<ReusableOptionGroup[]>(OPTION_GROUPS_BLOB_PATH);
+      if (!Array.isArray(data)) throw new Error("Invalid option-groups blob shape");
+      return data;
+    } catch (err) {
+      if (allowDiskFallbackAfterBlobReadError()) {
+        const local = await readLocalOptionGroupsJson();
+        if (local) {
+          console.warn("[menu-store] Option-groups blob read failed; using data/option-groups.json fallback.", err);
+          return local;
+        }
+      }
+      throw err;
+    }
+  }
+  const raw = await readFile(OPTION_GROUPS_FILE, "utf-8");
+  const data = JSON.parse(raw) as ReusableOptionGroup[];
+  if (!Array.isArray(data)) throw new Error("Invalid option-groups.json shape");
+  return data;
+}
+
+export async function writeOptionGroupsToDisk(groups: ReusableOptionGroup[]): Promise<void> {
+  if (hasBlobStorage()) {
+    await writeJsonToBlob(OPTION_GROUPS_BLOB_PATH, groups);
+    return;
+  }
+  if (isProductionRuntime()) {
+    throw new Error("BLOB_READ_WRITE_TOKEN missing in production; refusing local filesystem write for option groups");
+  }
+  await mkdir(DATA_DIR, { recursive: true });
+  await writeFile(OPTION_GROUPS_FILE, JSON.stringify(groups, null, 2), "utf-8");
 }

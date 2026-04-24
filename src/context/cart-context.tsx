@@ -2,9 +2,11 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useMenuData } from "@/context/menu-data-context";
+import { useOptionGroups } from "@/context/option-groups-context";
 import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey, resolveStarterOption } from "@/lib/cart-line-key";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
 import { findItemSelectionOption, getItemSelectionGroup } from "@/lib/item-selection";
+import { findCategoryByItemId, optionSelectionExtraEur, resolveReusableOptionGroupsForDish } from "@/lib/reusable-option-groups";
 import type { LunchStarterOption, MenuItem, OrderChoiceOption } from "@/lib/menu-types";
 
 export type CartLine = {
@@ -14,12 +16,13 @@ export type CartLine = {
   starterChoice?: LunchStarterOption;
   orderChoice?: OrderChoiceOption;
   sushiExtras?: { wasabi: boolean; ginger: boolean };
+  optionSelections?: Record<string, string[]>;
 };
 
 type CartContextValue = {
   quantities: Record<string, number>;
   setQuantity: (lineKey: string, quantity: number) => void;
-  addOne: (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean; orderChoiceId?: string | null }) => void;
+  addOne: (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean; orderChoiceId?: string | null; optionSelections?: Record<string, string[]> }) => void;
   removeOne: (lineKey: string) => void;
   lines: CartLine[];
   itemCount: number;
@@ -30,7 +33,8 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const { itemById } = useMenuData();
+  const { itemById, categories } = useMenuData();
+  const { groups: reusableGroups } = useOptionGroups();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const setQuantity = useCallback((lineKey: string, quantity: number) => {
@@ -46,7 +50,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addOne = useCallback(
-    (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean; orderChoiceId?: string | null }) => {
+    (itemId: string, opts?: { starterOptionId?: string | null; wasabi?: boolean; ginger?: boolean; orderChoiceId?: string | null; optionSelections?: Record<string, string[]> }) => {
       setQuantities((prev) => {
         const item = itemById[itemId];
         if (!item) return prev;
@@ -60,7 +64,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const key = cartLineKey(itemId, needStarter ? starterOptionId! : null, {
           wasabi: opts?.wasabi,
           ginger: opts?.ginger,
-          orderChoiceId
+          orderChoiceId,
+          optionSelections: opts?.optionSelections
         });
         return { ...prev, [key]: (prev[key] ?? 0) + 1 };
       });
@@ -86,9 +91,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     let subtotalEur = 0;
     for (const [key, qty] of Object.entries(quantities)) {
       if (qty <= 0) continue;
-      const { itemId, starterOptionId, orderChoiceId, extras } = parseCartLineKey(key);
+      const { itemId, starterOptionId, orderChoiceId, extras, optionSelections } = parseCartLineKey(key);
       const item = itemById[itemId];
       if (!item) continue;
+      const category = findCategoryByItemId(categories, item.id);
+      const linkedGroups = category ? resolveReusableOptionGroupsForDish(item, category.id, reusableGroups) : [];
+      const optionExtraEur = optionSelectionExtraEur(linkedGroups, optionSelections);
       const selectionGroup = getItemSelectionGroup(item);
       const fallbackChoice =
         !orderChoiceId && selectionGroup?.required && (selectionGroup.options.length ?? 0) > 0
@@ -99,16 +107,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (!starterOptionId) continue;
         const opt = resolveStarterOption(item, starterOptionId);
         if (!opt) continue;
-        lines.push({ lineKey: key, item, quantity: qty, starterChoice: opt, orderChoice, sushiExtras: extras });
+        lines.push({ lineKey: key, item, quantity: qty, starterChoice: opt, orderChoice, sushiExtras: extras, optionSelections });
       } else {
         if (starterOptionId) continue;
-        lines.push({ lineKey: key, item, quantity: qty, orderChoice, sushiExtras: extras });
+        lines.push({ lineKey: key, item, quantity: qty, orderChoice, sushiExtras: extras, optionSelections });
       }
       itemCount += qty;
-      subtotalEur += getEffectivePriceEur(item, orderChoice?.id) * qty;
+      subtotalEur += (getEffectivePriceEur(item, orderChoice?.id) + optionExtraEur) * qty;
     }
     return { lines, itemCount, subtotalEur };
-  }, [quantities, itemById]);
+  }, [quantities, itemById, categories, reusableGroups]);
 
   const value = useMemo(
     () => ({

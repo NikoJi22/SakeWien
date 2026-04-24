@@ -7,6 +7,9 @@ import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey } from "@/lib/c
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getDiscountedPriceEur, getEffectivePriceEur } from "@/lib/menu-pricing";
 import { getItemSelectionGroup } from "@/lib/item-selection";
+import { useOptionGroups } from "@/context/option-groups-context";
+import { useMenuData } from "@/context/menu-data-context";
+import { optionSelectionExtraEur, resolveReusableOptionGroupsForDish, validateOptionGroupSelections } from "@/lib/reusable-option-groups";
 import { useCart } from "@/context/cart-context";
 import { useLanguage } from "@/context/language-context";
 import { MenuAllergenChips } from "@/components/menu/menu-diet-allergen";
@@ -20,6 +23,11 @@ function Badge({ children, className }: { children: React.ReactNode; className?:
   );
 }
 
+function isSideLikeLabel(label?: string): boolean {
+  const t = (label ?? "").toLowerCase();
+  return t.includes("beilage") || t.includes("side");
+}
+
 const ADDED_HINT_MS = 2200;
 
 /** Einheitliche Produkt-Tags (Chip-System inaktiv + dezentes Gold nur für Promo) */
@@ -30,21 +38,46 @@ const tagSpicy = "border border-red-200 bg-red-50 text-red-700";
 
 export function OrderMenuItem({
   item,
+  categoryId,
   spotlight = false,
   starterGroupId = "default"
 }: {
   item: MenuItem;
+  categoryId?: string;
   spotlight?: boolean;
   starterGroupId?: string;
 }) {
   const { language, t } = useLanguage();
   const { quantities, addOne, removeOne } = useCart();
+  const { categories } = useMenuData();
+  const { groups: reusableGroups } = useOptionGroups();
   const L = labelMenuItem(item, language);
   const discountedPrice = getDiscountedPriceEur(item);
   const starterConfig = item.lunchStarterChoice;
   const needsStarter = itemRequiresLunchStarter(item);
-  const selectionGroup = getItemSelectionGroup(item);
+  const rawSelectionGroup = getItemSelectionGroup(item);
+  const isLegacySideSelectionGroup =
+    !!rawSelectionGroup && (isSideLikeLabel(rawSelectionGroup.label.de) || isSideLikeLabel(rawSelectionGroup.label.en));
+  const selectionGroup = isLegacySideSelectionGroup ? null : rawSelectionGroup;
   const [orderChoiceId, setOrderChoiceId] = useState(selectionGroup?.defaultOptionId ?? selectionGroup?.options?.[0]?.id ?? "");
+  const resolvedCategoryId = useMemo(
+    () => categoryId ?? categories.find((c) => c.items.some((i) => i.id === item.id))?.id,
+    [categoryId, categories, item.id]
+  );
+  const linkedOptionGroups = useMemo(
+    () => (resolvedCategoryId ? resolveReusableOptionGroupsForDish(item, resolvedCategoryId, reusableGroups) : []),
+    [resolvedCategoryId, item, reusableGroups]
+  );
+  const visibleReusableGroups = linkedOptionGroups;
+  const [groupSelections, setGroupSelections] = useState<Record<string, string[]>>({});
+  useEffect(() => {
+    const next: Record<string, string[]> = {};
+    for (const g of visibleReusableGroups) {
+      if (g.selectionType === "single" && g.required && g.options[0]) next[g.id] = [g.options[0].id];
+      else next[g.id] = [];
+    }
+    setGroupSelections(next);
+  }, [item.id, visibleReusableGroups]);
   const firstStarterId = starterConfig?.options[0]?.id ?? "";
   const [starterId, setStarterId] = useState(firstStarterId);
 
@@ -88,9 +121,10 @@ export function OrderMenuItem({
   const lineKey = useMemo(
     () =>
       cartLineKey(item.id, needsStarter ? starterId : null, {
-        orderChoiceId
+        orderChoiceId,
+        optionSelections: groupSelections
       }),
-    [item.id, needsStarter, starterId, orderChoiceId]
+    [item.id, needsStarter, starterId, orderChoiceId, groupSelections]
   );
 
   const qty = quantities[lineKey] ?? 0;
@@ -108,9 +142,11 @@ export function OrderMenuItem({
   const onAdd = () => {
     if (needsStarter && !starterId) return;
     if (selectionGroup?.required && !orderChoiceId) return;
+    if (!validateOptionGroupSelections(visibleReusableGroups, groupSelections)) return;
     addOne(item.id, {
       starterOptionId: needsStarter ? starterId : undefined,
-      orderChoiceId: orderChoiceId || undefined
+      orderChoiceId: orderChoiceId || undefined,
+      optionSelections: groupSelections
     });
     setShowAddedHint(true);
     if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
@@ -224,6 +260,46 @@ export function OrderMenuItem({
             </div>
           </div>
         ) : null}
+        {visibleReusableGroups.map((g) => (
+          <div key={g.id} className="mt-2 rounded-xl border border-brand-line bg-brand-canvas/80 px-2.5 py-2 sm:mt-3 sm:px-3 sm:py-2.5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-subtle">{g.name[language]}</p>
+            <div className="mt-1.5 flex flex-col gap-1.5 sm:mt-2 sm:gap-2">
+              {g.options.map((opt) => {
+                const selected = (groupSelections[g.id] ?? []).includes(opt.id);
+                return (
+                  <label
+                    key={opt.id}
+                    className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-brand-line bg-brand-card px-2 py-1 text-xs text-brand-ink transition hover:bg-brand-surface-hover sm:py-1.5 sm:text-sm"
+                  >
+                    <span className="flex items-center gap-2">
+                      <input
+                        type={g.selectionType === "single" ? "radio" : "checkbox"}
+                        className="accent-brand-primary h-4 w-4 shrink-0"
+                        name={`og-${starterGroupId}-${item.id}-${g.id}`}
+                        checked={selected}
+                        onChange={() => {
+                          setGroupSelections((prev) => {
+                            const cur = prev[g.id] ?? [];
+                            let next: string[];
+                            if (g.selectionType === "single") {
+                              next = [opt.id];
+                            } else {
+                              next = selected ? cur.filter((id) => id !== opt.id) : [...cur, opt.id];
+                              if (next.length > g.maxSelections) return prev;
+                            }
+                            return { ...prev, [g.id]: next };
+                          });
+                        }}
+                      />
+                      {opt.label[language]}
+                    </span>
+                    <span className="tabular-nums text-brand-subtle">+ {formatPriceEur(opt.extraPriceEur ?? 0, language)}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        ))}
 
         <div className="mt-auto border-t border-brand-line pt-3 sm:pt-4">
           <div className="flex items-center justify-between gap-2.5 sm:gap-3">
@@ -234,12 +310,12 @@ export function OrderMenuItem({
                     {formatPriceEur(item.priceEur, language)}
                   </span>
                   <span className="text-xl font-bold tabular-nums text-brand-price sm:text-2xl">
-                    {formatPriceEur(getEffectivePriceEur(item, orderChoiceId || null), language)}
+                    {formatPriceEur(getEffectivePriceEur(item, orderChoiceId || null) + optionSelectionExtraEur(visibleReusableGroups, groupSelections), language)}
                   </span>
                 </span>
               ) : (
                 <span className="text-xl font-bold tabular-nums text-brand-price sm:text-2xl">
-                  {formatPriceEur(getEffectivePriceEur(item, orderChoiceId || null), language)}
+                  {formatPriceEur(getEffectivePriceEur(item, orderChoiceId || null) + optionSelectionExtraEur(visibleReusableGroups, groupSelections), language)}
                 </span>
               )}
             </span>
@@ -257,7 +333,7 @@ export function OrderMenuItem({
               <button
                 type="button"
                 onClick={onAdd}
-                disabled={isSoldOut || (needsStarter && !starterId) || (!!selectionGroup?.required && !orderChoiceId)}
+                disabled={isSoldOut || (needsStarter && !starterId) || (!!selectionGroup?.required && !orderChoiceId) || !validateOptionGroupSelections(visibleReusableGroups, groupSelections)}
                 className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-xl"
                 aria-label="Increase"
               >

@@ -1,0 +1,51 @@
+[
+  {
+    "id": "og-4cc933a6",
+    "name": {
+      "de": "Beilagen",
+      "en": "Sides"
+    },
+    "required": false,
+    "selectionType": "single",
+    "minSelections": 0,
+    "maxSelections": 1,
+    "options": [
+      {
+        "id": "opt-d9fc92d8",
+        "label": {
+          "de": "Ohne Beilage",
+          "en": "Without side"
+        },
+        "extraPriceEur": 0
+      },
+      {
+        "id": "opt-6c5030d6",
+        "label": {
+          "de": "Jasminreis",
+          "en": "Jasmine rice"
+        },
+        "extraPriceEur": 2.5
+      },
+      {
+        "id": "opt-276cf6cb",
+        "label": {
+          "de": "Eierreis mit Gemüse",
+          "en": "Egg fried rice with vegetables"
+        },
+        "extraPriceEur": 5
+      },
+      {
+        "id": "opt-832ceaed",
+        "label": {
+          "de": "Gebratene Nudeln mit Gemüse",
+          "en": "noodles"
+        },
+        "extraPriceEur": 5
+      }
+    ],
+    "linkedCategoryIds": [
+      "warm-dishes"
+    ],
+    "linkedDishIds": []
+  }
+]
