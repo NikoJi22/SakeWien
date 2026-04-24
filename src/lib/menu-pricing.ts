@@ -48,6 +48,15 @@ export function getDiscountedPriceEur(item: MenuItem): number | null {
 
 export function resolveOrderChoiceBasePriceEur(item: MenuItem, orderChoiceId?: string | null): number {
   const opt = findItemSelectionOption(item, orderChoiceId);
+  const selectionGroup = item.variants?.length
+    ? { priceMode: "absolute" as const }
+    : { priceMode: item.orderChoiceGroup?.priceMode ?? "absolute" };
+  if (selectionGroup.priceMode === "surcharge") {
+    const extra = typeof opt?.extraPriceEur === "number" && Number.isFinite(opt.extraPriceEur) && opt.extraPriceEur >= 0
+      ? opt.extraPriceEur
+      : 0;
+    return item.priceEur + extra;
+  }
   if (typeof opt?.priceEur === "number" && Number.isFinite(opt.priceEur) && opt.priceEur >= 0) {
     return opt.priceEur;
   }

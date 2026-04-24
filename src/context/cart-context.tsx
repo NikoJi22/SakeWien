@@ -92,7 +92,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const selectionGroup = getItemSelectionGroup(item);
       const fallbackChoice =
         !orderChoiceId && selectionGroup?.required && (selectionGroup.options.length ?? 0) > 0
-          ? selectionGroup.options[0]
+          ? selectionGroup.options.find((opt) => opt.id === selectionGroup.defaultOptionId) ?? selectionGroup.options[0]
           : undefined;
       const orderChoice = orderChoiceId ? findItemSelectionOption(item, orderChoiceId) ?? fallbackChoice : fallbackChoice;
       if (itemRequiresLunchStarter(item)) {

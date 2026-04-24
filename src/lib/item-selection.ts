@@ -3,6 +3,8 @@ import type { MenuItem, OrderChoiceOption } from "@/lib/menu-types";
 export type ItemSelectionGroup = {
   label: { de: string; en: string };
   required: boolean;
+  priceMode: "absolute" | "surcharge";
+  defaultOptionId?: string;
   options: OrderChoiceOption[];
 };
 
@@ -11,6 +13,7 @@ export function getItemSelectionGroup(item: MenuItem): ItemSelectionGroup | null
     return {
       label: { de: "Variante", en: "Variant" },
       required: true,
+      priceMode: "absolute",
       options: item.variants.map((variant) => ({
         id: variant.id,
         name: variant.label,
@@ -22,6 +25,8 @@ export function getItemSelectionGroup(item: MenuItem): ItemSelectionGroup | null
     return {
       label: item.orderChoiceGroup.label,
       required: !!item.orderChoiceGroup.required,
+      priceMode: item.orderChoiceGroup.priceMode ?? "absolute",
+      defaultOptionId: item.orderChoiceGroup.defaultOptionId,
       options: item.orderChoiceGroup.options
     };
   }

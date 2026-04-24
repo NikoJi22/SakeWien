@@ -15,11 +15,17 @@ export type OrderChoiceOption = {
   name: { en: string; de: string };
   /** Optional absolute price override for this option. */
   priceEur?: number;
+  /** Optional surcharge added to item base price (legacy options without this remain 0 surcharge). */
+  extraPriceEur?: number;
 };
 
 export type OrderChoiceGroup = {
   label: { en: string; de: string };
   required?: boolean;
+  /** "absolute" = option defines final base price; "surcharge" = option adds extraPriceEur to item base price. */
+  priceMode?: "absolute" | "surcharge";
+  /** Optional default selected option id (useful when one side is included, alternatives cost extra). */
+  defaultOptionId?: string;
   options: OrderChoiceOption[];
 };
 

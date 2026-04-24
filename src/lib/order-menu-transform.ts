@@ -73,14 +73,38 @@ function withWarmDishSideSelection(items: MenuItem[]): MenuItem[] {
   return items.map((item) => {
     const next = cloneItem(item);
     if (next.variants?.length) return next;
-    if (next.orderChoiceGroup?.options?.length) return next;
+    if (next.orderChoiceGroup?.options?.length) {
+      const group = next.orderChoiceGroup;
+      const hasNoSide = group.options.some((opt) => opt.id === "side-none");
+      const normalizedOptions = hasNoSide
+        ? group.options
+        : [
+            {
+              id: "side-none",
+              name: { de: "Ohne Beilage", en: "Without side" },
+              extraPriceEur: 0
+            },
+            ...group.options
+          ];
+      next.orderChoiceGroup = {
+        ...group,
+        required: true,
+        priceMode: "surcharge",
+        defaultOptionId: group.defaultOptionId ?? "side-none",
+        options: normalizedOptions
+      };
+      return next;
+    }
     next.orderChoiceGroup = {
       label: { de: "Beilage", en: "Side" },
       required: true,
+      priceMode: "surcharge",
+      defaultOptionId: "side-none",
       options: [
-        { id: "side-rice", name: { de: "Reis", en: "Rice" } },
-        { id: "side-noodles", name: { de: "Nudeln", en: "Noodles" } },
-        { id: "side-egg-rice", name: { de: "Eierreis", en: "Egg fried rice" } }
+        { id: "side-none", name: { de: "Ohne Beilage", en: "Without side" }, extraPriceEur: 0 },
+        { id: "side-rice", name: { de: "Jasminreis", en: "Jasmine rice" }, extraPriceEur: 2.5 },
+        { id: "side-noodles", name: { de: "Gebratene Nudeln mit Gemüse", en: "Fried noodles with vegetables" }, extraPriceEur: 5.0 },
+        { id: "side-egg-rice", name: { de: "Eierreis mit Gemüse", en: "Egg fried rice with vegetables" }, extraPriceEur: 5.0 }
       ]
     };
     return next;

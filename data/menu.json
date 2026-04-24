@@ -1553,7 +1553,42 @@
         ],
         "vegetarian": true,
         "vegan": true,
-        "spicyLevel": 0
+        "spicyLevel": 0,
+        "orderChoiceGroup": {
+          "label": {
+            "de": "Beilage",
+            "en": "Side"
+          },
+          "required": true,
+          "priceMode": "surcharge",
+          "defaultOptionId": "side-rice",
+          "options": [
+            {
+              "id": "side-rice",
+              "name": {
+                "de": "Jasminreis",
+                "en": "Jasmine rice"
+              },
+              "extraPriceEur": 2.5
+            },
+            {
+              "id": "side-noodles",
+              "name": {
+                "de": "Gebratene Nudeln mit Gemüse",
+                "en": "Fried noodles with vegetables"
+              },
+              "extraPriceEur": 5
+            },
+            {
+              "id": "side-egg-rice",
+              "name": {
+                "de": "Eierreis mit Gemüse",
+                "en": "Egg fried rice with vegetables"
+              },
+              "extraPriceEur": 6
+            }
+          ]
+        }
       },
       {
         "id": "warm-red-curry-tofu",
@@ -1573,7 +1608,42 @@
         "vegetarian": true,
         "vegan": true,
         "spicy": true,
-        "spicyLevel": 1
+        "spicyLevel": 1,
+        "orderChoiceGroup": {
+          "label": {
+            "de": "Beilage",
+            "en": "Side"
+          },
+          "required": true,
+          "priceMode": "surcharge",
+          "defaultOptionId": "side-rice",
+          "options": [
+            {
+              "id": "side-rice",
+              "name": {
+                "de": "Jasminreis",
+                "en": "Jasmine rice"
+              },
+              "extraPriceEur": 2.5
+            },
+            {
+              "id": "side-noodles",
+              "name": {
+                "de": "Gebratene Nudeln mit Gemüse",
+                "en": "Fried noodles with vegetables"
+              },
+              "extraPriceEur": 5
+            },
+            {
+              "id": "side-egg-rice",
+              "name": {
+                "de": "Eierreis mit Gemüse",
+                "en": "Egg fried rice with vegetables"
+              },
+              "extraPriceEur": 5
+            }
+          ]
+        }
       },
       {
         "id": "warm-cashew-tofu",

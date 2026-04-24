@@ -20,6 +20,33 @@ const AUTOSAVE_DELAY_MS = 8000;
 const ALWAYS_VISIBLE_ADMIN_CATEGORY_IDS = ["lunch", "maki-cat", "sushi", "warm-dishes"] as const;
 const ALWAYS_VISIBLE_ADMIN_CATEGORY_SET = new Set<string>(ALWAYS_VISIBLE_ADMIN_CATEGORY_IDS);
 
+function ensureWarmDishNoSideOption(categories: MenuCategory[]): MenuCategory[] {
+  return categories.map((cat) => {
+    if (cat.id !== "warm-dishes") return cat;
+    return {
+      ...cat,
+      items: cat.items.map((item) => {
+        const group = item.orderChoiceGroup;
+        if (!group?.options?.length) return item;
+        const hasNoSide = group.options.some((o) => o.id === "side-none");
+        if (hasNoSide && group.defaultOptionId) return item;
+        return {
+          ...item,
+          orderChoiceGroup: {
+            ...group,
+            required: true,
+            priceMode: "surcharge",
+            defaultOptionId: group.defaultOptionId ?? "side-none",
+            options: hasNoSide
+              ? group.options
+              : [{ id: "side-none", name: { de: "Ohne Beilage", en: "Without side" }, extraPriceEur: 0 }, ...group.options]
+          }
+        };
+      })
+    };
+  });
+}
+
 function cloneMenu(c: MenuCategory[]): MenuCategory[] {
   return JSON.parse(JSON.stringify(c)) as MenuCategory[];
 }
@@ -208,7 +235,7 @@ export function AdminDashboard() {
       if (thisId !== loadRequestId.current) return;
       if (!menuRes.ok) throw new Error("Menu load failed");
       const menuData = (await menuRes.json()) as MenuCategory[];
-      const list = cloneMenu(Array.isArray(menuData) ? menuData : []);
+      const list = ensureWarmDishNoSideOption(cloneMenu(Array.isArray(menuData) ? menuData : []));
       if (thisId !== loadRequestId.current) return;
       setCategories(list);
       setExpandedCat((prev) => {
@@ -769,6 +796,137 @@ export function AdminDashboard() {
     );
   }
 
+  function shouldShowSideOptions(catIndex: number, item: MenuItem): boolean {
+    const catId = categories[catIndex]?.id;
+    if (catId === "warm-dishes") return true;
+    const labelDe = item.orderChoiceGroup?.label?.de?.toLowerCase() ?? "";
+    const labelEn = item.orderChoiceGroup?.label?.en?.toLowerCase() ?? "";
+    return labelDe.includes("beilage") || labelEn.includes("side");
+  }
+
+  function ensureSideChoiceGroup(catIndex: number, itemIndex: number) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        if (item.orderChoiceGroup?.options?.length) return item;
+        return {
+          ...item,
+          orderChoiceGroup: {
+            label: { de: "Beilage", en: "Side" },
+            required: true,
+            priceMode: "surcharge",
+            defaultOptionId: "side-none",
+            options: [
+              { id: "side-none", name: { de: "Ohne Beilage", en: "Without side" }, extraPriceEur: 0 },
+              { id: "side-rice", name: { de: "Jasminreis", en: "Jasmine rice" }, extraPriceEur: 2.5 },
+              { id: "side-noodles", name: { de: "Gebratene Nudeln mit Gemüse", en: "Fried noodles with vegetables" }, extraPriceEur: 5 },
+              { id: "side-egg-rice", name: { de: "Eierreis mit Gemüse", en: "Egg fried rice with vegetables" }, extraPriceEur: 5 }
+            ]
+          }
+        };
+      })
+    );
+  }
+
+  function setSideGroupLabel(catIndex: number, itemIndex: number, lang: "de" | "en", value: string) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const group = item.orderChoiceGroup;
+        if (!group) return item;
+        return { ...item, orderChoiceGroup: { ...group, label: { ...group.label, [lang]: value } } };
+      })
+    );
+  }
+
+  function setSideDefaultOption(catIndex: number, itemIndex: number, optionId: string) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const group = item.orderChoiceGroup;
+        if (!group) return item;
+        return { ...item, orderChoiceGroup: { ...group, defaultOptionId: optionId, priceMode: "surcharge", required: true } };
+      })
+    );
+  }
+
+  function updateSideOption(
+    catIndex: number,
+    itemIndex: number,
+    optionIndex: number,
+    field: "name.de" | "name.en" | "extraPriceEur",
+    value: string
+  ) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const group = item.orderChoiceGroup;
+        if (!group?.options?.[optionIndex]) return item;
+        const options = [...group.options];
+        const target = options[optionIndex];
+        if (field === "name.de") {
+          options[optionIndex] = { ...target, name: { ...target.name, de: value } };
+        } else if (field === "name.en") {
+          options[optionIndex] = { ...target, name: { ...target.name, en: value } };
+        } else {
+          const parsed = parseAdminPriceEur(value);
+          options[optionIndex] = { ...target, extraPriceEur: parsed === "invalid" || parsed === "empty" ? 0 : parsed };
+        }
+        return {
+          ...item,
+          orderChoiceGroup: { ...group, priceMode: "surcharge", required: true, options }
+        };
+      })
+    );
+  }
+
+  function addSideOption(catIndex: number, itemIndex: number) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const group = item.orderChoiceGroup;
+        if (!group) return item;
+        return {
+          ...item,
+          orderChoiceGroup: {
+            ...group,
+            priceMode: "surcharge",
+            required: true,
+            options: [
+              ...group.options,
+              {
+                id: `side-${crypto.randomUUID().slice(0, 8)}`,
+                name: { de: "Neue Beilage", en: "New side" },
+                extraPriceEur: 0
+              }
+            ]
+          }
+        };
+      })
+    );
+  }
+
+  function removeSideOption(catIndex: number, itemIndex: number, optionIndex: number) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const group = item.orderChoiceGroup;
+        if (!group?.options?.[optionIndex]) return item;
+        const nextOptions = group.options.filter((_, i) => i !== optionIndex);
+        const nextDefault =
+          group.defaultOptionId && nextOptions.some((o) => o.id === group.defaultOptionId)
+            ? group.defaultOptionId
+            : nextOptions[0]?.id;
+        return {
+          ...item,
+          orderChoiceGroup: nextOptions.length
+            ? {
+                ...group,
+                options: nextOptions,
+                defaultOptionId: nextDefault,
+                priceMode: "surcharge",
+                required: true
+              }
+            : undefined
+        };
+      })
+    );
+  }
+
   const addDishButtonClass =
     "rounded-full border border-brand-primary/70 bg-brand-primary/10 px-5 py-2.5 text-sm font-semibold tracking-wide text-brand-primary transition hover:bg-brand-primary/20";
 
@@ -1305,9 +1463,16 @@ export function AdminDashboard() {
                     !q && dragOverCategoryBeforeIndex === ci ? "ring-2 ring-brand-primary/40 ring-offset-2 ring-offset-neutral-50" : ""
                   } ${draggingCategoryIndex === ci ? "opacity-70" : ""}`}
                 >
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => toggleCat(cat.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        toggleCat(cat.id);
+                      }
+                    }}
                     className="flex w-full items-center gap-3 border-b border-[#eeeeee] bg-neutral-50/80 px-4 py-4 text-left transition hover:bg-neutral-100 sm:px-5"
                   >
                     {!q && (
@@ -1323,7 +1488,10 @@ export function AdminDashboard() {
                             setDraggingCategoryIndex(null);
                             setDragOverCategoryBeforeIndex(null);
                           }}
-                          onClick={(e) => e.preventDefault()}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           className="flex cursor-grab touch-none flex-col items-center justify-center gap-0.5 px-2 py-1.5 text-neutral-400 active:cursor-grabbing"
                           aria-label="Kategorie ziehen, um die Reihenfolge zu ändern"
                           title="Kategorie ziehen"
@@ -1373,7 +1541,7 @@ export function AdminDashboard() {
                       </p>
                     </div>
                     <span className="hidden text-[10px] uppercase tracking-wider text-neutral-400 sm:inline">{open ? "Collapse" : "Expand"}</span>
-                  </button>
+                  </div>
 
                   {open && (
                     <div className="space-y-0 p-4 sm:p-5 sm:pt-2">
@@ -1684,6 +1852,114 @@ export function AdminDashboard() {
                                   </p>
                                 )}
                               </div>
+                              {shouldShowSideOptions(ci, item) && (
+                                <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Beilage Optionen</p>
+                                    <div className="flex items-center gap-3">
+                                      {!item.orderChoiceGroup?.options?.length && (
+                                        <button
+                                          type="button"
+                                          onClick={() => ensureSideChoiceGroup(ci, ii)}
+                                          className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
+                                        >
+                                          Standard-Beilagen laden
+                                        </button>
+                                      )}
+                                      {item.orderChoiceGroup?.options?.length ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => addSideOption(ci, ii)}
+                                          className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
+                                        >
+                                          Beilage hinzufügen
+                                        </button>
+                                      ) : null}
+                                    </div>
+                                  </div>
+                                  <p className="text-xs text-neutral-500">
+                                    Aufpreis wird zum Gerichtspreis addiert. Ohne Wert gilt automatisch 0,00 EUR.
+                                  </p>
+                                  {item.orderChoiceGroup?.options?.length ? (
+                                    <>
+                                      <div className="grid gap-3 sm:grid-cols-2">
+                                        <AdminField label="Gruppenlabel DE">
+                                          <input
+                                            value={item.orderChoiceGroup.label.de}
+                                            onChange={(e) => setSideGroupLabel(ci, ii, "de", e.target.value)}
+                                            className={adminInputClass}
+                                          />
+                                        </AdminField>
+                                        <AdminField label="Gruppenlabel EN">
+                                          <input
+                                            value={item.orderChoiceGroup.label.en}
+                                            onChange={(e) => setSideGroupLabel(ci, ii, "en", e.target.value)}
+                                            className={adminInputClass}
+                                          />
+                                        </AdminField>
+                                      </div>
+                                      <div className="space-y-3">
+                                        {item.orderChoiceGroup.options.map((opt, oi) => (
+                                          <div
+                                            key={`${opt.id}-${oi}`}
+                                            className="grid gap-2 rounded-lg border border-[#eeeeee] bg-neutral-50/80 p-3 sm:grid-cols-2 lg:grid-cols-5"
+                                          >
+                                            <AdminField label="Name DE">
+                                              <input
+                                                value={opt.name.de}
+                                                onChange={(e) => updateSideOption(ci, ii, oi, "name.de", e.target.value)}
+                                                className={adminInputClass}
+                                              />
+                                            </AdminField>
+                                            <AdminField label="Name EN">
+                                              <input
+                                                value={opt.name.en}
+                                                onChange={(e) => updateSideOption(ci, ii, oi, "name.en", e.target.value)}
+                                                className={adminInputClass}
+                                              />
+                                            </AdminField>
+                                            <AdminField label="Aufpreis (EUR)">
+                                              <input
+                                                type="number"
+                                                inputMode="decimal"
+                                                min={0}
+                                                step={0.1}
+                                                value={typeof opt.extraPriceEur === "number" ? opt.extraPriceEur : 0}
+                                                onChange={(e) => updateSideOption(ci, ii, oi, "extraPriceEur", e.target.value)}
+                                                className={adminInputClass}
+                                              />
+                                            </AdminField>
+                                            <div className="flex items-end">
+                                              <button
+                                                type="button"
+                                                onClick={() => setSideDefaultOption(ci, ii, opt.id)}
+                                                className={`text-[10px] font-semibold uppercase hover:underline ${
+                                                  item.orderChoiceGroup?.defaultOptionId === opt.id ? "text-emerald-700" : "text-neutral-500"
+                                                }`}
+                                              >
+                                                {item.orderChoiceGroup?.defaultOptionId === opt.id ? "Standard-Beilage" : "Als Standard"}
+                                              </button>
+                                            </div>
+                                            <div className="flex items-end">
+                                              <button
+                                                type="button"
+                                                onClick={() => removeSideOption(ci, ii, oi)}
+                                                className="text-[10px] font-semibold uppercase text-red-400/90 hover:underline"
+                                              >
+                                                Beilage löschen
+                                              </button>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <p className="text-xs text-neutral-500">
+                                      Noch keine Beilage-Optionen vorhanden.
+                                    </p>
+                                  )}
+                                </div>
+                              )}
                               <div className="lg:col-span-2">
                                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Flags</p>
                                 <div className="flex flex-wrap gap-3 sm:gap-4">

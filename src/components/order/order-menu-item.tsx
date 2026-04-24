@@ -44,7 +44,7 @@ export function OrderMenuItem({
   const starterConfig = item.lunchStarterChoice;
   const needsStarter = itemRequiresLunchStarter(item);
   const selectionGroup = getItemSelectionGroup(item);
-  const [orderChoiceId, setOrderChoiceId] = useState(selectionGroup?.options?.[0]?.id ?? "");
+  const [orderChoiceId, setOrderChoiceId] = useState(selectionGroup?.defaultOptionId ?? selectionGroup?.options?.[0]?.id ?? "");
   const firstStarterId = starterConfig?.options[0]?.id ?? "";
   const [starterId, setStarterId] = useState(firstStarterId);
 
@@ -63,8 +63,10 @@ export function OrderMenuItem({
       setOrderChoiceId("");
       return;
     }
-    setOrderChoiceId((cur) => (opts.some((o) => o.id === cur) ? cur : opts[0].id));
-  }, [item.id, selectionGroup?.options]);
+    setOrderChoiceId((cur) =>
+      opts.some((o) => o.id === cur) ? cur : (selectionGroup?.defaultOptionId ?? opts[0].id)
+    );
+  }, [item.id, selectionGroup?.options, selectionGroup?.defaultOptionId]);
 
   /** Warenkorb-Zeile nutzt gewählten Starter in der Key — UI-Radio sonst ≠ Key → Menge 0, Minus wirkungslos */
   useEffect(() => {
@@ -210,7 +212,11 @@ export function OrderMenuItem({
                     />
                     {opt.name[language]}
                   </span>
-                  {typeof opt.priceEur === "number" ? (
+                  {selectionGroup.priceMode === "surcharge" ? (
+                    <span className="tabular-nums text-brand-subtle">
+                      + {formatPriceEur(typeof opt.extraPriceEur === "number" ? opt.extraPriceEur : 0, language)}
+                    </span>
+                  ) : typeof opt.priceEur === "number" ? (
                     <span className="tabular-nums text-brand-subtle">{formatPriceEur(opt.priceEur, language)}</span>
                   ) : null}
                 </label>

@@ -67,6 +67,48 @@ function sanitizeVariants(raw: unknown): MenuItemVariant[] | undefined {
   return cleaned.length ? cleaned : undefined;
 }
 
+function sanitizeOrderChoiceGroup(raw: unknown): MenuItem["orderChoiceGroup"] | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const rec = raw as Record<string, unknown>;
+  const label = rec.label;
+  if (!label || typeof label !== "object") return undefined;
+  const lb = label as Record<string, unknown>;
+  if (typeof lb.de !== "string" || typeof lb.en !== "string") return undefined;
+  const optionsRaw = rec.options;
+  if (!Array.isArray(optionsRaw) || optionsRaw.length === 0) return undefined;
+  const options: NonNullable<MenuItem["orderChoiceGroup"]>["options"] = [];
+  for (const optRaw of optionsRaw) {
+    if (!optRaw || typeof optRaw !== "object") continue;
+    const opt = optRaw as Record<string, unknown>;
+    if (typeof opt.id !== "string" || !opt.name || typeof opt.name !== "object") continue;
+    const n = opt.name as Record<string, unknown>;
+    if (typeof n.de !== "string" || typeof n.en !== "string") continue;
+    const id = opt.id.trim();
+    if (!id) continue;
+    const priceNum = typeof opt.priceEur === "number" ? opt.priceEur : Number(opt.priceEur);
+    const extraNum = typeof opt.extraPriceEur === "number" ? opt.extraPriceEur : Number(opt.extraPriceEur);
+    options.push({
+      id,
+      name: { de: n.de.trim(), en: n.en.trim() },
+      ...(Number.isFinite(priceNum) && priceNum >= 0 ? { priceEur: Math.round(priceNum * 100) / 100 } : {}),
+      ...(Number.isFinite(extraNum) && extraNum >= 0 ? { extraPriceEur: Math.round(extraNum * 100) / 100 } : {})
+    });
+  }
+  if (!options.length) return undefined;
+  const priceMode = rec.priceMode === "surcharge" ? "surcharge" : "absolute";
+  const defaultOrderChoiceId =
+    typeof rec.defaultOptionId === "string" && options.some((o) => o.id === rec.defaultOptionId)
+      ? rec.defaultOptionId
+      : undefined;
+  return {
+    label: { de: lb.de.trim(), en: lb.en.trim() },
+    required: !!rec.required,
+    priceMode,
+    defaultOptionId: defaultOrderChoiceId,
+    options
+  };
+}
+
 async function requireAdmin() {
   const store = await cookies();
   return verifyAdminSession(store.get(ADMIN_COOKIE)?.value);
@@ -137,6 +179,7 @@ export async function POST(request: Request) {
         const allergens = mi.allergens?.length ? normalizeAllergenCodes(mi.allergens) : undefined;
         const lunchStarterChoice = sanitizeLunchStarterChoice(mi.lunchStarterChoice);
         const variants = sanitizeVariants((mi as { variants?: unknown }).variants);
+        const orderChoiceGroup = sanitizeOrderChoiceGroup((mi as { orderChoiceGroup?: unknown }).orderChoiceGroup);
         const spicyLevel =
           mi.spicyLevel === 2 || mi.spicyLevel === 1 || mi.spicyLevel === 0
             ? mi.spicyLevel
@@ -149,7 +192,8 @@ export async function POST(request: Request) {
           ...(allergens?.length ? { allergens } : { allergens: undefined }),
           spicyLevel,
           lunchStarterChoice,
-          variants
+          variants,
+          orderChoiceGroup
         };
       })
     }));
