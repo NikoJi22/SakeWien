@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export-menu": "npx tsx scripts/export-menu.ts"
+    "export-menu": "npx tsx scripts/export-menu.ts",
+    "backup:live": "npx tsx scripts/backup-live.ts"
   },
   "dependencies": {
     "@vercel/blob": "^2.3.3",

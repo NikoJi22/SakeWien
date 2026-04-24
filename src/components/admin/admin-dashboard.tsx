@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { useRouter } from "next/navigation";
-import type { GiftConfig, MenuCategory, MenuItem, SiteContentConfig } from "@/lib/menu-types";
+import type { GiftConfig, MenuCategory, MenuItem, MenuItemVariant, SiteContentConfig } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
 import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
@@ -17,6 +17,8 @@ const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
 const DRAG_PAYLOAD_TYPE = "application/x-sake-menu-item";
 const CATEGORY_DRAG_PAYLOAD_TYPE = "application/x-sake-menu-category";
 const AUTOSAVE_DELAY_MS = 8000;
+const ALWAYS_VISIBLE_ADMIN_CATEGORY_IDS = ["lunch", "maki-cat", "sushi", "warm-dishes"] as const;
+const ALWAYS_VISIBLE_ADMIN_CATEGORY_SET = new Set<string>(ALWAYS_VISIBLE_ADMIN_CATEGORY_IDS);
 
 function cloneMenu(c: MenuCategory[]): MenuCategory[] {
   return JSON.parse(JSON.stringify(c)) as MenuCategory[];
@@ -209,9 +211,13 @@ export function AdminDashboard() {
       const list = cloneMenu(Array.isArray(menuData) ? menuData : []);
       if (thisId !== loadRequestId.current) return;
       setCategories(list);
-      if (list.some((c) => c.id === LUNCH_CATEGORY_ID)) {
-        setExpandedCat((prev) => ({ ...prev, [LUNCH_CATEGORY_ID]: true }));
-      }
+      setExpandedCat((prev) => {
+        const next = { ...prev };
+        for (const catId of ALWAYS_VISIBLE_ADMIN_CATEGORY_IDS) {
+          if (list.some((c) => c.id === catId)) next[catId] = true;
+        }
+        return next;
+      });
       if (giftRes.ok) {
         const g = (await giftRes.json()) as GiftConfig;
         if (thisId !== loadRequestId.current) return;
@@ -240,7 +246,10 @@ export function AdminDashboard() {
     () =>
       categories
         .map((cat, ci) => ({ cat, ci }))
-        .filter(({ cat }) => categoryMatchesSearch(cat, search)),
+        .filter(
+          ({ cat }) =>
+            ALWAYS_VISIBLE_ADMIN_CATEGORY_SET.has(cat.id) || categoryMatchesSearch(cat, search)
+        ),
     [categories, search]
   );
 
@@ -682,6 +691,80 @@ export function AdminDashboard() {
           return next;
         }
         return { ...item, lunchStarterChoice: { ...ch, options } };
+      })
+    );
+  }
+
+  function updateVariantField(
+    catIndex: number,
+    itemIndex: number,
+    variantIndex: number,
+    key: "id" | "priceEur",
+    value: string
+  ) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const variants = item.variants ?? [];
+        if (!variants[variantIndex]) return item;
+        const nextVariants = [...variants];
+        if (key === "priceEur") {
+          const parsed = parseAdminPriceEur(value);
+          if (parsed === "invalid" || parsed === "empty") {
+            nextVariants[variantIndex] = { ...nextVariants[variantIndex], priceEur: 0 };
+          } else {
+            nextVariants[variantIndex] = { ...nextVariants[variantIndex], priceEur: parsed };
+          }
+        } else {
+          nextVariants[variantIndex] = { ...nextVariants[variantIndex], id: value };
+        }
+        return { ...item, variants: nextVariants };
+      })
+    );
+  }
+
+  function updateVariantLabelField(
+    catIndex: number,
+    itemIndex: number,
+    variantIndex: number,
+    lang: "de" | "en",
+    value: string
+  ) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const variants = item.variants ?? [];
+        if (!variants[variantIndex]) return item;
+        const nextVariants = [...variants];
+        const current = nextVariants[variantIndex];
+        nextVariants[variantIndex] = {
+          ...current,
+          label: { ...current.label, [lang]: value }
+        };
+        return { ...item, variants: nextVariants };
+      })
+    );
+  }
+
+  function addVariantRow(catIndex: number, itemIndex: number) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const variants: MenuItemVariant[] = item.variants ? [...item.variants] : [];
+        variants.push({
+          id: `variant-${crypto.randomUUID().slice(0, 8)}`,
+          label: { de: "Neue Variante", en: "New variant" },
+          priceEur: item.priceEur
+        });
+        return { ...item, variants };
+      })
+    );
+  }
+
+  function removeVariantRow(catIndex: number, itemIndex: number, variantIndex: number) {
+    setCategories((prev) =>
+      replaceItemAt(prev, catIndex, itemIndex, (item) => {
+        const variants = item.variants ?? [];
+        if (!variants[variantIndex]) return item;
+        const nextVariants = variants.filter((_, i) => i !== variantIndex);
+        return { ...item, variants: nextVariants.length ? nextVariants : undefined };
       })
     );
   }
@@ -1535,6 +1618,72 @@ export function AdminDashboard() {
                                 imageUrl={item.image}
                                 onChange={(url) => setItemField(ci, ii, "image", url)}
                               />
+                              <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
+                                <div className="flex items-center justify-between gap-3">
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Varianten / Größen</p>
+                                  <button
+                                    type="button"
+                                    onClick={() => addVariantRow(ci, ii)}
+                                    className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
+                                  >
+                                    Variante hinzufügen
+                                  </button>
+                                </div>
+                                <p className="text-xs text-neutral-500">
+                                  Wenn Varianten vorhanden sind, muss der Kunde im Bestellbereich eine Variante auswählen.
+                                </p>
+                                {item.variants?.length ? (
+                                  <div className="space-y-3">
+                                    {item.variants.map((variant, vi) => (
+                                      <div
+                                        key={`${variant.id}-${vi}`}
+                                        className="grid gap-2 rounded-lg border border-[#eeeeee] bg-neutral-50/80 p-3 sm:grid-cols-2 lg:grid-cols-4"
+                                      >
+                                        <AdminField label="Label DE">
+                                          <input
+                                            value={variant.label.de}
+                                            onChange={(e) => updateVariantLabelField(ci, ii, vi, "de", e.target.value)}
+                                            className={adminInputClass}
+                                            placeholder="z. B. 6 Stück"
+                                          />
+                                        </AdminField>
+                                        <AdminField label="Label EN">
+                                          <input
+                                            value={variant.label.en}
+                                            onChange={(e) => updateVariantLabelField(ci, ii, vi, "en", e.target.value)}
+                                            className={adminInputClass}
+                                            placeholder="e.g. 6 pcs"
+                                          />
+                                        </AdminField>
+                                        <AdminField label="Preis (EUR)">
+                                          <input
+                                            type="number"
+                                            inputMode="decimal"
+                                            min={0}
+                                            step={0.1}
+                                            value={variant.priceEur}
+                                            onChange={(e) => updateVariantField(ci, ii, vi, "priceEur", e.target.value)}
+                                            className={adminInputClass}
+                                          />
+                                        </AdminField>
+                                        <div className="flex items-end">
+                                          <button
+                                            type="button"
+                                            onClick={() => removeVariantRow(ci, ii, vi)}
+                                            className="text-[10px] font-semibold uppercase text-red-400/90 hover:underline"
+                                          >
+                                            Variante löschen
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-neutral-500">
+                                    Keine Varianten gesetzt. Dann gilt der normale Einzelpreis.
+                                  </p>
+                                )}
+                              </div>
                               <div className="lg:col-span-2">
                                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Flags</p>
                                 <div className="flex flex-wrap gap-3 sm:gap-4">

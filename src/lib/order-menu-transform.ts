@@ -72,6 +72,7 @@ function collapseQuantityVariants(items: MenuItem[]): MenuItem[] {
 function withWarmDishSideSelection(items: MenuItem[]): MenuItem[] {
   return items.map((item) => {
     const next = cloneItem(item);
+    if (next.variants?.length) return next;
     if (next.orderChoiceGroup?.options?.length) return next;
     next.orderChoiceGroup = {
       label: { de: "Beilage", en: "Side" },

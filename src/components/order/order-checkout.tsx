@@ -9,6 +9,7 @@ import { useSiteContent } from "@/context/site-content-context";
 import { useLanguage } from "@/context/language-context";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
+import { getItemSelectionGroup } from "@/lib/item-selection";
 import { DELIVERY_MIN_ORDER_EUR } from "@/lib/order-config";
 import {
   canAcceptNewOrdersVienna,
@@ -540,7 +541,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         id: lineKey,
         name: `${starterChoice
           ? `${item.name[language]} — ${item.lunchStarterChoice!.label[language]}: ${starterChoice.name[language]}`
-          : item.name[language]}${orderChoice ? ` — ${item.orderChoiceGroup?.label[language]}: ${orderChoice.name[language]}` : ""}`,
+          : item.name[language]}${orderChoice ? ` — ${getItemSelectionGroup(item)?.label[language]}: ${orderChoice.name[language]}` : ""}`,
         quantity,
         unitPriceEur: getEffectivePriceEur(item, orderChoice?.id),
         lineTotalEur: getEffectivePriceEur(item, orderChoice?.id) * quantity
@@ -695,7 +696,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
                     )}
                     {orderChoice && (
                       <span className="mt-0.5 block text-xs font-normal text-brand-body">
-                        {item.orderChoiceGroup?.label[language]}: {orderChoice.name[language]}
+                        {getItemSelectionGroup(item)?.label[language]}: {orderChoice.name[language]}
                       </span>
                     )}
                     {(sushiExtras?.wasabi || sushiExtras?.ginger) && (

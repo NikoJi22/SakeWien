@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { useMenuData } from "@/context/menu-data-context";
 import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey, resolveStarterOption } from "@/lib/cart-line-key";
 import { getEffectivePriceEur } from "@/lib/menu-pricing";
+import { findItemSelectionOption, getItemSelectionGroup } from "@/lib/item-selection";
 import type { LunchStarterOption, MenuItem, OrderChoiceOption } from "@/lib/menu-types";
 
 export type CartLine = {
@@ -53,7 +54,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const orderChoiceId = opts?.orderChoiceId ?? null;
         const needStarter = itemRequiresLunchStarter(item);
         if (needStarter && !starterOptionId) return prev;
-        const requiredOrderChoice = !!item.orderChoiceGroup?.required && (item.orderChoiceGroup.options?.length ?? 0) > 0;
+        const selectionGroup = getItemSelectionGroup(item);
+        const requiredOrderChoice = !!selectionGroup?.required && (selectionGroup.options?.length ?? 0) > 0;
         if (requiredOrderChoice && !orderChoiceId) return prev;
         const key = cartLineKey(itemId, needStarter ? starterOptionId! : null, {
           wasabi: opts?.wasabi,
@@ -87,13 +89,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const { itemId, starterOptionId, orderChoiceId, extras } = parseCartLineKey(key);
       const item = itemById[itemId];
       if (!item) continue;
+      const selectionGroup = getItemSelectionGroup(item);
       const fallbackChoice =
-        !orderChoiceId && item.orderChoiceGroup?.required && item.orderChoiceGroup.options.length > 0
-          ? item.orderChoiceGroup.options[0]
+        !orderChoiceId && selectionGroup?.required && (selectionGroup.options.length ?? 0) > 0
+          ? selectionGroup.options[0]
           : undefined;
-      const orderChoice = orderChoiceId
-        ? item.orderChoiceGroup?.options?.find((o) => o.id === orderChoiceId) ?? fallbackChoice
-        : fallbackChoice;
+      const orderChoice = orderChoiceId ? findItemSelectionOption(item, orderChoiceId) ?? fallbackChoice : fallbackChoice;
       if (itemRequiresLunchStarter(item)) {
         if (!starterOptionId) continue;
         const opt = resolveStarterOption(item, starterOptionId);

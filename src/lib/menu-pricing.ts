@@ -1,4 +1,5 @@
 import type { MenuItem } from "./menu-types";
+import { findItemSelectionOption } from "./item-selection";
 
 type ParsedDeal =
   | { kind: "percent"; value: number }
@@ -46,9 +47,7 @@ export function getDiscountedPriceEur(item: MenuItem): number | null {
 }
 
 export function resolveOrderChoiceBasePriceEur(item: MenuItem, orderChoiceId?: string | null): number {
-  const opt = orderChoiceId
-    ? item.orderChoiceGroup?.options?.find((o) => o.id === orderChoiceId)
-    : undefined;
+  const opt = findItemSelectionOption(item, orderChoiceId);
   if (typeof opt?.priceEur === "number" && Number.isFinite(opt.priceEur) && opt.priceEur >= 0) {
     return opt.priceEur;
   }

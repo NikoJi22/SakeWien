@@ -6,6 +6,7 @@ import type { MenuItem } from "@/lib/menu-types";
 import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey } from "@/lib/cart-line-key";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getDiscountedPriceEur, getEffectivePriceEur } from "@/lib/menu-pricing";
+import { getItemSelectionGroup } from "@/lib/item-selection";
 import { useCart } from "@/context/cart-context";
 import { useLanguage } from "@/context/language-context";
 import { MenuAllergenChips } from "@/components/menu/menu-diet-allergen";
@@ -42,8 +43,8 @@ export function OrderMenuItem({
   const discountedPrice = getDiscountedPriceEur(item);
   const starterConfig = item.lunchStarterChoice;
   const needsStarter = itemRequiresLunchStarter(item);
-  const orderChoiceGroup = item.orderChoiceGroup;
-  const [orderChoiceId, setOrderChoiceId] = useState(orderChoiceGroup?.options?.[0]?.id ?? "");
+  const selectionGroup = getItemSelectionGroup(item);
+  const [orderChoiceId, setOrderChoiceId] = useState(selectionGroup?.options?.[0]?.id ?? "");
   const firstStarterId = starterConfig?.options[0]?.id ?? "";
   const [starterId, setStarterId] = useState(firstStarterId);
 
@@ -57,13 +58,13 @@ export function OrderMenuItem({
   }, [item.id, item.lunchStarterChoice?.options]);
 
   useEffect(() => {
-    const opts = item.orderChoiceGroup?.options;
+    const opts = selectionGroup?.options;
     if (!opts?.length) {
       setOrderChoiceId("");
       return;
     }
     setOrderChoiceId((cur) => (opts.some((o) => o.id === cur) ? cur : opts[0].id));
-  }, [item.id, item.orderChoiceGroup?.options]);
+  }, [item.id, selectionGroup?.options]);
 
   /** Warenkorb-Zeile nutzt gewählten Starter in der Key — UI-Radio sonst ≠ Key → Menge 0, Minus wirkungslos */
   useEffect(() => {
@@ -71,7 +72,7 @@ export function OrderMenuItem({
       if (v <= 0) continue;
       const p = parseCartLineKey(k);
       if (p.itemId !== item.id) continue;
-      if (p.orderChoiceId && item.orderChoiceGroup?.options?.some((o) => o.id === p.orderChoiceId)) {
+      if (p.orderChoiceId && selectionGroup?.options?.some((o) => o.id === p.orderChoiceId)) {
         setOrderChoiceId(p.orderChoiceId);
       }
       if (!needsStarter || !p.starterOptionId) continue;
@@ -80,7 +81,7 @@ export function OrderMenuItem({
         setStarterId(p.starterOptionId);
       }
     }
-  }, [quantities, item.id, item.lunchStarterChoice?.options, item.orderChoiceGroup?.options, needsStarter]);
+  }, [quantities, item.id, item.lunchStarterChoice?.options, selectionGroup?.options, needsStarter]);
 
   const lineKey = useMemo(
     () =>
@@ -104,7 +105,7 @@ export function OrderMenuItem({
 
   const onAdd = () => {
     if (needsStarter && !starterId) return;
-    if (orderChoiceGroup?.required && !orderChoiceId) return;
+    if (selectionGroup?.required && !orderChoiceId) return;
     addOne(item.id, {
       starterOptionId: needsStarter ? starterId : undefined,
       orderChoiceId: orderChoiceId || undefined
@@ -187,13 +188,13 @@ export function OrderMenuItem({
           </div>
         )}
 
-        {orderChoiceGroup?.options?.length ? (
+        {selectionGroup?.options?.length ? (
           <div className="mt-2 rounded-xl border border-brand-line bg-brand-canvas/80 px-2.5 py-2 sm:mt-3 sm:px-3 sm:py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-subtle">
-              {orderChoiceGroup.label[language]}
+              {selectionGroup.label[language]}
             </p>
-            <div className="mt-1.5 flex flex-col gap-1.5 sm:mt-2 sm:gap-2" role="radiogroup" aria-label={orderChoiceGroup.label[language]}>
-              {orderChoiceGroup.options.map((opt) => (
+            <div className="mt-1.5 flex flex-col gap-1.5 sm:mt-2 sm:gap-2" role="radiogroup" aria-label={selectionGroup.label[language]}>
+              {selectionGroup.options.map((opt) => (
                 <label
                   key={opt.id}
                   className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-brand-line bg-brand-card px-2 py-1 text-xs text-brand-ink transition hover:bg-brand-surface-hover has-[:checked]:border-brand-primary has-[:checked]:bg-brand-surface-hover sm:py-1.5 sm:text-sm"
@@ -250,7 +251,7 @@ export function OrderMenuItem({
               <button
                 type="button"
                 onClick={onAdd}
-                disabled={isSoldOut || (needsStarter && !starterId) || (!!orderChoiceGroup?.required && !orderChoiceId)}
+                disabled={isSoldOut || (needsStarter && !starterId) || (!!selectionGroup?.required && !orderChoiceId)}
                 className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-xl"
                 aria-label="Increase"
               >

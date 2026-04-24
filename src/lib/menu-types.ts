@@ -23,6 +23,12 @@ export type OrderChoiceGroup = {
   options: OrderChoiceOption[];
 };
 
+export type MenuItemVariant = {
+  id: string;
+  label: { en: string; de: string };
+  priceEur: number;
+};
+
 export type LunchStarterOption = {
   id: string;
   name: { en: string; de: string };
@@ -39,6 +45,8 @@ export type MenuItem = {
   name: { en: string; de: string };
   description: { en: string; de: string };
   priceEur: number;
+  /** Optional product variants/sizes. If present, ordering requires selecting one variant. */
+  variants?: MenuItemVariant[];
   image: string;
   /** EU/AT-style allergen codes, e.g. ["A","G","D"] */
   allergens?: string[];

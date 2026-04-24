@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
-import type { LunchStarterChoice, LunchStarterOption, MenuCategory, MenuItem } from "@/lib/menu-types";
+import type { LunchStarterChoice, LunchStarterOption, MenuCategory, MenuItem, MenuItemVariant } from "@/lib/menu-types";
 import { normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
 import { readMenuFromDisk, writeMenuToDisk } from "@/lib/menu-store";
@@ -42,6 +42,29 @@ function sanitizeLunchStarterChoice(raw: unknown): LunchStarterChoice | undefine
   }
   if (cleaned.length === 0) return undefined;
   return { label: { de: lb.de.trim(), en: lb.en.trim() }, options: cleaned };
+}
+
+function sanitizeVariants(raw: unknown): MenuItemVariant[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const cleaned: MenuItemVariant[] = [];
+  for (const v of raw) {
+    if (!v || typeof v !== "object") continue;
+    const rec = v as Record<string, unknown>;
+    if (typeof rec.id !== "string" || !rec.label || typeof rec.label !== "object") continue;
+    const lb = rec.label as Record<string, unknown>;
+    if (typeof lb.de !== "string" || typeof lb.en !== "string") continue;
+    const priceRaw = rec.priceEur;
+    const price = typeof priceRaw === "number" ? priceRaw : Number(priceRaw);
+    if (!Number.isFinite(price) || price < 0) continue;
+    const id = rec.id.trim();
+    if (!id) continue;
+    cleaned.push({
+      id,
+      label: { de: lb.de.trim(), en: lb.en.trim() },
+      priceEur: Math.round(price * 100) / 100
+    });
+  }
+  return cleaned.length ? cleaned : undefined;
 }
 
 async function requireAdmin() {
@@ -113,6 +136,7 @@ export async function POST(request: Request) {
         const mi = item as MenuItem;
         const allergens = mi.allergens?.length ? normalizeAllergenCodes(mi.allergens) : undefined;
         const lunchStarterChoice = sanitizeLunchStarterChoice(mi.lunchStarterChoice);
+        const variants = sanitizeVariants((mi as { variants?: unknown }).variants);
         const spicyLevel =
           mi.spicyLevel === 2 || mi.spicyLevel === 1 || mi.spicyLevel === 0
             ? mi.spicyLevel
@@ -124,7 +148,8 @@ export async function POST(request: Request) {
           image: normalizeMenuItemImage(mi.image),
           ...(allergens?.length ? { allergens } : { allergens: undefined }),
           spicyLevel,
-          lunchStarterChoice
+          lunchStarterChoice,
+          variants
         };
       })
     }));
