@@ -2,10 +2,93 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { MenuCategory, ReusableOptionGroup } from "@/lib/menu-types";
+import type { AdminLang } from "@/lib/admin-i18n";
 import { adminInputClass } from "./admin-field";
 import { resolveReusableOptionGroupsForDish } from "@/lib/reusable-option-groups";
 
-export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }) {
+export function AdminOptionGroups({ categories, lang = "de" }: { categories: MenuCategory[]; lang?: AdminLang }) {
+  const txt =
+    lang === "zh"
+      ? {
+          title: "选项组",
+          new: "新建",
+          templateSides: "模板：配菜",
+          templateDrinks: "模板：饮料",
+          templateSauces: "模板：酱料",
+          preview: "预览 / 测试",
+          selectDish: "选择菜品…",
+          activeGroups: "生效的选项组：",
+          save: "保存选项组",
+          saveOk: "选项组已保存。",
+          saveFail: "保存失败。",
+          deleteGroup: "删除选项组",
+          deleteOption: "删除选项",
+          links: "关联"
+          ,
+          categories: "分类",
+          dishes: "菜品"
+          ,
+          requiredShort: "必选",
+          yes: "是",
+          no: "否",
+          selectionShort: "选择",
+          single: "单选",
+          multiple: "多选",
+          noLinked: "没有关联到该菜品的选项组。",
+          loading: "加载中…",
+          nameDe: "名称（德语）",
+          nameEn: "名称（英语）",
+          requiredLabel: "必选",
+          selectionType: "选择类型",
+          singleChoice: "单选",
+          multipleChoice: "多选",
+          min: "最少选择",
+          max: "最多选择",
+          addOption: "添加选项",
+          optionPlaceholderDe: "标签（德语）",
+          optionPlaceholderEn: "标签（英语）",
+          extraPrice: "加价（EUR）"
+        }
+      : {
+          title: "Optionsgruppen",
+          new: "Neu erstellen",
+          templateSides: "Template: Beilagen",
+          templateDrinks: "Template: Getränke",
+          templateSauces: "Template: Saucen",
+          preview: "Vorschau / Test",
+          selectDish: "Gericht auswählen…",
+          activeGroups: "Aktive Optionsgruppen:",
+          save: "Optionsgruppen speichern",
+          saveOk: "Optionsgruppen gespeichert.",
+          saveFail: "Speichern fehlgeschlagen.",
+          deleteGroup: "Optionsgruppe löschen",
+          deleteOption: "Option löschen",
+          links: "Verknüpfungen"
+          ,
+          categories: "Kategorien",
+          dishes: "Gerichte"
+          ,
+          requiredShort: "Pflicht",
+          yes: "Ja",
+          no: "Nein",
+          selectionShort: "Auswahl",
+          single: "Single",
+          multiple: "Multiple",
+          noLinked: "Keine Gruppe verknüpft.",
+          loading: "Loading…",
+          nameDe: "Name (DE)",
+          nameEn: "Name (EN)",
+          requiredLabel: "Required",
+          selectionType: "Selection type",
+          singleChoice: "single choice",
+          multipleChoice: "multiple choice",
+          min: "Min selections",
+          max: "Max selections",
+          addOption: "Option hinzufügen",
+          optionPlaceholderDe: "Label DE",
+          optionPlaceholderEn: "Label EN",
+          extraPrice: "Aufpreis (EUR)"
+        };
   const [groups, setGroups] = useState<ReusableOptionGroup[]>([]);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
@@ -20,13 +103,13 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
         const data = (await res.json()) as ReusableOptionGroup[];
         setGroups(Array.isArray(data) ? data : []);
       } catch {
-        setStatus("Could not load option groups.");
+      setStatus(lang === "zh" ? "无法加载选项组。" : "Could not load option groups.");
       } finally {
         setLoading(false);
       }
     };
     void run();
-  }, []);
+  }, [lang]);
 
   const dishOptions = useMemo(
     () =>
@@ -108,21 +191,21 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
       body: JSON.stringify(groups)
     });
     if (!res.ok) {
-      setStatus("Save failed.");
+      setStatus(txt.saveFail);
       return;
     }
-    setStatus("Option groups saved.");
+    setStatus(txt.saveOk);
     window.dispatchEvent(new Event("sake-option-groups-updated"));
   }
 
   return (
     <section className="space-y-4 rounded-2xl border border-[#eeeeee] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
       <div className="flex items-center justify-between">
-        <h2 className="font-serif text-xl text-neutral-900">Optionsgruppen</h2>
+        <h2 className="font-serif text-xl text-neutral-900">{txt.title}</h2>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => addTemplate("beilagen")} className="rounded-full border border-[#ddd] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-700 hover:bg-neutral-50">Template: Beilagen</button>
-          <button type="button" onClick={() => addTemplate("getraenke")} className="rounded-full border border-[#ddd] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-700 hover:bg-neutral-50">Template: Getränke</button>
-          <button type="button" onClick={() => addTemplate("saucen")} className="rounded-full border border-[#ddd] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-700 hover:bg-neutral-50">Template: Saucen</button>
+          <button type="button" onClick={() => addTemplate("beilagen")} className="rounded-full border border-[#ddd] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-700 hover:bg-neutral-50">{txt.templateSides}</button>
+          <button type="button" onClick={() => addTemplate("getraenke")} className="rounded-full border border-[#ddd] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-700 hover:bg-neutral-50">{txt.templateDrinks}</button>
+          <button type="button" onClick={() => addTemplate("saucen")} className="rounded-full border border-[#ddd] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-700 hover:bg-neutral-50">{txt.templateSauces}</button>
           <button
             type="button"
             onClick={() =>
@@ -143,18 +226,18 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
             }
             className="rounded-full border border-brand-primary/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-primary hover:bg-brand-primary/10"
           >
-            Neu erstellen
+            {txt.new}
           </button>
         </div>
       </div>
       <div className="rounded-xl border border-[#e8e8e8] bg-neutral-50 p-4 space-y-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-neutral-500">Vorschau / Test</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-neutral-500">{txt.preview}</p>
         <select
           className={adminInputClass}
           value={previewDishId}
           onChange={(e) => setPreviewDishId(e.target.value)}
         >
-          <option value="">Gericht auswählen…</option>
+          <option value="">{txt.selectDish}</option>
           {dishOptions.map((d) => (
             <option key={d.id} value={d.id}>
               {d.label}
@@ -163,22 +246,22 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
         </select>
         {previewDish ? (
           <div className="text-xs text-neutral-700">
-            <p className="font-medium">Aktive Optionsgruppen:</p>
+            <p className="font-medium">{txt.activeGroups}</p>
             {previewGroups.length ? (
               <ul className="mt-1 list-disc pl-5">
                 {previewGroups.map((g) => (
                   <li key={g.id}>
-                    {g.name.de || g.id} ({g.selectionType}, required: {g.required ? "yes" : "no"})
+                    {g.name.de || g.id} ({g.selectionType === "single" ? txt.single : txt.multiple}, {txt.requiredShort}: {g.required ? txt.yes : txt.no})
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="mt-1 text-neutral-500">Keine Gruppe verknüpft.</p>
+              <p className="mt-1 text-neutral-500">{txt.noLinked}</p>
             )}
           </div>
         ) : null}
       </div>
-      {loading ? <p className="text-sm text-neutral-500">Loading…</p> : null}
+      {loading ? <p className="text-sm text-neutral-500">{txt.loading}</p> : null}
       <div className="space-y-4">
         {groups.map((g, gi) => (
           <div key={g.id} className="rounded-xl border border-[#eeeeee] bg-neutral-50/70 p-4 space-y-3">
@@ -186,26 +269,26 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
               <button
                 type="button"
                 onClick={() => {
-                  if (!confirm(`Optionsgruppe "${g.name.de || g.id}" wirklich löschen?`)) return;
+                if (!confirm(lang === "zh" ? `确定删除选项组 "${g.name.de || g.id}" ?` : `Optionsgruppe "${g.name.de || g.id}" wirklich löschen?`)) return;
                   setGroups((prev) => prev.filter((_, i) => i !== gi));
                 }}
                 className="text-[10px] font-semibold uppercase text-red-500 hover:underline"
               >
-                Optionsgruppe löschen
+              {txt.deleteGroup}
               </button>
             </div>
             <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-600">
               <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                Kategorien: {g.linkedCategoryIds?.length ?? 0}
+                {txt.categories}: {g.linkedCategoryIds?.length ?? 0}
               </span>
               <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                Gerichte: {g.linkedDishIds?.length ?? 0}
+                {txt.dishes}: {g.linkedDishIds?.length ?? 0}
               </span>
               <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                Pflicht: {g.required ? "Ja" : "Nein"}
+                {txt.requiredShort}: {g.required ? txt.yes : txt.no}
               </span>
               <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                Auswahl: {g.selectionType === "single" ? "Single" : "Multiple"}
+                {txt.selectionShort}: {g.selectionType === "single" ? txt.single : txt.multiple}
               </span>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -213,17 +296,17 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
                 className={adminInputClass}
                 value={g.name.de}
                 onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, name: { ...x.name, de: e.target.value } } : x)))}
-                placeholder="Name DE"
+                placeholder={txt.nameDe}
               />
               <input
                 className={adminInputClass}
                 value={g.name.en}
                 onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, name: { ...x.name, en: e.target.value } } : x)))}
-                placeholder="Name EN"
+                placeholder={txt.nameEn}
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-4">
-              <label className="text-xs">Required
+              <label className="text-xs">{txt.requiredLabel}
                 <input type="checkbox" checked={g.required} onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, required: e.target.checked } : x)))} />
               </label>
               <select
@@ -231,34 +314,34 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
                 value={g.selectionType}
                 onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, selectionType: e.target.value as "single" | "multiple" } : x)))}
               >
-                <option value="single">single choice</option>
-                <option value="multiple">multiple choice</option>
+                <option value="single">{txt.singleChoice}</option>
+                <option value="multiple">{txt.multipleChoice}</option>
               </select>
-              <input type="number" className={adminInputClass} value={g.minSelections} onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, minSelections: Number(e.target.value) } : x)))} />
-              <input type="number" className={adminInputClass} value={g.maxSelections} onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, maxSelections: Number(e.target.value) } : x)))} />
+              <input type="number" title={txt.min} className={adminInputClass} value={g.minSelections} onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, minSelections: Number(e.target.value) } : x)))} />
+              <input type="number" title={txt.max} className={adminInputClass} value={g.maxSelections} onChange={(e) => setGroups((prev) => prev.map((x, i) => (i === gi ? { ...x, maxSelections: Number(e.target.value) } : x)))} />
             </div>
             <div className="space-y-2">
               {g.options.map((o, oi) => (
                 <div key={o.id} className="grid gap-2 sm:grid-cols-4">
-                  <input className={adminInputClass} value={o.label.de} onChange={(e) => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: x.options.map((q, qi) => qi === oi ? { ...q, label: { ...q.label, de: e.target.value } } : q) } : x))} placeholder="Label DE" />
-                  <input className={adminInputClass} value={o.label.en} onChange={(e) => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: x.options.map((q, qi) => qi === oi ? { ...q, label: { ...q.label, en: e.target.value } } : q) } : x))} placeholder="Label EN" />
-                  <input type="number" step={0.1} min={0} className={adminInputClass} value={o.extraPriceEur ?? 0} onChange={(e) => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: x.options.map((q, qi) => qi === oi ? { ...q, extraPriceEur: Number(e.target.value) } : q) } : x))} />
+                  <input className={adminInputClass} value={o.label.de} onChange={(e) => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: x.options.map((q, qi) => qi === oi ? { ...q, label: { ...q.label, de: e.target.value } } : q) } : x))} placeholder={txt.optionPlaceholderDe} />
+                  <input className={adminInputClass} value={o.label.en} onChange={(e) => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: x.options.map((q, qi) => qi === oi ? { ...q, label: { ...q.label, en: e.target.value } } : q) } : x))} placeholder={txt.optionPlaceholderEn} />
+                  <input type="number" title={txt.extraPrice} step={0.1} min={0} className={adminInputClass} value={o.extraPriceEur ?? 0} onChange={(e) => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: x.options.map((q, qi) => qi === oi ? { ...q, extraPriceEur: Number(e.target.value) } : q) } : x))} />
                   <button
                     type="button"
                     onClick={() => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: x.options.filter((_, qi) => qi !== oi) } : x))}
                     className="text-xs text-red-500"
                   >
-                    Option löschen
+                    {txt.deleteOption}
                   </button>
                 </div>
               ))}
-              <button type="button" onClick={() => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: [...x.options, { id: `opt-${crypto.randomUUID().slice(0, 8)}`, label: { de: "Neue Option", en: "New option" }, extraPriceEur: 0 }] } : x))} className="text-xs text-brand-primary">Option hinzufügen</button>
+              <button type="button" onClick={() => setGroups((prev) => prev.map((x, i) => i === gi ? { ...x, options: [...x.options, { id: `opt-${crypto.randomUUID().slice(0, 8)}`, label: { de: "Neue Option", en: "New option" }, extraPriceEur: 0 }] } : x))} className="text-xs text-brand-primary">{txt.addOption}</button>
             </div>
             <details>
-              <summary className="cursor-pointer text-xs font-semibold text-neutral-700">Verknüpfungen</summary>
+            <summary className="cursor-pointer text-xs font-semibold text-neutral-700">{txt.links}</summary>
               <div className="mt-2 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-semibold">Kategorien</p>
+                  <p className="text-xs font-semibold">{txt.categories}</p>
                   {categories.map((c) => (
                     <label key={c.id} className="block text-xs">
                       <input
@@ -284,7 +367,7 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
                   ))}
                 </div>
                 <div>
-                  <p className="text-xs font-semibold">Gerichte</p>
+                  <p className="text-xs font-semibold">{txt.dishes}</p>
                   <div className="max-h-40 overflow-auto">
                     {dishOptions.map((d) => (
                       <label key={d.id} className="block text-xs">
@@ -318,7 +401,7 @@ export function AdminOptionGroups({ categories }: { categories: MenuCategory[] }
       </div>
       <div className="flex items-center gap-3">
         <button type="button" onClick={() => void save()} className="rounded-full border border-brand-primary/80 bg-brand-primary/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-primary hover:bg-brand-primary/25">
-          Save options groups
+          {txt.save}
         </button>
         {status ? <span className="text-xs text-neutral-600">{status}</span> : null}
       </div>

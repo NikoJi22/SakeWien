@@ -14,6 +14,7 @@ import { normalizeSiteContentConfig } from "@/lib/site-content";
 import { AdminField, adminInputClass, adminSelectClass, adminTextareaClass } from "./admin-field";
 import { DishImageField } from "./dish-image-field";
 import { AdminOptionGroups } from "./admin-option-groups";
+import { getStoredAdminLang, setStoredAdminLang, type AdminLang } from "@/lib/admin-i18n";
 
 const LS_NEW_DISH_AT_TOP = "sake-vienna-admin-new-dish-at-top";
 const DRAG_PAYLOAD_TYPE = "application/x-sake-menu-item";
@@ -152,6 +153,7 @@ export function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [adminTab, setAdminTab] = useState<"overview" | "option-groups">("overview");
   const [optionGroups, setOptionGroups] = useState<ReusableOptionGroup[]>([]);
+  const [adminLang, setAdminLang] = useState<AdminLang>("de");
   /** Category id → expanded (default collapsed = less scrolling) */
   const [expandedCat, setExpandedCat] = useState<Record<string, boolean>>({});
   /** New dishes: insert at top of category (stored locally in the browser). */
@@ -189,6 +191,129 @@ export function AdminDashboard() {
       /* ignore */
     }
   }, []);
+
+  useEffect(() => {
+    setAdminLang(getStoredAdminLang());
+  }, []);
+
+  const adminCopy =
+    adminLang === "zh"
+      ? {
+          tabOverview: "概览",
+          tabOptionGroups: "选项组",
+          searchPlaceholder: "搜索分类或菜品…",
+          logout: "退出登录",
+          saveMenu: "保存菜单",
+          admin: "管理后台",
+          onThisPage: "本页导航",
+          websiteContent: "网站内容",
+          orderGift: "下单赠品",
+          expandAll: "展开全部分类",
+          collapseAll: "折叠全部",
+          homepage: "首页",
+          editHomepage: "编辑首页图片和文本。",
+          vacationMode: "休假模式",
+          vacationModeHint: "启用后并且日期有效时，将暂停线上下单。",
+          active: "启用",
+          saveWebsiteContent: "保存网站内容",
+          checkoutBonus: "结账奖励",
+          orderGiftDesc: "设置两个购物金额档位，达到后可选择免费赠品。",
+          saveGiftSettings: "保存赠品设置",
+          menu: "菜单",
+          jumpToSection: "跳转到区域",
+          jumpTo: "跳转到…",
+          freeItemsInCheckout: "结账赠品菜品",
+          freeItemsHint: "仅这里勾选的菜品 ID 可作为赠品选择（若有多个赠品名额，可重复同一 ID）。",
+          saving: "保存中…",
+          newDishAtTopHint: "新菜自动插入到分类顶部（否则在底部）。排序仍可使用拖拽或上下箭头。",
+          addCategory: "+ 新建分类",
+          noSearchResults: "没有匹配“{q}”的分类或菜品。",
+          move: "移动",
+          variantsTitle: "规格 / 变体",
+          addVariant: "添加变体",
+          variantHint: "存在变体时，客户在下单前必须选择一个变体。",
+          removeVariant: "删除变体",
+          noVariants: "未设置变体时，使用菜品基础价格。",
+          dishOptionGroups: "本菜品的选项组",
+          dishOptionGroupsHint: "分类关联的选项组会自动生效。这里可为单个菜品额外启用或停用。",
+          flags: "标签",
+          spicyLevel: "辣度等级",
+          noSpicy: "不辣",
+          specialDealHint: "支持：-10% 或 -1€",
+          lunchStarterTitle: "午市套餐 — 前菜选择（在线下单）",
+          lunchStarterHint: "启用后，顾客下单时必须选择一个前菜。关闭后移除此菜品的前菜选择。",
+          lunchStarterToggle: "下单时显示前菜选择",
+          options: "选项",
+          removeOption: "删除选项",
+          addOption: "+ 添加选项",
+          allergens: "过敏原（欧盟代码）",
+          addDish: "+ 添加菜品",
+          dropBottomDish: "拖放到这里可移动到最底部",
+          dropBottomCategory: "拖放到这里可将分类移到最底部",
+          saveEntireMenu: "保存整个菜单",
+          sectionWebsiteContent: "网站内容",
+          sectionOrderGift: "下单赠品"
+        }
+      : {
+          tabOverview: "Übersicht",
+          tabOptionGroups: "Optionsgruppen",
+          searchPlaceholder: "Kategorie oder Gericht suchen…",
+          logout: "Abmelden",
+          saveMenu: "Menü speichern",
+          admin: "Admin",
+          onThisPage: "On this page",
+          websiteContent: "Website content",
+          orderGift: "Order gift",
+          expandAll: "Expand all categories",
+          collapseAll: "Collapse all",
+          homepage: "Homepage",
+          editHomepage: "Bilder und Texte auf der Startseite bearbeiten.",
+          vacationMode: "Vacation mode",
+          vacationModeHint: "Wenn aktiv und der Zeitraum gültig ist, werden Online-Bestellungen blockiert.",
+          active: "Aktiv",
+          saveWebsiteContent: "Save website content",
+          checkoutBonus: "Checkout bonus",
+          orderGiftDesc: "Two cart subtotal tiers: from tier 1 guests get up to N free picks; from tier 2 the higher count applies.",
+          saveGiftSettings: "Save gift settings",
+          menu: "Menu",
+          jumpToSection: "Jump to section",
+          jumpTo: "Jump to…",
+          freeItemsInCheckout: "Gratisartikel im Checkout",
+          freeItemsHint:
+            "Nur hier angehakte Gerichte-IDs stehen als Gratiswahl zur Verfügung (mehrfach dieselbe ID möglich, wenn mehrere Gratis-Slots aktiv sind).",
+          saving: "Saving…",
+          newDishAtTopHint:
+            "Neue Gerichte automatisch oben in der Kategorie einfügen (sonst unten). Zum Sortieren weiterhin Drag & Drop oder Pfeile nutzen.",
+          addCategory: "+ Category",
+          noSearchResults: "No categories or dishes match “{q}”.",
+          move: "Move",
+          variantsTitle: "Varianten / Größen",
+          addVariant: "Variante hinzufügen",
+          variantHint: "Wenn Varianten vorhanden sind, muss der Kunde im Bestellbereich eine Variante auswählen.",
+          removeVariant: "Variante löschen",
+          noVariants: "Keine Varianten gesetzt. Dann gilt der normale Einzelpreis.",
+          dishOptionGroups: "Optionsgruppen für dieses Gericht",
+          dishOptionGroupsHint:
+            "Kategorie-verknüpfte Gruppen gelten automatisch. Hier können Sie pro Gericht zusätzlich aktivieren oder deaktivieren.",
+          flags: "Flags",
+          spicyLevel: "Schärfe-Level",
+          noSpicy: "Keine",
+          specialDealHint: "Unterstützt: -10% oder -1€",
+          lunchStarterTitle: "Mittagsmenü — Vorspeise (Online-Bestellung)",
+          lunchStarterHint:
+            "Aktiv: Gäste wählen beim Bestellen eine Option. Deaktivieren entfernt die Auswahl für dieses Gericht.",
+          lunchStarterToggle: "Vorspeisenwahl beim Bestellen",
+          options: "Optionen",
+          removeOption: "Remove option",
+          addOption: "+ Option",
+          allergens: "Allergens (EU codes)",
+          addDish: "+ Dish",
+          dropBottomDish: "Ziel für „ganz unten“ — hier ablegen",
+          dropBottomCategory: "Ziel für Kategorie „ganz unten“",
+          saveEntireMenu: "Save entire menu",
+          sectionWebsiteContent: "Website content",
+          sectionOrderGift: "Order gift"
+        };
 
   useEffect(() => {
     const run = async () => {
@@ -829,12 +954,12 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-12">
+    <div className={`min-h-screen pb-24 lg:pb-12 ${adminLang === "zh" ? "admin-zh" : ""}`}>
       {/* Sticky toolbar */}
       <header className="sticky top-0 z-40 border-b border-[#eeeeee] bg-white shadow-sm">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6">
           <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-lg tracking-wide text-neutral-900 sm:text-xl">Admin</h1>
+            <h1 className="font-serif text-lg tracking-wide text-neutral-900 sm:text-xl">{adminCopy.admin}</h1>
             <div className="mt-2 flex items-center gap-2">
               <button
                 type="button"
@@ -843,7 +968,7 @@ export function AdminDashboard() {
                   adminTab === "overview" ? "bg-neutral-900 text-white" : "border border-[#ddd] text-neutral-600"
                 }`}
               >
-                Übersicht
+                {adminCopy.tabOverview}
               </button>
               <button
                 type="button"
@@ -852,13 +977,33 @@ export function AdminDashboard() {
                   adminTab === "option-groups" ? "bg-neutral-900 text-white" : "border border-[#ddd] text-neutral-600"
                 }`}
               >
-                Optionsgruppen
+                {adminCopy.tabOptionGroups}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminLang("de");
+                  setStoredAdminLang("de");
+                }}
+                className={`rounded-full px-3 py-1 text-xs ${adminLang === "de" ? "bg-neutral-900 text-white" : "border border-[#ddd] text-neutral-600"}`}
+              >
+                DE
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminLang("zh");
+                  setStoredAdminLang("zh");
+                }}
+                className={`rounded-full px-3 py-1 text-xs ${adminLang === "zh" ? "bg-neutral-900 text-white" : "border border-[#ddd] text-neutral-600"}`}
+              >
+                中文
               </button>
             </div>
             <p className="hidden text-[11px] text-neutral-500 sm:block">
               Search, jump to a category, or expand one section at a time. Lunch menu (Mittagsmenü): category id{" "}
-              <code className="rounded bg-neutral-100 px-1">{LUNCH_CATEGORY_ID}</code> — opens expanded after load; use sidebar or
-              &quot;Jump to&quot;.
+              <code className="rounded bg-neutral-100 px-1">{LUNCH_CATEGORY_ID}</code>{" "}
+              {adminLang === "zh" ? "— 加载后会自动展开；可使用侧边导航或“跳转到”。" : "— opens expanded after load; use sidebar or \"Jump to\"."}
             </p>
           </div>
           <div className="flex w-full flex-col gap-2 sm:max-w-md sm:flex-1">
@@ -866,7 +1011,7 @@ export function AdminDashboard() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search category or dish…"
+              placeholder={adminCopy.searchPlaceholder}
               className={`${adminInputClass} w-full text-sm`}
               aria-label="Search menu"
             />
@@ -879,21 +1024,21 @@ export function AdminDashboard() {
               disabled={savingMenu}
               className="rounded-full border border-brand-primary/80 bg-brand-primary/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-primary hover:bg-brand-primary/25 disabled:opacity-50"
             >
-              {savingMenu ? "…" : "Save menu"}
+              {savingMenu ? "…" : adminCopy.saveMenu}
             </button>
             <button
               type="button"
               onClick={() => void logout()}
               className="rounded-full border border-[#ccc] px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-neutral-700 hover:bg-neutral-100"
             >
-              Log out
+              {adminCopy.logout}
             </button>
           </div>
         </div>
         {/* Mobile jump menu */}
         <div className="border-t border-[#eeeeee] px-4 py-2 lg:hidden">
           <label className="sr-only" htmlFor="admin-jump-mobile">
-            Jump to section
+            {adminCopy.jumpToSection}
           </label>
           <select
             id="admin-jump-mobile"
@@ -907,9 +1052,9 @@ export function AdminDashboard() {
               e.target.value = "";
             }}
           >
-            <option value="">Jump to…</option>
-            <option value="site">Website content</option>
-            <option value="gift">Order gift</option>
+            <option value="">{adminCopy.jumpTo}</option>
+            <option value="site">{adminCopy.sectionWebsiteContent}</option>
+            <option value="gift">{adminCopy.sectionOrderGift}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.title.de || c.id} ({c.items.length})
@@ -923,20 +1068,20 @@ export function AdminDashboard() {
         {/* Sidebar TOC — desktop */}
         <aside className="hidden lg:block">
           <nav className="sticky top-[7.5rem] space-y-1 rounded-xl border border-[#eeeeee] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">On this page</p>
+            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">{adminCopy.onThisPage}</p>
             <button
               type="button"
               onClick={goToSite}
               className="w-full rounded-lg px-2 py-2 text-left text-sm text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900"
             >
-              Website content
+              {adminCopy.websiteContent}
             </button>
             <button
               type="button"
               onClick={goToGift}
               className="w-full rounded-lg px-2 py-2 text-left text-sm text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900"
             >
-              Order gift
+              {adminCopy.orderGift}
             </button>
             <div className="my-2 border-t border-[#eeeeee]" />
             {categories.map((c) => (
@@ -952,10 +1097,10 @@ export function AdminDashboard() {
             ))}
             <div className="mt-3 border-t border-[#eeeeee] pt-3">
               <button type="button" onClick={expandAll} className="w-full py-1.5 text-left text-[11px] text-brand-primary hover:underline">
-                Expand all categories
+                {adminCopy.expandAll}
               </button>
               <button type="button" onClick={collapseAll} className="w-full py-1.5 text-left text-[11px] text-neutral-500 hover:underline">
-                Collapse all
+                {adminCopy.collapseAll}
               </button>
             </div>
           </nav>
@@ -963,15 +1108,15 @@ export function AdminDashboard() {
 
         <div className="min-w-0 space-y-10">
           {adminTab === "option-groups" ? (
-            <AdminOptionGroups categories={categories} />
+            <AdminOptionGroups categories={categories} lang={adminLang} />
           ) : (
             <>
           <section id="admin-site-content" className="scroll-mt-28 space-y-4 rounded-2xl border border-[#eeeeee] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-serif text-xl text-neutral-900">Website content</h2>
-              <span className="text-[10px] uppercase tracking-wider text-neutral-400">Homepage</span>
+              <h2 className="font-serif text-xl text-neutral-900">{adminCopy.websiteContent}</h2>
+              <span className="text-[10px] uppercase tracking-wider text-neutral-400">{adminCopy.homepage}</span>
             </div>
-            <p className="text-xs text-neutral-500">Bilder und Texte auf der Startseite bearbeiten.</p>
+            <p className="text-xs text-neutral-500">{adminCopy.editHomepage}</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <AdminField label="Hero title (DE)">
                 <input
@@ -1087,9 +1232,9 @@ export function AdminDashboard() {
                 }
               />
               <div className="sm:col-span-2 mt-1 rounded-xl border border-[#e8e8e8] bg-neutral-50 p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">Vacation mode</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">{adminCopy.vacationMode}</p>
                 <p className="mt-1 text-xs text-neutral-500">
-                  Wenn aktiv und der Zeitraum gültig ist, werden Online-Bestellungen blockiert.
+                  {adminCopy.vacationModeHint}
                 </p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-3">
                   <label className="flex items-center gap-2 rounded-lg border border-[#e4e4e4] bg-white px-3 py-2 text-sm text-neutral-800">
@@ -1107,7 +1252,7 @@ export function AdminDashboard() {
                       }
                       className="h-4 w-4 accent-brand-primary"
                     />
-                    Aktiv
+                    {adminCopy.active}
                   </label>
                   <AdminField label="Startdatum">
                     <input
@@ -1151,18 +1296,16 @@ export function AdminDashboard() {
               disabled={savingSite}
               className="rounded-full border border-[#ccc] bg-white px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
             >
-              {savingSite ? "Saving…" : "Save website content"}
+              {savingSite ? adminCopy.saving : adminCopy.saveWebsiteContent}
             </button>
           </section>
 
           <section id="admin-gift" className="scroll-mt-28 space-y-4 rounded-2xl border border-[#eeeeee] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-serif text-xl text-neutral-900">Order gift</h2>
-              <span className="text-[10px] uppercase tracking-wider text-neutral-400">Checkout bonus</span>
+              <h2 className="font-serif text-xl text-neutral-900">{adminCopy.orderGift}</h2>
+              <span className="text-[10px] uppercase tracking-wider text-neutral-400">{adminCopy.checkoutBonus}</span>
             </div>
-            <p className="text-xs text-neutral-500">
-              Two cart subtotal tiers: from tier 1 guests get up to N free picks; from tier 2 the higher count applies. Same item can be chosen multiple times when N is greater than 1.
-            </p>
+            <p className="text-xs text-neutral-500">{adminCopy.orderGiftDesc}</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <AdminField label="Tier 1 — from cart subtotal (EUR)">
                 <input
@@ -1224,9 +1367,9 @@ export function AdminDashboard() {
               </AdminField>
             </div>
             <div className="space-y-2 rounded-xl border border-[#e8e8e8] bg-neutral-50 p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">Gratisartikel im Checkout</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">{adminCopy.freeItemsInCheckout}</p>
               <p className="text-xs text-neutral-500">
-                Nur hier angehakte Gerichte-IDs stehen als Gratiswahl zur Verfügung (mehrfach dieselbe ID möglich, wenn mehrere Gratis-Slots aktiv sind).
+                {adminCopy.freeItemsHint}
               </p>
               <div className="max-h-60 space-y-2 overflow-y-auto rounded-lg border border-[#ececec] bg-white p-3">
                 {giftSelectableItems.map((entry) => {
@@ -1283,13 +1426,13 @@ export function AdminDashboard() {
               disabled={savingGift}
               className="rounded-full border border-[#ccc] bg-white px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 disabled:opacity-50"
             >
-              {savingGift ? "Saving…" : "Save gift settings"}
+              {savingGift ? adminCopy.saving : adminCopy.saveGiftSettings}
             </button>
           </section>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
             <div className="space-y-2">
-              <h2 className="font-serif text-xl text-neutral-900">Menu</h2>
+              <h2 className="font-serif text-xl text-neutral-900">{adminCopy.menu}</h2>
               <label className="flex cursor-pointer items-start gap-2 text-xs text-neutral-600">
                 <input
                   type="checkbox"
@@ -1298,30 +1441,32 @@ export function AdminDashboard() {
                   className="accent-brand-primary mt-0.5 h-4 w-4 shrink-0"
                 />
                 <span>
-                  Neue Gerichte automatisch <strong className="font-medium text-neutral-800">oben</strong> in der Kategorie einfügen (sonst unten). Zum Sortieren weiterhin Drag &amp; Drop oder Pfeile nutzen.
+                  {adminCopy.newDishAtTopHint}
                 </span>
               </label>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <button type="button" onClick={expandAll} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500 hover:text-neutral-900">
-                Expand all
+                {adminCopy.expandAll}
               </button>
               <span className="text-neutral-300">|</span>
               <button type="button" onClick={collapseAll} className="text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500 hover:text-neutral-900">
-                Collapse all
+                {adminCopy.collapseAll}
               </button>
               <button
                 type="button"
                 onClick={addCategory}
                 className="rounded-full border border-brand-primary/40 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-primary hover:bg-brand-primary/10"
               >
-                + Category
+                {adminCopy.addCategory}
               </button>
             </div>
           </div>
 
           {search.trim() && filteredEntries.length === 0 && (
-            <p className="rounded-lg border border-[#eeeeee] bg-neutral-50 px-4 py-3 text-sm text-neutral-600">No categories or dishes match “{search.trim()}”.</p>
+            <p className="rounded-lg border border-[#eeeeee] bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
+              {adminCopy.noSearchResults.replace("{q}", search.trim())}
+            </p>
           )}
 
           <div className="space-y-4">
@@ -1485,13 +1630,13 @@ export function AdminDashboard() {
                             disabled={savingMenu}
                             className="rounded-full border border-brand-primary/80 bg-brand-primary/15 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-primary hover:bg-brand-primary/25 disabled:opacity-50"
                           >
-                            {savingMenu ? "Saving…" : "Save"}
+                            {savingMenu ? adminCopy.saving : (adminLang === "zh" ? "保存" : "Save")}
                           </button>
                           <div className="flex flex-wrap gap-2 sm:justify-end">
                             <span className="text-[10px] uppercase tracking-wider text-neutral-400">id: {cat.id}</span>
                             {cat.items.length === 0 && (
                               <button type="button" onClick={() => addItem(ci)} className={addDishButtonClass}>
-                                + Dish
+                                {adminCopy.addDish}
                               </button>
                             )}
                             <button
@@ -1604,7 +1749,7 @@ export function AdminDashboard() {
                               <div className="flex flex-wrap items-center gap-3">
                                 <span className="text-[10px] text-neutral-400">{item.id}</span>
                                 <label className="flex items-center gap-2 text-xs text-neutral-600">
-                                  <span className="text-[10px] uppercase tracking-wider">Move</span>
+                                  <span className="text-[10px] uppercase tracking-wider">{adminCopy.move}</span>
                                   <select
                                     value={cat.id}
                                     onChange={(e) => moveItem(ci, ii, e.target.value)}
@@ -1699,17 +1844,17 @@ export function AdminDashboard() {
                               />
                               <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
                                 <div className="flex items-center justify-between gap-3">
-                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Varianten / Größen</p>
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{adminCopy.variantsTitle}</p>
                                   <button
                                     type="button"
                                     onClick={() => addVariantRow(ci, ii)}
                                     className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
                                   >
-                                    Variante hinzufügen
+                                    {adminCopy.addVariant}
                                   </button>
                                 </div>
                                 <p className="text-xs text-neutral-500">
-                                  Wenn Varianten vorhanden sind, muss der Kunde im Bestellbereich eine Variante auswählen.
+                                  {adminCopy.variantHint}
                                 </p>
                                 {item.variants?.length ? (
                                   <div className="space-y-3">
@@ -1723,7 +1868,7 @@ export function AdminDashboard() {
                                             value={variant.label.de}
                                             onChange={(e) => updateVariantLabelField(ci, ii, vi, "de", e.target.value)}
                                             className={adminInputClass}
-                                            placeholder="z. B. 6 Stück"
+                                            placeholder={adminLang === "zh" ? "例如：6件" : "z. B. 6 Stück"}
                                           />
                                         </AdminField>
                                         <AdminField label="Label EN">
@@ -1731,7 +1876,7 @@ export function AdminDashboard() {
                                             value={variant.label.en}
                                             onChange={(e) => updateVariantLabelField(ci, ii, vi, "en", e.target.value)}
                                             className={adminInputClass}
-                                            placeholder="e.g. 6 pcs"
+                                            placeholder={adminLang === "zh" ? "例如：6 pcs" : "e.g. 6 pcs"}
                                           />
                                         </AdminField>
                                         <AdminField label="Preis (EUR)">
@@ -1751,7 +1896,7 @@ export function AdminDashboard() {
                                             onClick={() => removeVariantRow(ci, ii, vi)}
                                             className="text-[10px] font-semibold uppercase text-red-400/90 hover:underline"
                                           >
-                                            Variante löschen
+                                            {adminCopy.removeVariant}
                                           </button>
                                         </div>
                                       </div>
@@ -1759,15 +1904,15 @@ export function AdminDashboard() {
                                   </div>
                                 ) : (
                                   <p className="text-xs text-neutral-500">
-                                    Keine Varianten gesetzt. Dann gilt der normale Einzelpreis.
+                                    {adminCopy.noVariants}
                                   </p>
                                 )}
                               </div>
                               {optionGroups.length > 0 && (
                                 <div className="lg:col-span-2 space-y-2 rounded-xl border border-[#e5e5e5] bg-white p-4">
-                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Optionsgruppen für dieses Gericht</p>
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{adminCopy.dishOptionGroups}</p>
                                   <p className="text-xs text-neutral-500">
-                                    Kategorie-verknüpfte Gruppen gelten automatisch. Hier können Sie pro Gericht zusätzlich aktivieren oder deaktivieren.
+                                    {adminCopy.dishOptionGroupsHint}
                                   </p>
                                   <div className="grid gap-2 sm:grid-cols-2">
                                     {optionGroups.map((g) => {
@@ -1791,7 +1936,7 @@ export function AdminDashboard() {
                                 </div>
                               )}
                               <div className="lg:col-span-2">
-                                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Flags</p>
+                                <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{adminCopy.flags}</p>
                                 <div className="flex flex-wrap gap-3 sm:gap-4">
                                   {(
                                     [
@@ -1818,13 +1963,13 @@ export function AdminDashboard() {
                                   ))}
                                 </div>
                                 <div className="mt-3 flex items-center gap-3">
-                                  <label className="text-sm text-neutral-700">Schärfe-Level</label>
+                                  <label className="text-sm text-neutral-700">{adminCopy.spicyLevel}</label>
                                   <select
                                     value={item.spicyLevel ?? 0}
                                     onChange={(e) => setItemField(ci, ii, "spicyLevel", Number(e.target.value) as 0 | 1 | 2)}
                                     className={`${adminSelectClass} max-w-[160px] py-2 text-sm`}
                                   >
-                                    <option value={0}>Keine</option>
+                                    <option value={0}>{adminCopy.noSpicy}</option>
                                     <option value={1}>🌶</option>
                                     <option value={2}>🌶🌶</option>
                                   </select>
@@ -1836,19 +1981,19 @@ export function AdminDashboard() {
                                         value={item.specialDealLabel ?? ""}
                                         onChange={(e) => setItemField(ci, ii, "specialDealLabel", e.target.value)}
                                         className={adminInputClass}
-                                        placeholder="z. B. -10% oder -1€"
+                                        placeholder={adminLang === "zh" ? "例如：-10% 或 -1€" : "z. B. -10% oder -1€"}
                                       />
-                                      <p className="mt-1 text-[11px] text-neutral-500">Unterstützt: -10% oder -1€</p>
+                                      <p className="mt-1 text-[11px] text-neutral-500">{adminCopy.specialDealHint}</p>
                                     </AdminField>
                                   </div>
                                 )}
                               </div>
                               <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
                                 <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-                                  Mittagsmenü — Vorspeise (Online-Bestellung)
+                                  {adminCopy.lunchStarterTitle}
                                 </p>
                                 <p className="text-xs text-neutral-500">
-                                  Aktiv: Gäste wählen beim Bestellen eine Option. Deaktivieren entfernt die Auswahl für dieses Gericht.
+                                  {adminCopy.lunchStarterHint}
                                 </p>
                                 <label className="flex cursor-pointer items-center gap-2 text-sm text-neutral-800">
                                   <input
@@ -1857,7 +2002,7 @@ export function AdminDashboard() {
                                     checked={!!item.lunchStarterChoice?.options?.length}
                                     onChange={(e) => setLunchStarterEnabled(ci, ii, e.target.checked)}
                                   />
-                                  Vorspeisenwahl beim Bestellen
+                                  {adminCopy.lunchStarterToggle}
                                 </label>
                                 {item.lunchStarterChoice?.options?.length ? (
                                   <div className="space-y-3 border-t border-[#eeeeee] pt-3">
@@ -1879,7 +2024,7 @@ export function AdminDashboard() {
                                         />
                                       </AdminField>
                                     </div>
-                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">Optionen</p>
+                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{adminCopy.options}</p>
                                     <div className="space-y-3">
                                       {item.lunchStarterChoice.options.map((opt, oi) => (
                                         <div
@@ -1912,7 +2057,7 @@ export function AdminDashboard() {
                                             onClick={() => removeLunchStarterOptionRow(ci, ii, oi)}
                                             className="text-[10px] font-semibold uppercase text-red-400/90 hover:underline sm:mb-2"
                                           >
-                                            Remove option
+                                            {adminCopy.removeOption}
                                           </button>
                                         </div>
                                       ))}
@@ -1922,14 +2067,14 @@ export function AdminDashboard() {
                                       onClick={() => addLunchStarterOptionRow(ci, ii)}
                                       className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
                                     >
-                                      + Option
+                                      {adminCopy.addOption}
                                     </button>
                                   </div>
                                 ) : null}
                               </div>
                               <div className="lg:col-span-2">
                                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-                                  Allergens (EU codes)
+                                  {adminCopy.allergens}
                                 </p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {ALLERGEN_CODES_ORDER.map((code) => {
@@ -1954,7 +2099,7 @@ export function AdminDashboard() {
                             </div>
                             <div className="mt-4 flex justify-center border-t border-[#eeeeee] pt-4 sm:justify-end">
                               <button type="button" onClick={() => addItemAfter(ci, ii)} className={addDishButtonClass}>
-                                + Dish
+                                {adminCopy.addDish}
                               </button>
                             </div>
                           </div>
@@ -1986,7 +2131,7 @@ export function AdminDashboard() {
                                 : "border-[#ddd] text-neutral-400"
                             }`}
                           >
-                            Ziel für „ganz unten“ — hier ablegen
+                            {adminCopy.dropBottomDish}
                           </div>
                         )}
                       </div>
@@ -2027,7 +2172,7 @@ export function AdminDashboard() {
                     : "border-[#ddd] text-neutral-400"
                 } ${draggingCategoryIndex !== null ? "opacity-100" : "opacity-0 pointer-events-none"}`}
               >
-                Ziel für Kategorie „ganz unten“
+                {adminCopy.dropBottomCategory}
               </div>
             )}
           </div>
@@ -2039,7 +2184,7 @@ export function AdminDashboard() {
               disabled={savingMenu}
               className="rounded-full border border-brand-primary/80 bg-brand-primary/15 px-8 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-primary hover:bg-brand-primary/25 disabled:opacity-50"
             >
-              {savingMenu ? "Saving…" : "Save entire menu"}
+              {savingMenu ? adminCopy.saving : adminCopy.saveEntireMenu}
             </button>
           </div>
             </>

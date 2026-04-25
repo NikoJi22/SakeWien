@@ -130,6 +130,8 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
+    // Admin endpoint intentionally bypasses lunch-hour visibility logic:
+    // admins must always see/edit lunch menu regardless of time/day.
     const data = await readMenuFromDisk();
     return NextResponse.json(data, { headers: noStoreJson });
   } catch (err) {

@@ -121,6 +121,27 @@ html {
   color: transparent;
 }
 
+/* Admin Chinese mode: keep layout, increase readability. */
+.admin-zh {
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.admin-zh p,
+.admin-zh li,
+.admin-zh label,
+.admin-zh span,
+.admin-zh div {
+  line-height: 1.65;
+}
+
+.admin-zh input,
+.admin-zh select,
+.admin-zh textarea,
+.admin-zh button {
+  font-size: 1rem;
+}
+
 /* Mobile nav: light scrim + white drawer (portaled to body) */
 .mobile-menu-fullscreen-overlay {
   position: fixed !important;
