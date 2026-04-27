@@ -1067,7 +1067,7 @@ export function AdminDashboard() {
       <div className="mx-auto grid max-w-[1600px] gap-8 px-4 py-8 lg:grid-cols-[minmax(200px,240px)_1fr] lg:gap-10 lg:px-8">
         {/* Sidebar TOC — desktop */}
         <aside className="hidden lg:block">
-          <nav className="sticky top-[7.5rem] space-y-1 rounded-xl border border-[#eeeeee] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <nav className="sticky top-[7.5rem] max-h-[calc(100vh-8.5rem)] overflow-y-auto space-y-1 rounded-xl border border-[#eeeeee] bg-white p-3 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
             <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">{adminCopy.onThisPage}</p>
             <button
               type="button"
