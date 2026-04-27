@@ -48,6 +48,9 @@ export function AdminOptionGroups({ categories, lang = "de" }: { categories: Men
           optionPlaceholderDe: "标签（德语）",
           optionPlaceholderEn: "标签（英语）",
           extraPrice: "加价（EUR）"
+          ,
+          lunchCategoryLinked: "已关联午市分类",
+          lunchDishesLinked: "午市菜品"
         }
       : {
           title: "Optionsgruppen",
@@ -88,6 +91,9 @@ export function AdminOptionGroups({ categories, lang = "de" }: { categories: Men
           optionPlaceholderDe: "Label DE",
           optionPlaceholderEn: "Label EN",
           extraPrice: "Aufpreis (EUR)"
+          ,
+          lunchCategoryLinked: "Mit Lunch-Kategorie verknüpft",
+          lunchDishesLinked: "Lunch-Gerichte"
         };
   const [groups, setGroups] = useState<ReusableOptionGroup[]>([]);
   const [status, setStatus] = useState("");
@@ -265,32 +271,48 @@ export function AdminOptionGroups({ categories, lang = "de" }: { categories: Men
       <div className="space-y-4">
         {groups.map((g, gi) => (
           <div key={g.id} className="rounded-xl border border-[#eeeeee] bg-neutral-50/70 p-4 space-y-3">
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                if (!confirm(lang === "zh" ? `确定删除选项组 "${g.name.de || g.id}" ?` : `Optionsgruppe "${g.name.de || g.id}" wirklich löschen?`)) return;
-                  setGroups((prev) => prev.filter((_, i) => i !== gi));
-                }}
-                className="text-[10px] font-semibold uppercase text-red-500 hover:underline"
-              >
-              {txt.deleteGroup}
-              </button>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-600">
-              <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                {txt.categories}: {g.linkedCategoryIds?.length ?? 0}
-              </span>
-              <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                {txt.dishes}: {g.linkedDishIds?.length ?? 0}
-              </span>
-              <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                {txt.requiredShort}: {g.required ? txt.yes : txt.no}
-              </span>
-              <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
-                {txt.selectionShort}: {g.selectionType === "single" ? txt.single : txt.multiple}
-              </span>
-            </div>
+            {(() => {
+              const lunchCategoryLinked = (g.linkedCategoryIds ?? []).includes("lunch");
+              const lunchDishLinkedCount = categories
+                .find((c) => c.id === "lunch")
+                ?.items.filter((i) => (g.linkedDishIds ?? []).includes(i.id)).length ?? 0;
+              return (
+                <>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                      if (!confirm(lang === "zh" ? `确定删除选项组 "${g.name.de || g.id}" ?` : `Optionsgruppe "${g.name.de || g.id}" wirklich löschen?`)) return;
+                        setGroups((prev) => prev.filter((_, i) => i !== gi));
+                      }}
+                      className="text-[10px] font-semibold uppercase text-red-500 hover:underline"
+                    >
+                    {txt.deleteGroup}
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-neutral-600">
+                    <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
+                      {txt.categories}: {g.linkedCategoryIds?.length ?? 0}
+                    </span>
+                    <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
+                      {txt.dishes}: {g.linkedDishIds?.length ?? 0}
+                    </span>
+                    <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
+                      {txt.requiredShort}: {g.required ? txt.yes : txt.no}
+                    </span>
+                    <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
+                      {txt.selectionShort}: {g.selectionType === "single" ? txt.single : txt.multiple}
+                    </span>
+                    <span className={`rounded-full border px-2 py-0.5 ${lunchCategoryLinked ? "border-brand-primary/40 bg-brand-primary/10 text-brand-primary-dark" : "border-[#ddd] bg-white"}`}>
+                      {txt.lunchCategoryLinked}: {lunchCategoryLinked ? txt.yes : txt.no}
+                    </span>
+                    <span className="rounded-full border border-[#ddd] bg-white px-2 py-0.5">
+                      {txt.lunchDishesLinked}: {lunchDishLinkedCount}
+                    </span>
+                  </div>
+                </>
+              );
+            })()}
             <div className="grid gap-3 sm:grid-cols-2">
               <input
                 className={adminInputClass}

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import type { GiftConfig, MenuCategory, MenuItem, MenuItemVariant, SiteContentConfig } from "@/lib/menu-types";
 import type { ReusableOptionGroup } from "@/lib/menu-types";
 import { ALLERGEN_CODES_ORDER, normalizeAllergenCodes } from "@/lib/allergen-codes";
-import { LUNCH_STARTER_CHOICE } from "@/lib/menu-data";
 import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
 import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
 import { normalizeGiftConfig } from "@/lib/gift-config";
@@ -240,12 +239,7 @@ export function AdminDashboard() {
           spicyLevel: "辣度等级",
           noSpicy: "不辣",
           specialDealHint: "支持：-10% 或 -1€",
-          lunchStarterTitle: "午市套餐 — 前菜选择（在线下单）",
-          lunchStarterHint: "启用后，顾客下单时必须选择一个前菜。关闭后移除此菜品的前菜选择。",
-          lunchStarterToggle: "下单时显示前菜选择",
           options: "选项",
-          removeOption: "删除选项",
-          addOption: "+ 添加选项",
           allergens: "过敏原（欧盟代码）",
           addDish: "+ 添加菜品",
           dropBottomDish: "拖放到这里可移动到最底部",
@@ -299,13 +293,7 @@ export function AdminDashboard() {
           spicyLevel: "Schärfe-Level",
           noSpicy: "Keine",
           specialDealHint: "Unterstützt: -10% oder -1€",
-          lunchStarterTitle: "Mittagsmenü — Vorspeise (Online-Bestellung)",
-          lunchStarterHint:
-            "Aktiv: Gäste wählen beim Bestellen eine Option. Deaktivieren entfernt die Auswahl für dieses Gericht.",
-          lunchStarterToggle: "Vorspeisenwahl beim Bestellen",
           options: "Optionen",
-          removeOption: "Remove option",
-          addOption: "+ Option",
           allergens: "Allergens (EU codes)",
           addDish: "+ Dish",
           dropBottomDish: "Ziel für „ganz unten“ — hier ablegen",
@@ -740,101 +728,6 @@ export function AdminDashboard() {
         ...c,
         title: { ...c.title, [lang]: value }
       }))
-    );
-  }
-
-  function setLunchStarterEnabled(catIndex: number, itemIndex: number, enabled: boolean) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (dish) => {
-        if (enabled) {
-          return {
-            ...dish,
-            lunchStarterChoice: JSON.parse(JSON.stringify(LUNCH_STARTER_CHOICE)) as MenuItem["lunchStarterChoice"]
-          };
-        }
-        const next: MenuItem = { ...dish };
-        delete next.lunchStarterChoice;
-        return next;
-      })
-    );
-  }
-
-  function updateLunchStarterLabelField(catIndex: number, itemIndex: number, lang: "de" | "en", value: string) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const ch = item.lunchStarterChoice;
-        if (!ch) return item;
-        return {
-          ...item,
-          lunchStarterChoice: {
-            ...ch,
-            label: { ...ch.label, [lang]: value }
-          }
-        };
-      })
-    );
-  }
-
-  function updateLunchStarterOptionId(catIndex: number, itemIndex: number, optIdx: number, id: string) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const ch = item.lunchStarterChoice;
-        if (!ch?.options[optIdx]) return item;
-        const options = ch.options.map((opt, i) => (i === optIdx ? { ...opt, id } : opt));
-        return { ...item, lunchStarterChoice: { ...ch, options } };
-      })
-    );
-  }
-
-  function updateLunchStarterOptionName(
-    catIndex: number,
-    itemIndex: number,
-    optIdx: number,
-    lang: "de" | "en",
-    value: string
-  ) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const ch = item.lunchStarterChoice;
-        const opt = ch?.options[optIdx];
-        if (!ch || !opt) return item;
-        const options = ch.options.map((o, i) =>
-          i === optIdx ? { ...o, name: { ...o.name, [lang]: value } } : o
-        );
-        return { ...item, lunchStarterChoice: { ...ch, options } };
-      })
-    );
-  }
-
-  function addLunchStarterOptionRow(catIndex: number, itemIndex: number) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const ch = item.lunchStarterChoice;
-        if (!ch) return item;
-        return {
-          ...item,
-          lunchStarterChoice: {
-            ...ch,
-            options: [...ch.options, { id: `ls-${crypto.randomUUID().slice(0, 8)}`, name: { de: "", en: "" } }]
-          }
-        };
-      })
-    );
-  }
-
-  function removeLunchStarterOptionRow(catIndex: number, itemIndex: number, optIdx: number) {
-    setCategories((prev) =>
-      replaceItemAt(prev, catIndex, itemIndex, (item) => {
-        const ch = item.lunchStarterChoice;
-        if (!ch) return item;
-        const options = ch.options.filter((_, i) => i !== optIdx);
-        if (options.length === 0) {
-          const next: MenuItem = { ...item };
-          delete next.lunchStarterChoice;
-          return next;
-        }
-        return { ...item, lunchStarterChoice: { ...ch, options } };
-      })
     );
   }
 
@@ -1987,90 +1880,6 @@ export function AdminDashboard() {
                                     </AdminField>
                                   </div>
                                 )}
-                              </div>
-                              <div className="lg:col-span-2 space-y-3 rounded-xl border border-[#e5e5e5] bg-white p-4">
-                                <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
-                                  {adminCopy.lunchStarterTitle}
-                                </p>
-                                <p className="text-xs text-neutral-500">
-                                  {adminCopy.lunchStarterHint}
-                                </p>
-                                <label className="flex cursor-pointer items-center gap-2 text-sm text-neutral-800">
-                                  <input
-                                    type="checkbox"
-                                    className="accent-brand-primary h-4 w-4"
-                                    checked={!!item.lunchStarterChoice?.options?.length}
-                                    onChange={(e) => setLunchStarterEnabled(ci, ii, e.target.checked)}
-                                  />
-                                  {adminCopy.lunchStarterToggle}
-                                </label>
-                                {item.lunchStarterChoice?.options?.length ? (
-                                  <div className="space-y-3 border-t border-[#eeeeee] pt-3">
-                                    <div className="grid gap-3 sm:grid-cols-2">
-                                      <AdminField label="Vorspeise — Überschrift (DE)">
-                                        <input
-                                          value={item.lunchStarterChoice.label.de}
-                                          onChange={(e) => updateLunchStarterLabelField(ci, ii, "de", e.target.value)}
-                                          className={adminInputClass}
-                                          placeholder="z. B. Vorspeise"
-                                        />
-                                      </AdminField>
-                                      <AdminField label="Vorspeise — Überschrift (EN)">
-                                        <input
-                                          value={item.lunchStarterChoice.label.en}
-                                          onChange={(e) => updateLunchStarterLabelField(ci, ii, "en", e.target.value)}
-                                          className={adminInputClass}
-                                          placeholder="e.g. Starter"
-                                        />
-                                      </AdminField>
-                                    </div>
-                                    <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">{adminCopy.options}</p>
-                                    <div className="space-y-3">
-                                      {item.lunchStarterChoice.options.map((opt, oi) => (
-                                        <div
-                                          key={`${opt.id}-${oi}`}
-                                          className="flex flex-col gap-2 rounded-lg border border-[#eeeeee] bg-neutral-50/80 p-3 sm:flex-row sm:flex-wrap sm:items-end"
-                                        >
-                                          <AdminField label="Option-ID" className="min-w-[140px] flex-1">
-                                            <input
-                                              value={opt.id}
-                                              onChange={(e) => updateLunchStarterOptionId(ci, ii, oi, e.target.value)}
-                                              className={`${adminInputClass} font-mono text-xs`}
-                                            />
-                                          </AdminField>
-                                          <AdminField label="Name DE" className="min-w-[160px] flex-1">
-                                            <input
-                                              value={opt.name.de}
-                                              onChange={(e) => updateLunchStarterOptionName(ci, ii, oi, "de", e.target.value)}
-                                              className={adminInputClass}
-                                            />
-                                          </AdminField>
-                                          <AdminField label="Name EN" className="min-w-[160px] flex-1">
-                                            <input
-                                              value={opt.name.en}
-                                              onChange={(e) => updateLunchStarterOptionName(ci, ii, oi, "en", e.target.value)}
-                                              className={adminInputClass}
-                                            />
-                                          </AdminField>
-                                          <button
-                                            type="button"
-                                            onClick={() => removeLunchStarterOptionRow(ci, ii, oi)}
-                                            className="text-[10px] font-semibold uppercase text-red-400/90 hover:underline sm:mb-2"
-                                          >
-                                            {adminCopy.removeOption}
-                                          </button>
-                                        </div>
-                                      ))}
-                                    </div>
-                                    <button
-                                      type="button"
-                                      onClick={() => addLunchStarterOptionRow(ci, ii)}
-                                      className="text-[10px] font-semibold uppercase text-brand-primary hover:underline"
-                                    >
-                                      {adminCopy.addOption}
-                                    </button>
-                                  </div>
-                                ) : null}
                               </div>
                               <div className="lg:col-span-2">
                                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">

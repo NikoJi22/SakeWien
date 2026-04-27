@@ -47,5 +47,54 @@
       "warm-dishes"
     ],
     "linkedDishIds": []
+  },
+  {
+    "id": "og-927355cf",
+    "name": {
+      "de": "Beilagen",
+      "en": "Sides"
+    },
+    "required": false,
+    "selectionType": "single",
+    "minSelections": 0,
+    "maxSelections": 1,
+    "options": [
+      {
+        "id": "opt-5ea1e23c",
+        "label": {
+          "de": "Ohne Vorspeise",
+          "en": "Without starter"
+        },
+        "extraPriceEur": 0
+      },
+      {
+        "id": "opt-d1a3e138",
+        "label": {
+          "de": "Miso Suppe",
+          "en": "Miso soup"
+        },
+        "extraPriceEur": 0
+      },
+      {
+        "id": "opt-5e3dd3e5",
+        "label": {
+          "de": "Süßsauer Suppe",
+          "en": "Sweet and sour soup"
+        },
+        "extraPriceEur": 0
+      },
+      {
+        "id": "opt-4d41e171",
+        "label": {
+          "de": "Mini Frühlingsrollen",
+          "en": "Mini spring rolls"
+        },
+        "extraPriceEur": 0
+      }
+    ],
+    "linkedCategoryIds": [
+      "lunch"
+    ],
+    "linkedDishIds": []
   }
 ]

@@ -69,12 +69,12 @@ export function OrderMenuItem({
     [resolvedCategoryId, item, reusableGroups]
   );
   const visibleReusableGroups = linkedOptionGroups;
+  const useLegacyLunchStarter = needsStarter && !(resolvedCategoryId === "lunch" && visibleReusableGroups.length > 0);
   const [groupSelections, setGroupSelections] = useState<Record<string, string[]>>({});
   useEffect(() => {
     const next: Record<string, string[]> = {};
     for (const g of visibleReusableGroups) {
-      if (g.selectionType === "single" && g.required && g.options[0]) next[g.id] = [g.options[0].id];
-      else next[g.id] = [];
+      next[g.id] = [];
     }
     setGroupSelections(next);
   }, [item.id, visibleReusableGroups]);
@@ -120,11 +120,11 @@ export function OrderMenuItem({
 
   const lineKey = useMemo(
     () =>
-      cartLineKey(item.id, needsStarter ? starterId : null, {
+      cartLineKey(item.id, useLegacyLunchStarter ? starterId : null, {
         orderChoiceId,
         optionSelections: groupSelections
       }),
-    [item.id, needsStarter, starterId, orderChoiceId, groupSelections]
+    [item.id, useLegacyLunchStarter, starterId, orderChoiceId, groupSelections]
   );
 
   const qty = quantities[lineKey] ?? 0;
@@ -140,11 +140,11 @@ export function OrderMenuItem({
   }, []);
 
   const onAdd = () => {
-    if (needsStarter && !starterId) return;
+    if (useLegacyLunchStarter && !starterId) return;
     if (selectionGroup?.required && !orderChoiceId) return;
     if (!validateOptionGroupSelections(visibleReusableGroups, groupSelections)) return;
     addOne(item.id, {
-      starterOptionId: needsStarter ? starterId : undefined,
+      starterOptionId: useLegacyLunchStarter ? starterId : undefined,
       orderChoiceId: orderChoiceId || undefined,
       optionSelections: groupSelections
     });
@@ -201,7 +201,7 @@ export function OrderMenuItem({
 
         <MenuAllergenChips item={item} className="mt-1.5 min-h-[1rem] sm:mt-2 sm:min-h-[1.25rem]" />
 
-        {needsStarter && starterConfig && (
+        {useLegacyLunchStarter && starterConfig && (
           <div className="mt-2 rounded-xl border border-brand-line bg-brand-canvas/80 px-2.5 py-2 sm:mt-3 sm:px-3 sm:py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-subtle">{starterConfig.label[language]}</p>
             <p className="mt-0.5 text-[11px] text-brand-body sm:mt-1 sm:text-xs">{t.order.lunchStarterHint}</p>
@@ -264,6 +264,20 @@ export function OrderMenuItem({
           <div key={g.id} className="mt-2 rounded-xl border border-brand-line bg-brand-canvas/80 px-2.5 py-2 sm:mt-3 sm:px-3 sm:py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-brand-subtle">{g.name[language]}</p>
             <div className="mt-1.5 flex flex-col gap-1.5 sm:mt-2 sm:gap-2">
+              {g.selectionType === "single" && !g.required ? (
+                <label className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border border-brand-line bg-brand-card px-2 py-1 text-xs text-brand-ink transition hover:bg-brand-surface-hover sm:py-1.5 sm:text-sm">
+                  <span className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      className="accent-brand-primary h-4 w-4 shrink-0"
+                      name={`og-${starterGroupId}-${item.id}-${g.id}`}
+                      checked={(groupSelections[g.id] ?? []).length === 0}
+                      onChange={() => setGroupSelections((prev) => ({ ...prev, [g.id]: [] }))}
+                    />
+                    {language === "de" ? "Keine Auswahl" : "No selection"}
+                  </span>
+                </label>
+              ) : null}
               {g.options.map((opt) => {
                 const selected = (groupSelections[g.id] ?? []).includes(opt.id);
                 return (
@@ -333,7 +347,12 @@ export function OrderMenuItem({
               <button
                 type="button"
                 onClick={onAdd}
-                disabled={isSoldOut || (needsStarter && !starterId) || (!!selectionGroup?.required && !orderChoiceId) || !validateOptionGroupSelections(visibleReusableGroups, groupSelections)}
+                disabled={
+                  isSoldOut ||
+                  (useLegacyLunchStarter && !starterId) ||
+                  (!!selectionGroup?.required && !orderChoiceId) ||
+                  !validateOptionGroupSelections(visibleReusableGroups, groupSelections)
+                }
                 className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-semibold text-brand-primary transition hover:bg-brand-surface-hover hover:text-brand-primary-dark disabled:opacity-30 sm:h-9 sm:w-9 sm:text-xl"
                 aria-label="Increase"
               >

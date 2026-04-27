@@ -40,13 +40,14 @@ function sanitizeGroups(raw: unknown): ReusableOptionGroup[] | null {
       (x): x is string => typeof x === "string"
     );
     const selectionType = rec.selectionType === "multiple" ? "multiple" : "single";
-    const minSelections = Math.max(0, Number(rec.minSelections ?? (selectionType === "single" ? 1 : 0)) || 0);
+    const required = !!rec.required;
+    const minSelections = Math.max(0, Number(rec.minSelections ?? (required ? 1 : 0)) || 0);
     const maxSelections =
       Math.max(minSelections, Number(rec.maxSelections ?? (selectionType === "single" ? 1 : Math.max(1, options.length))) || 0);
     out.push({
       id: rec.id.trim(),
       name: { de: name.de.trim(), en: name.en.trim() },
-      required: !!rec.required,
+      required,
       selectionType,
       minSelections,
       maxSelections,

@@ -56,7 +56,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (!item) return prev;
         const starterOptionId = opts?.starterOptionId ?? null;
         const orderChoiceId = opts?.orderChoiceId ?? null;
-        const needStarter = itemRequiresLunchStarter(item);
+        const category = findCategoryByItemId(categories, item.id);
+        const linkedGroups = category ? resolveReusableOptionGroupsForDish(item, category.id, reusableGroups) : [];
+        const needStarter = itemRequiresLunchStarter(item) && !(category?.id === "lunch" && linkedGroups.length > 0);
         if (needStarter && !starterOptionId) return prev;
         const selectionGroup = getItemSelectionGroup(item);
         const requiredOrderChoice = !!selectionGroup?.required && (selectionGroup.options?.length ?? 0) > 0;
@@ -70,7 +72,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return { ...prev, [key]: (prev[key] ?? 0) + 1 };
       });
     },
-    [itemById]
+    [itemById, categories, reusableGroups]
   );
 
   const removeOne = useCallback((lineKey: string) => {
@@ -103,7 +105,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           ? selectionGroup.options.find((opt) => opt.id === selectionGroup.defaultOptionId) ?? selectionGroup.options[0]
           : undefined;
       const orderChoice = orderChoiceId ? findItemSelectionOption(item, orderChoiceId) ?? fallbackChoice : fallbackChoice;
-      if (itemRequiresLunchStarter(item)) {
+      const needsLegacyStarter = itemRequiresLunchStarter(item) && !(category?.id === "lunch" && linkedGroups.length > 0);
+      if (needsLegacyStarter) {
         if (!starterOptionId) continue;
         const opt = resolveStarterOption(item, starterOptionId);
         if (!opt) continue;
