@@ -5,6 +5,8 @@ import { normalizeAllergenCodes } from "@/lib/allergen-codes";
 import { DEFAULT_DISH_PLACEHOLDER_IMAGE } from "@/lib/dish-image";
 import { readMenuFromDisk, writeMenuToDisk } from "@/lib/menu-store";
 import { cookies } from "next/headers";
+import { LUNCH_CATEGORY_ID } from "@/lib/order-config";
+import { menuCategories as seedMenuCategories } from "@/lib/menu-data";
 
 function isMenuCategoryArray(x: unknown): x is MenuCategory[] {
   if (!Array.isArray(x)) return false;
@@ -125,6 +127,26 @@ function normalizeMenuItemImage(raw: unknown): string {
 
 const noStoreJson = { "Cache-Control": "private, no-store, must-revalidate" };
 
+function cloneCategory(cat: MenuCategory): MenuCategory {
+  return JSON.parse(JSON.stringify(cat)) as MenuCategory;
+}
+
+function getSeedLunchCategory(): MenuCategory | null {
+  const seedLunch = seedMenuCategories.find((c) => c.id === LUNCH_CATEGORY_ID);
+  return seedLunch ? cloneCategory(seedLunch) : null;
+}
+
+/**
+ * Safety net for production data: if "lunch" was ever accidentally stripped from persisted JSON,
+ * admin must still always receive/edit a full menu that contains lunch.
+ */
+function ensureLunchCategoryPresent(categories: MenuCategory[]): MenuCategory[] {
+  if (categories.some((c) => c.id === LUNCH_CATEGORY_ID)) return categories;
+  const seedLunch = getSeedLunchCategory();
+  if (!seedLunch) return categories;
+  return [...categories, seedLunch];
+}
+
 export async function GET() {
   if (!(await requireAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -132,7 +154,7 @@ export async function GET() {
   try {
     // Admin endpoint intentionally bypasses lunch-hour visibility logic:
     // admins must always see/edit lunch menu regardless of time/day.
-    const data = await readMenuFromDisk();
+    const data = ensureLunchCategoryPresent(await readMenuFromDisk());
     return NextResponse.json(data, { headers: noStoreJson });
   } catch (err) {
     console.error("[admin/menu] GET: storage read failed — not falling back to TypeScript seed (would reset images).", err);
@@ -219,7 +241,7 @@ export async function POST(request: Request) {
       })
     }));
 
-    await writeMenuToDisk(sanitized);
+    await writeMenuToDisk(ensureLunchCategoryPresent(sanitized));
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[admin/menu] Failed to persist menu", error);
