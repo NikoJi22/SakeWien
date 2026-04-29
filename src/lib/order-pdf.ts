@@ -4,6 +4,9 @@ import { DELIVERY_TIME_ESTIMATE_DE, OPENING_HOURS_PDF_DE } from "@/lib/order-sch
 const COMPANY_STREET = "Kaiserstraße 81/6";
 const COMPANY_CITY = "1070 Wien";
 
+/** Öffentliche Website auf dem Thermobon (nicht Deployment-Host wie *.vercel.app) */
+const DEFAULT_ORDER_PDF_WEBSITE = "www.sakewien.at";
+
 /** Kassenbon: Anzeigename (ohne Logo, thermotauglich) — im PDF immer GROSSBUCHSTABEN */
 const headerRestaurantName = () => process.env.ORDER_PDF_RESTAURANT_NAME?.trim() || "Sake";
 
@@ -19,13 +22,11 @@ const deliveryDistrictsNotice = () =>
   process.env.ORDER_PDF_DELIVERY_DISTRICTS?.trim() ||
   "Lieferung nur in den Wiener Bezirken 6, 7, 8, 15 und 16. In alle anderen Bezirke liefern wir nicht.";
 
-/** Fußzeile: Website (ORDER_PDF_WEBSITE), sonst Vercel-URL, sonst leer */
+/** Fußzeile: Website (ORDER_PDF_WEBSITE), sonst öffentliche Standard-Domain */
 function footerWebsiteLines(): string[] {
   const fromEnv = process.env.ORDER_PDF_WEBSITE?.trim();
   if (fromEnv) return [fromEnv];
-  const vercel = process.env.VERCEL_URL?.trim();
-  if (vercel) return [`https://${vercel.replace(/^https?:\/\//, "")}`];
-  return [];
+  return [DEFAULT_ORDER_PDF_WEBSITE];
 }
 
 export type OrderPdfLine = {
