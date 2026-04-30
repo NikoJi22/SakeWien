@@ -1,4 +1,4 @@
-import { allocateNextOrderNumber } from "@/lib/order-sequence-store";
+import { allocateUniqueOrderCode } from "@/lib/order-code-store";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { MailerConfigError, MailerSendError, sendMail } from "@/lib/mailer";
@@ -252,7 +252,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const orderId = await allocateNextOrderNumber();
+    const orderCode = await allocateUniqueOrderCode();
     const itemsSubtotalEur = body.lines.reduce((s, l) => s + Number(l.lineTotalEur || 0), 0);
     const grandTotalEur = Number(body.subtotalEur || 0);
     const requestedGiftIds = Array.isArray(body.giftItemIds)
@@ -294,7 +294,7 @@ export async function POST(request: Request) {
       body.fulfillment === "delivery" ? String(body.deliveryDate ?? "").trim() : "";
 
     const pdfInput: OrderPdfInput = {
-      orderId,
+      orderId: orderCode,
       fulfillment: body.fulfillment,
       createdAt: new Date(),
       customerName,
@@ -329,7 +329,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "pdf_failed" }, { status: 500 });
     }
 
-    const subject = `Neue Bestellung ${orderId}`;
+    const subject = `Neue Bestellung ${orderCode}`;
     const scheduleLine =
       body.fulfillment === "pickup"
         ? `Abholung: ${formatOrderDateTimeVienna(body.pickupTime) ?? "—"}`
@@ -338,7 +338,7 @@ export async function POST(request: Request) {
     const emailLines = [
       subject,
       "",
-      `Bestellnr.: ${orderId}`,
+      `Bestellnr.: ${orderCode}`,
       `Zeit (Wien): ${formatOrderDateTimeVienna(new Date().toISOString())}`,
       `Kunde: ${customerName}`,
       `Telefon: ${orderPhone ?? "—"}`,
@@ -356,7 +356,7 @@ export async function POST(request: Request) {
         lines: emailLines,
         attachments: [
           {
-            filename: sanitizePdfFilename(orderId),
+            filename: sanitizePdfFilename(orderCode),
             content: pdfBuffer,
             contentType: "application/pdf"
           }
@@ -378,7 +378,7 @@ export async function POST(request: Request) {
     }
 
     store.delete(ORDER_PHONE_COOKIE);
-    return NextResponse.json({ ok: true, orderId });
+    return NextResponse.json({ ok: true, orderId: orderCode, orderCode });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[order] Unexpected error — order not accepted:", msg, error);
