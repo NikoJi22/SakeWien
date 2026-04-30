@@ -15,8 +15,8 @@ export const EARLIEST_SLOT_MINUTE = 30;
 export const LATEST_SLOT_HOUR = 21;
 export const LATEST_SLOT_MINUTE = 30;
 
-/** Liefer-PLZ: Wiener Bezirke 6, 7, 8, 15, 16 */
-const DELIVERY_PLZ_RE = /^(106|107|108|115|116)\d{2}$/;
+/** Liefer-PLZ: 1060–1069, 1070–1079, 1080–1089, 1150–1159, 1160–1169 (4-stellig) */
+const DELIVERY_PLZ_RE = /^(106|107|108|115|116)\d$/;
 
 export const DELIVERY_TIME_ESTIMATE_DE = "ca. 45–60 Minuten (unverbindlich)";
 export const DELIVERY_TIME_ESTIMATE_EN = "approx. 45–60 minutes (non-binding)";
