@@ -527,7 +527,7 @@ export const translations: Record<Language, TranslationSchema> = {
       houseNumber: "Hausnummer",
       staircase: "Stiege",
       floor: "Stock",
-      door: "Tür / Türnummer",
+      door: "Tür",
       postalCode: "Postleitzahl",
       city: "Ort",
       message: "Nachricht",
