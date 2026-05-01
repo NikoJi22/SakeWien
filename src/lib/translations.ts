@@ -325,19 +325,19 @@ export const translations: Record<Language, TranslationSchema> = {
     about: {
       title: "About us",
       intro:
-        "SAKE Vienna brings refined Japanese cuisine to the Ring—dark elegance, precise craft, and warm hospitality in the heart of the city.",
-      storyTitle: "Atmosphere & story",
+        "SAKE Vienna is an approachable Japanese spot in Neubau—straightforward flavours, a bright, relaxed room, and a team that likes to welcome you at the counter.",
+      storyTitle: "Our space",
       storyBody:
-        "In a calm, dark interior inspired by Japanese minimalism, we focus on precision, presentation, and the warmth of true omotenashi. Every detail is composed so you can slow down and savour the moment.",
-      qualityTitle: "Ingredients & craft",
+        "A light-filled, easy-going interior: pale wood, clean lines, and our SAKE feature wall. We keep the mood unpretentious and the service clear—whether you sit down for a quick lunch, linger over dinner, or pick up your order on the go.",
+      qualityTitle: "Ingredients & kitchen",
       qualityBody:
-        "We select fresh fish, seasonal produce, and pantry staples with care. Our kitchen prepares sushi, sashimi, and hot dishes daily—respecting tradition while refining each plate for Vienna.",
-      serviceTitle: "Dine in, takeaway & delivery",
+        "We choose fresh fish, seasonal vegetables, and trusted staples with care. Each day we prepare sushi, sashimi, and hot plates with consistency in mind—familiar Japanese comfort, tuned for everyday Vienna.",
+      serviceTitle: "Eat in, takeaway & delivery",
       serviceBody:
-        "Reserve a table for a full evening in our dining room, enjoy dishes to go, or order online for pickup and delivery across Vienna. Wherever you choose to experience SAKE, the same standards apply.",
+        "Drop by the restaurant, order dishes to take away, or use our online shop for pickup and delivery in Vienna. The same care goes into every plate, however you choose to enjoy it.",
       locationTitle: "Find us",
       locationBody:
-        "Kärntner Ring—in the heart of Vienna. For directions, opening hours, and private events, our team is one message away.",
+        "Kaiserstraße 81 1070 Vienna. For directions, opening hours, and private events, our team is one message away.",
       ctaLabel: "Contact & directions"
     },
     order: {
@@ -364,7 +364,7 @@ export const translations: Record<Language, TranslationSchema> = {
       pickupTime: "Pickup time",
       pickupDateLabel: "Pickup date",
       pickupPhoneInfoTitle: "Pickup phone:",
-      pickupPhoneInfoValue: "+43 1 234 56 78",
+      pickupPhoneInfoValue: "+4315223551",
       pickupPhoneCustomerLabel: "Your phone number (required)",
       pickupPhoneCustomerHint: "We use this number to reach you about your pickup order.",
       pickupSlotHint:
@@ -559,19 +559,19 @@ export const translations: Record<Language, TranslationSchema> = {
     about: {
       title: "Über uns",
       intro:
-        "SAKE Vienna verbindet japanische Präzision mit Wiener Gastfreundschaft—dunkle Eleganz, sorgfältiges Handwerk und echte Herzlichkeit am Ring.",
-      storyTitle: "Atmosphäre & Geschichte",
+        "SAKE Vienna ist ein unkompliziertes japanisches Lokal in Neubau—klare Aromen, ein helles, entspanntes Ambiente und ein Team, das Sie gern am Tresen begrüßt.",
+      storyTitle: "Unser Lokal",
       storyBody:
-        "In ruhigem, dunklem Ambiente inspiriert von japanischer Reduktion legen wir Wert auf Präsentation, Präzision und die Wärme echter Omotenashi. Jedes Detail ist darauf ausgelegt, den Moment bewusst zu genießen.",
-      qualityTitle: "Zutaten & Handwerk",
+        "Hell, freundlich, übersichtlich: helles Holz, klare Linien und unsere SAKE-Wand im Raum. Wir halten die Stimmung bodennah und den Service verständlich—ob Mittagessen, längeres Abendessen oder spontan zum Mitnehmen.",
+      qualityTitle: "Zutaten & Küche",
       qualityBody:
-        "Wir wählen frischen Fisch, saisonales Gemüse und ausgewählte Spezialitäten mit Sorgfalt. Küche und Sushi-Bar bereiten täglich Sushi, Sashimi und warme Gerichte zu—traditionsbewusst und zugleich fein auf Wien abgestimmt.",
+        "Wir kaufen frischen Fisch, saisonisches Gemüse und bewährte Zutaten mit Bedacht. Täglich entstehen Sushi, Sashimi und warme Gerichte mit dem Anspruch auf Beständigkeit—vertraute japanische Küche für den Alltag in Wien.",
       serviceTitle: "Restaurant, Takeaway & Lieferung",
       serviceBody:
-        "Reservieren Sie einen Tisch für den Abend im Restaurant, genießen Sie Gerichte zum Mitnehmen oder bestellen Sie online zur Abholung oder Lieferung in Wien. Überall gilt derselbe Anspruch an Qualität und Sorgfalt.",
+        "Kommen Sie im Lokal vorbei, bestellen Sie zum Mitnehmen oder nutzen Sie den Onlineshop für Abholung und Lieferung in Wien. Die Sorgfalt bleibt dieselbe—egal wie Sie bei uns essen.",
       locationTitle: "Besuchen Sie uns",
       locationBody:
-        "Am Kärntner Ring, im Herzen Wiens. Für Anfahrt, Öffnungszeiten und private Anlässe erreichen Sie uns direkt über die Kontaktseite.",
+        "Kaiserstraße 81 1070 Wien. Für Anfahrt, Öffnungszeiten und private Anlässe erreichen Sie uns direkt über die Kontaktseite.",
       ctaLabel: "Kontakt & Anfahrt"
     },
     order: {
@@ -599,7 +599,7 @@ export const translations: Record<Language, TranslationSchema> = {
       pickupTime: "Abholzeit",
       pickupDateLabel: "Abholdatum",
       pickupPhoneInfoTitle: "Telefon für Abholung:",
-      pickupPhoneInfoValue: "+43 1 234 56 78",
+      pickupPhoneInfoValue: "+4315223551",
       pickupPhoneCustomerLabel: "Ihre Telefonnummer (Pflichtfeld)",
       pickupPhoneCustomerHint: "Wir nutzen diese Nummer, um Sie bei der Abholung zu erreichen.",
       pickupSlotHint:

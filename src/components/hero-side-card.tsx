@@ -35,6 +35,7 @@ export function HeroSideCard({ href, label, imageSrc, imageAlt, edgeToEdge = fal
         fill
         className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
         sizes="(max-width: 1024px) 100vw, 30vw"
+        unoptimized={imageSrc.startsWith("/")}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[rgba(31,35,38,0.42)] via-[rgba(70,95,107,0.12)] to-transparent transition group-hover:from-[rgba(31,35,38,0.5)]" />
       <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-full border border-white/45 bg-brand-card/95 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-ink shadow-md transition group-hover:bg-brand-card">

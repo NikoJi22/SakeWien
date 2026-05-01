@@ -8,14 +8,17 @@ import { SiteLogo } from "@/components/site-logo";
 import { useLanguage } from "@/context/language-context";
 import { brandBtnSecondary } from "@/lib/brand-actions";
 
-const STORY_IMAGE =
-  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=85";
+const STORY_IMAGE = "/about-sake-interior.png";
 const QUALITY_IMAGE =
   "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=1600&q=85";
 
 export default function AboutPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const a = t.about;
+  const storyImageAlt =
+    language === "de"
+      ? "Innenansicht von SAKE Vienna: Theke, Sitzplätze und SAKE-Schriftzug an der Wand"
+      : "Interior of SAKE Vienna: counter, seating, and SAKE lettering on the wall";
 
   return (
     <div>
@@ -27,7 +30,15 @@ export default function AboutPage() {
         </div>
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-brand-line bg-brand-card shadow-[0_1px_3px_rgba(31,35,38,0.05)]">
-            <Image src={STORY_IMAGE} alt="" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+            <Image
+              src={STORY_IMAGE}
+              alt={storyImageAlt}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
+              unoptimized
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-[rgba(31,35,38,0.2)] via-transparent to-transparent" />
           </div>
           <div className="space-y-4">
