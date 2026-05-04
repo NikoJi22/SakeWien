@@ -30,6 +30,9 @@ const fontSans = Montserrat({
 export const metadata: Metadata = {
   title: "Sake Vienna",
   description: "Modern Japanese restaurant website for Sake in Vienna.",
+  verification: {
+    google: "jHWRCpjFQWeg3rGG2Y54uM1zYJYnROZIODuyOQb1HCw"
+  },
   icons: {
     icon: SITE_LOGO_MARK_PATH,
     apple: SITE_LOGO_MARK_PATH
