@@ -19,6 +19,12 @@ type Props = {
 export function MenuGrid({ categories, filter }: Props) {
   const { language, t } = useLanguage();
   const { bestsellers, newDishes } = useMenuData();
+  const categoryDescription = (category: MenuCategory): string | undefined => {
+    if (language === "en") {
+      return category.descriptionEN?.trim() || category.descriptionDE?.trim() || undefined;
+    }
+    return category.descriptionDE?.trim() || undefined;
+  };
 
   const { filteredBestsellers, filteredNew } = useMemo(
     () => filterBestsellersAndNewSections(bestsellers, newDishes, filter),
@@ -64,7 +70,12 @@ export function MenuGrid({ categories, filter }: Props) {
         </MenuHighlightSection>
       )}
       {filteredCategories.map((category) => (
-        <MenuSection key={category.id} categoryId={category.id} title={category.title[language]}>
+        <MenuSection
+          key={category.id}
+          categoryId={category.id}
+          title={category.title[language]}
+          description={categoryDescription(category)}
+        >
           <div className="grid gap-9 md:grid-cols-2 md:gap-11">
             {category.items.map((item) => (
               <MenuItemCard key={item.id} item={item} />

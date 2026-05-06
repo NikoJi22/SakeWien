@@ -73,11 +73,16 @@ function splitUdonRamenCategory(category: MenuCategory): MenuCategory[] {
   if (category.id !== "udon-ramen") return [category];
   const ramenItems = category.items.filter((item) => item.id.startsWith("ramen-"));
   const udonItems = category.items.filter((item) => item.id.startsWith("udon-"));
-  const build = (id: "ramen" | "udon", titleDe: string, titleEn: string, items: MenuItem[]): MenuCategory => ({
-    id,
-    title: { de: titleDe, en: titleEn },
-    items
-  });
+  const build = (id: "ramen" | "udon", titleDe: string, titleEn: string, items: MenuItem[]): MenuCategory => {
+    const next: MenuCategory = {
+      id,
+      title: { de: titleDe, en: titleEn },
+      items
+    };
+    if (category.descriptionDE !== undefined) next.descriptionDE = category.descriptionDE;
+    if (category.descriptionEN !== undefined) next.descriptionEN = category.descriptionEN;
+    return next;
+  };
   return [build("ramen", "Ramen", "Ramen", ramenItems), build("udon", "Udon", "Udon", udonItems)];
 }
 

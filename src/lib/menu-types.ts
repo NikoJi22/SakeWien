@@ -85,6 +85,8 @@ export type MenuItem = {
 export type MenuCategory = {
   id: string;
   title: { en: string; de: string };
+  descriptionDE?: string;
+  descriptionEN?: string;
   /** Optional shared side-choice group for all dishes in this category (used for warm dishes). */
   warmSideChoiceGroup?: OrderChoiceGroup;
   items: MenuItem[];

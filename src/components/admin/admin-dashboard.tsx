@@ -107,7 +107,13 @@ function emptyDish(): MenuItem {
 function categoryMatchesSearch(cat: MenuCategory, q: string): boolean {
   if (!q.trim()) return true;
   const s = q.trim().toLowerCase();
-  if (cat.title.de.toLowerCase().includes(s) || cat.title.en.toLowerCase().includes(s) || cat.id.toLowerCase().includes(s)) {
+  if (
+    cat.title.de.toLowerCase().includes(s) ||
+    cat.title.en.toLowerCase().includes(s) ||
+    cat.id.toLowerCase().includes(s) ||
+    cat.descriptionDE?.toLowerCase().includes(s) ||
+    cat.descriptionEN?.toLowerCase().includes(s)
+  ) {
     return true;
   }
   return cat.items.some(
@@ -727,6 +733,15 @@ export function AdminDashboard() {
       replaceCategoryAt(prev, catIndex, (c) => ({
         ...c,
         title: { ...c.title, [lang]: value }
+      }))
+    );
+  }
+
+  function updateCategoryDescription(catIndex: number, lang: "de" | "en", value: string) {
+    setCategories((prev) =>
+      replaceCategoryAt(prev, catIndex, (c) => ({
+        ...c,
+        ...(lang === "de" ? { descriptionDE: value } : { descriptionEN: value })
       }))
     );
   }
@@ -1513,6 +1528,22 @@ export function AdminDashboard() {
                               value={cat.title.en}
                               onChange={(e) => updateCategoryTitle(ci, "en", e.target.value)}
                               className={adminInputClass}
+                            />
+                          </AdminField>
+                          <AdminField label="Category description (DE)" className="sm:col-span-2">
+                            <textarea
+                              value={cat.descriptionDE ?? ""}
+                              onChange={(e) => updateCategoryDescription(ci, "de", e.target.value)}
+                              className={adminTextareaClass}
+                              rows={2}
+                            />
+                          </AdminField>
+                          <AdminField label="Category description (EN)" className="sm:col-span-2">
+                            <textarea
+                              value={cat.descriptionEN ?? ""}
+                              onChange={(e) => updateCategoryDescription(ci, "en", e.target.value)}
+                              className={adminTextareaClass}
+                              rows={2}
                             />
                           </AdminField>
                         </div>

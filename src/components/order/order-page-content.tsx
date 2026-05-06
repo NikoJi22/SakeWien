@@ -24,6 +24,12 @@ export function OrderPageContent() {
   const { language, t } = useLanguage();
   const { categories, loading, error, bestsellers, newDishes } = useMenuData();
   const [filter, setFilter] = useState(emptyMenuAttributeFilter);
+  const categoryDescription = (category: (typeof categories)[number]): string | undefined => {
+    if (language === "en") {
+      return category.descriptionEN?.trim() || category.descriptionDE?.trim() || undefined;
+    }
+    return category.descriptionDE?.trim() || undefined;
+  };
 
   const { filteredBestsellers, filteredNew } = useMemo(
     () => filterBestsellersAndNewSections(bestsellers, newDishes, filter),
@@ -118,7 +124,12 @@ export function OrderPageContent() {
                   </MenuHighlightSection>
                 )}
                 {withItems.map((category) => (
-                  <MenuSection key={category.id} categoryId={category.id} title={category.title[language]}>
+                  <MenuSection
+                    key={category.id}
+                    categoryId={category.id}
+                    title={category.title[language]}
+                    description={categoryDescription(category)}
+                  >
                     <div className={orderMenuGridClass}>
                       {category.items.map((item) => (
                         <OrderMenuItem

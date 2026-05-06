@@ -111,6 +111,11 @@ function sanitizeOrderChoiceGroup(raw: unknown): MenuItem["orderChoiceGroup"] | 
   };
 }
 
+function sanitizeOptionalText(raw: unknown): string | undefined {
+  if (typeof raw !== "string") return undefined;
+  return raw.trim();
+}
+
 async function requireAdmin() {
   const store = await cookies();
   return verifyAdminSession(store.get(ADMIN_COOKIE)?.value);
@@ -198,6 +203,8 @@ export async function POST(request: Request) {
   try {
     const sanitized = body.map((cat) => ({
       ...cat,
+      descriptionDE: sanitizeOptionalText((cat as { descriptionDE?: unknown }).descriptionDE),
+      descriptionEN: sanitizeOptionalText((cat as { descriptionEN?: unknown }).descriptionEN),
       ...(cat.id === "warm-dishes"
         ? { warmSideChoiceGroup: sanitizeOrderChoiceGroup((cat as { warmSideChoiceGroup?: unknown }).warmSideChoiceGroup) }
         : {}),
