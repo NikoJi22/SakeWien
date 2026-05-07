@@ -185,6 +185,12 @@ type OrderCheckoutProps = {
   variant?: "sidebar" | "drawer";
 };
 
+type PlacedOrderSummary = {
+  orderCode: string;
+  fulfillment: "pickup" | "delivery";
+  totalEur: number;
+};
+
 export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const { language, t } = useLanguage();
   const { lines, subtotalEur, itemCount, clear, removeOne, addOne, setQuantity } = useCart();
@@ -212,7 +218,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [woodForkCount, setWoodForkCount] = useState(0);
   const [showOtpSection, setShowOtpSection] = useState(false);
   const [smsInfo, setSmsInfo] = useState<string | null>(null);
-  const [lastPlacedOrderId, setLastPlacedOrderId] = useState<string | null>(null);
+  const [lastPlacedOrder, setLastPlacedOrder] = useState<PlacedOrderSummary | null>(null);
   const [freeGiftSelections, setFreeGiftSelections] = useState<string[]>([]);
   const cutleryFeeEur = (chopsticksCount + woodSpoonCount + woodForkCount) * 0.1;
   const totalEur = subtotalEur + cutleryFeeEur;
@@ -502,7 +508,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
 
     setSubmitError(null);
     setSmsInfo(null);
-    setLastPlacedOrderId(null);
+    setLastPlacedOrder(null);
     setStatus("loading");
     const formEl = e.currentTarget;
     const payload = {
@@ -573,7 +579,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         credentials: "same-origin"
       });
 
-      let data: { ok?: boolean; orderId?: string; error?: string } = {};
+      let data: { ok?: boolean; orderId?: string; orderCode?: string; error?: string } = {};
       try {
         const text = await res.text();
         if (text.trim()) {
@@ -608,7 +614,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       }
 
       setSubmitError(null);
-      setLastPlacedOrderId(typeof data.orderId === "string" ? data.orderId : null);
+      setLastPlacedOrder({
+        orderCode: typeof data.orderCode === "string" ? data.orderCode : typeof data.orderId === "string" ? data.orderId : "—",
+        fulfillment,
+        totalEur
+      });
       setStatus("success");
       clear();
       const nextEarliest = earliestFulfillmentDateKeyVienna();
@@ -669,7 +679,6 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const toggleActive =
     "rounded-lg bg-brand-primary px-2 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md shadow-brand-primary/25 ring-2 ring-brand-primary/30 ring-offset-2 ring-offset-brand-canvas sm:text-sm";
   const infoBox = "rounded-xl border border-brand-line bg-brand-canvas/90 px-4 py-3 text-sm text-brand-body";
-  const successMsg = "text-center text-sm font-medium text-brand-success";
   const errorMsg = "text-center text-sm font-medium text-brand-danger";
 
   return (
@@ -965,6 +974,50 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
         )}
       </div>
 
+      {status === "success" && lastPlacedOrder ? (
+        <section className="flex flex-1 flex-col gap-5 p-5 sm:gap-6 sm:px-7 sm:py-8">
+          <div className="rounded-2xl border-2 border-brand-success/35 bg-brand-success/5 p-5 shadow-sm sm:p-6">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-success">Bestellung erfolgreich</p>
+            <h3 className="mt-2 text-xl font-bold text-brand-ink sm:text-2xl">Bestellung wurde erfolgreich gesendet</h3>
+            <div className="mt-5 space-y-2.5 text-sm sm:text-base">
+              <p className="text-brand-body">
+                <span className="font-semibold text-brand-ink">Bestellnummer:</span> {lastPlacedOrder.orderCode}
+              </p>
+              <p className="text-brand-body">
+                <span className="font-semibold text-brand-ink">Bestellart:</span>{" "}
+                {lastPlacedOrder.fulfillment === "pickup" ? "Abholung" : "Lieferung"}
+              </p>
+              <p className="text-brand-body">
+                <span className="font-semibold text-brand-ink">Gesamtbetrag:</span>{" "}
+                {formatPriceEur(lastPlacedOrder.totalEur, language)}
+              </p>
+              <p className="text-brand-body">
+                <span className="font-semibold text-brand-ink">Zahlung:</span> Barzahlung
+              </p>
+            </div>
+            <div className="mt-5 space-y-2 rounded-xl border border-brand-line bg-brand-canvas/70 p-4 text-sm text-brand-body">
+              <p>Bei Fragen kontaktiert Sie das Restaurant telefonisch.</p>
+              {lastPlacedOrder.fulfillment === "pickup" ? (
+                <p className="font-medium text-brand-ink">Bitte nennen Sie bei der Abholung Ihre Bestellnummer.</p>
+              ) : (
+                <p>
+                  Sie erhalten eine Bestätigung per E-Mail, falls eine E-Mail-Adresse angegeben wurde.
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setStatus("idle");
+              setLastPlacedOrder(null);
+            }}
+            className={`${btnPrimary} py-3.5 text-sm tracking-[0.15em]`}
+          >
+            Neue Bestellung starten
+          </button>
+        </section>
+      ) : (
       <form onSubmit={onSubmit} className="flex flex-1 flex-col gap-8 p-5 sm:gap-9 sm:px-7 sm:py-8">
         <div className="space-y-3">
           <p className={fulfillLabel}>{t.order.fulfillment}</p>
@@ -1257,17 +1310,8 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
           <p className="text-sm text-brand-subtle">Bitte zuerst Telefonnummer per SMS-Code verifizieren.</p>
         )}
         {submitError && <p className={errorMsg}>{submitError}</p>}
-        {status === "success" && (
-          <div className="space-y-1">
-            <p className={successMsg}>{t.order.orderPlacedSuccess}</p>
-            {lastPlacedOrderId && (
-              <p className="text-sm text-brand-subtle">
-                {t.order.orderReferenceLabel} {lastPlacedOrderId}
-              </p>
-            )}
-          </div>
-        )}
       </form>
+      )}
     </div>
   );
 }

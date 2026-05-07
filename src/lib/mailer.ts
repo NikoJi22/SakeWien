@@ -5,6 +5,8 @@ type EmailPayload = {
   lines: string[];
   /** Overrides RESTAURANT_EMAIL when set (e.g. order PDF notifications). */
   to?: string;
+  /** Optional explicit sender address/header (e.g. ORDER_FROM_EMAIL). */
+  from?: string;
   attachments?: Array<{ filename: string; content: Buffer; contentType?: string }>;
 };
 
@@ -59,7 +61,7 @@ export async function sendMail(payload: EmailPayload) {
 
   try {
     await transporter.sendMail({
-      from: `"Sake Website" <${user}>`,
+      from: payload.from?.trim() || `"Sake Website" <${user}>`,
       to,
       subject: payload.subject,
       text: payload.lines.join("\n"),

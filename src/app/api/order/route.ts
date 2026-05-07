@@ -73,6 +73,15 @@ function orderNotifyRecipient(): string {
   );
 }
 
+function orderFromAddress(): string | undefined {
+  const configured = process.env.ORDER_FROM_EMAIL?.trim() || process.env.RESTAURANT_EMAIL?.trim();
+  return configured || undefined;
+}
+
+function formatTotalEurForMail(totalEur: number): string {
+  return new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" }).format(totalEur);
+}
+
 function normalizePlz(raw: string): string {
   return raw.replace(/\s/g, "");
 }
@@ -253,6 +262,7 @@ export async function POST(request: Request) {
     }
 
     const orderCode = await allocateUniqueOrderCode();
+    const customerEmail = String(body.email ?? "").trim();
     const itemsSubtotalEur = body.lines.reduce((s, l) => s + Number(l.lineTotalEur || 0), 0);
     const grandTotalEur = Number(body.subtotalEur || 0);
     const requestedGiftIds = Array.isArray(body.giftItemIds)
@@ -375,6 +385,33 @@ export async function POST(request: Request) {
       }
       console.error("[order] mail_failed: unexpected error after PDF built — order not accepted", err);
       return NextResponse.json({ error: "mail_failed" }, { status: 502 });
+    }
+
+    if (customerEmail) {
+      try {
+        await sendMail({
+          to: customerEmail,
+          from: orderFromAddress(),
+          subject: "Bestätigung deiner Bestellung bei Sake",
+          lines: [
+            "Danke für deine Bestellung.",
+            "Wir haben deine Bestellung erhalten.",
+            "",
+            `Bestellnummer: ${orderCode}`,
+            `Bestellart: ${body.fulfillment === "pickup" ? "Abholung" : "Lieferung"}`,
+            `Gesamtbetrag: ${formatTotalEurForMail(grandTotalEur)}`,
+            "Zahlung: Barzahlung",
+            "",
+            "Bei Fragen kontaktiert dich das Restaurant telefonisch."
+          ]
+        });
+      } catch (err) {
+        console.error("[order] customer confirmation mail failed (non-blocking)", {
+          orderCode,
+          customerEmail: customerEmail.replace(/(.{2}).*(@.*)/, "$1…$2"),
+          error: err
+        });
+      }
     }
 
     store.delete(ORDER_PHONE_COOKIE);
