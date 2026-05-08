@@ -51,6 +51,8 @@ const ORDER_SUBMIT_ERROR_CODES = new Set([
   "delivery_outside_area",
   "empty_cart",
   "missing_customer_name",
+  "missing_customer_email",
+  "invalid_customer_email",
   "invalid_customer_phone",
   "invalid_json",
   "invalid_payload",
@@ -64,6 +66,10 @@ const ORDER_SUBMIT_ERROR_CODES = new Set([
   "server_misconfigured",
   "order_internal_error"
 ]);
+
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 function messageForOrderSubmitError(code: string | undefined, o: OrderCopy, httpStatus: number): string {
   switch (code) {
@@ -101,6 +107,10 @@ function messageForOrderSubmitError(code: string | undefined, o: OrderCopy, http
       return o.errEmptyCartPayload;
     case "missing_customer_name":
       return o.errMissingCustomerName;
+    case "missing_customer_email":
+      return o.errInvalidCustomerEmail;
+    case "invalid_customer_email":
+      return o.errInvalidCustomerEmail;
     case "invalid_customer_phone":
       return o.errInvalidCustomerPhone;
     case "invalid_json":
@@ -202,6 +212,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [fulfillment, setFulfillment] = useState<"pickup" | "delivery">("pickup");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [sendLoading, setSendLoading] = useState(false);
@@ -436,6 +447,11 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
     }
 
     const fd = new FormData(e.currentTarget);
+    const emailTrimmed = email.trim();
+    if (!isValidEmail(emailTrimmed)) {
+      setSubmitError(t.order.errInvalidCustomerEmail);
+      return;
+    }
     const pickupTime =
       fulfillment === "pickup" ? `${fulfillmentDate}T${pickupClock}:00` : "";
     if (fulfillment === "pickup") {
@@ -515,7 +531,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       fulfillment,
       name: String(fd.get("name") ?? ""),
       phone: normalizedPhone ?? phone.trim(),
-      email: String(fd.get("email") ?? ""),
+      email: emailTrimmed,
       deliveryAddress:
         fulfillment === "delivery"
           ? {
@@ -629,6 +645,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
       setOtp("");
       setShowOtpSection(false);
       setSmsInfo(null);
+      setEmail("");
 
       try {
         formEl.reset();
@@ -997,13 +1014,7 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
             </div>
             <div className="mt-5 space-y-2 rounded-xl border border-brand-line bg-brand-canvas/70 p-4 text-sm text-brand-body">
               <p>Bei Fragen kontaktiert Sie das Restaurant telefonisch.</p>
-              {lastPlacedOrder.fulfillment === "pickup" ? (
-                <p className="font-medium text-brand-ink">Bitte nennen Sie bei der Abholung Ihre Bestellnummer.</p>
-              ) : (
-                <p>
-                  Sie erhalten eine Bestätigung per E-Mail, falls eine E-Mail-Adresse angegeben wurde.
-                </p>
-              )}
+              <p>Sie erhalten eine Bestätigung per E-Mail.</p>
             </div>
           </div>
           <button
@@ -1142,8 +1153,19 @@ export function OrderCheckout({ variant = "sidebar" }: OrderCheckoutProps) {
             <input name="name" required className={inputClass} autoComplete="name" />
           </label>
           <label className={`flex flex-col gap-1.5 sm:col-span-2 ${labelMuted}`}>
-            <span>{t.order.emailOptional}</span>
-            <input name="email" type="email" className={inputClass} autoComplete="email" />
+            <span>{t.order.emailRequired}</span>
+            <input
+              name="email"
+              type="email"
+              required
+              className={inputClass}
+              autoComplete="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setSubmitError(null);
+              }}
+            />
           </label>
         </div>
 

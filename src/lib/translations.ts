@@ -167,7 +167,7 @@ type TranslationSchema = {
     removeFromCart: string;
     decreaseQty: string;
     increaseQty: string;
-    emailOptional: string;
+    emailRequired: string;
     smsVerifyTitle: string;
     /** Shown before any SMS was sent: code is requested via “Place order” */
     smsVerifyHintSubmit: string;
@@ -201,6 +201,7 @@ type TranslationSchema = {
     errSmsNotConfigured: string;
     errSmsProviderFailed: string;
     errMissingCustomerName: string;
+    errInvalidCustomerEmail: string;
     errInvalidCustomerPhone: string;
     errInvalidGiftSelection: string;
     errEmptyCartPayload: string;
@@ -408,7 +409,7 @@ export const translations: Record<Language, TranslationSchema> = {
       removeFromCart: "Remove",
       decreaseQty: "Decrease quantity",
       increaseQty: "Increase quantity",
-      emailOptional: "Email (optional)",
+      emailRequired: "Email (required)",
       smsVerifyTitle: "Verify your phone",
       smsVerifyHintSubmit: "Enter your phone number, tap “Send code”, then enter the SMS code below and confirm.",
       codeSentInfo: "Code sent. Enter it below and tap Confirm.",
@@ -440,6 +441,7 @@ export const translations: Record<Language, TranslationSchema> = {
         "SMS verification is not available: the text-message service is not configured. Please choose pickup or contact the restaurant.",
       errSmsProviderFailed: "The SMS service returned an error. Please try again in a moment.",
       errMissingCustomerName: "Please enter your name.",
+      errInvalidCustomerEmail: "Please enter a valid e-mail address.",
       errInvalidCustomerPhone: "Please enter a valid phone number with country code (e.g. +43…).",
       errInvalidGiftSelection: "Your free gift selection is invalid. Please choose again.",
       errEmptyCartPayload: "Your order data was incomplete. Please refresh the page and add items again.",
@@ -643,7 +645,7 @@ export const translations: Record<Language, TranslationSchema> = {
       removeFromCart: "Entfernen",
       decreaseQty: "Menge verringern",
       increaseQty: "Menge erhöhen",
-      emailOptional: "E-Mail (optional)",
+      emailRequired: "E-Mail (Pflichtfeld)",
       smsVerifyTitle: "Handy-Verifizierung",
       smsVerifyHintSubmit:
         "Telefonnummer eingeben, auf „Code senden“ tippen, dann den SMS-Code unten eingeben und bestätigen.",
@@ -677,6 +679,7 @@ export const translations: Record<Language, TranslationSchema> = {
         "SMS-Verifizierung nicht verfügbar: Der SMS-Dienst ist nicht konfiguriert. Bitte Abholung wählen oder das Restaurant kontaktieren.",
       errSmsProviderFailed: "Der SMS-Dienst hat einen Fehler gemeldet. Bitte in Kürze erneut versuchen.",
       errMissingCustomerName: "Bitte geben Sie Ihren Namen ein.",
+      errInvalidCustomerEmail: "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
       errInvalidCustomerPhone: "Bitte geben Sie eine gültige Telefonnummer mit Ländervorwahl ein (z. B. +43 …).",
       errInvalidGiftSelection: "Die Auswahl der Gratisartikel ist ungültig. Bitte erneut auswählen.",
       errEmptyCartPayload: "Die Bestelldaten waren unvollständig. Bitte Seite neu laden und erneut bestellen.",

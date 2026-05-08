@@ -106,7 +106,11 @@ const RECEIPT_PROBE_HEIGHT_PT = 16_000;
  */
 const RECEIPT_HEIGHT_BUFFER_PT = 32;
 
-const MARGIN_X = 10;
+/** Thermodrucker-Sicherheitsränder: rechts bewusst größer gegen Abschneiden. */
+const MARGIN_LEFT = 10;
+const MARGIN_RIGHT = 24;
+/** Zusätzlicher Einzug der rechten Betrags-Spalte (pt) für €-Zeichen-Sicherheit. */
+const PRICE_RIGHT_INSET = 2;
 /** Fester Rand oben bis erste Inhaltszeile (PDF-Punkte ≈ px bei 72 dpi). */
 const MARGIN_TOP = 30;
 /** Fester Rand unter dem letzten Inhalt (untere Kante des Bons). */
@@ -134,7 +138,7 @@ function ensureSpace(page: PDFPage, y: number, need: number): { page: PDFPage; y
 
 function drawTextRight(page: PDFPage, y: number, text: string, size: number, font: PDFFont): void {
   const w = font.widthOfTextAtSize(text, size);
-  page.drawText(text, { x: RECEIPT_W - MARGIN_X - w, y, size, font });
+  page.drawText(text, { x: RECEIPT_W - MARGIN_RIGHT - PRICE_RIGHT_INSET - w, y, size, font });
 }
 
 type RenderReceiptOpts = {
@@ -158,7 +162,7 @@ async function renderReceiptContent(
   let page = pdfDoc.addPage([RECEIPT_W, pageHeight]);
   let y = pageHeight - MARGIN_TOP;
 
-  const contentW = RECEIPT_W - MARGIN_X * 2;
+  const contentW = RECEIPT_W - MARGIN_LEFT - MARGIN_RIGHT;
 
   const drawCenter = (text: string, size: number, useBold = false) => {
     const f = useBold ? fontBold : font;
@@ -184,7 +188,7 @@ async function renderReceiptContent(
     const size = opts?.size ?? 11;
     const f = opts?.bold ? fontBold : font;
     ({ page, y } = ensureSpace(page, y, size + GAP_SM + 1));
-    page.drawText(text, { x: MARGIN_X, y, size, font: f });
+    page.drawText(text, { x: MARGIN_LEFT, y, size, font: f });
     y -= size + GAP_SM;
   };
 
@@ -193,7 +197,29 @@ async function renderReceiptContent(
     const lines = wrapLine(text, font, size, contentW);
     for (const ln of lines) {
       ({ page, y } = ensureSpace(page, y, step + 1));
-      page.drawText(ln, { x: MARGIN_X, y, size, font });
+      page.drawText(ln, { x: MARGIN_LEFT, y, size, font });
+      y -= step;
+    }
+  };
+
+  const drawLeftLabelValueWrapped = (label: string, value: string | undefined, size = 11, bold = false) => {
+    const f = bold ? fontBold : font;
+    const safeValue = value?.trim() || "—";
+    const prefix = `${label}: `;
+    const prefixW = f.widthOfTextAtSize(prefix, size);
+    const valueMaxW = Math.max(28, contentW - prefixW);
+    const valueLines = wrapLine(safeValue, f, size, valueMaxW);
+    const step = wrappedLineStepPt(size);
+    const blockH = valueLines.length * step + 2;
+    ({ page, y } = ensureSpace(page, y, blockH + 1));
+
+    const first = valueLines[0] ?? "—";
+    page.drawText(`${prefix}${first}`, { x: MARGIN_LEFT, y, size, font: f });
+    y -= step;
+
+    for (let i = 1; i < valueLines.length; i++) {
+      const ln = valueLines[i]!;
+      page.drawText(ln, { x: MARGIN_LEFT + prefixW, y, size, font: f });
       y -= step;
     }
   };
@@ -240,14 +266,14 @@ async function renderReceiptContent(
     drawCenterTimeBlock("LIEFERHINWEIS", input.deliveryTimeEstimate || DELIVERY_TIME_ESTIMATE_DE);
   }
 
-  drawLeft(`Bestellnr.: ${input.orderId}`, { size: 12, bold: true });
-  drawLeft(`Datum (Wien): ${formatViennaDateTime(input.createdAt)}`, { size: 11 });
-  drawLeft(`Art: ${fulfillmentLabel(input.fulfillment)}`, { size: 11, bold: true });
+  drawLeftLabelValueWrapped("Bestellnr.", input.orderId, 12, true);
+  drawLeftLabelValueWrapped("Datum (Wien)", formatViennaDateTime(input.createdAt), 11);
+  drawLeftLabelValueWrapped("Art", fulfillmentLabel(input.fulfillment), 11, true);
   y -= GAP_SM;
 
-  drawLeft(`Kunde: ${input.customerName || "—"}`, { size: 11 });
-  drawLeft(`Telefon: ${input.phone || "—"}`, { size: 11 });
-  if (input.email?.trim()) drawLeft(`E-Mail: ${input.email.trim()}`, { size: 11 });
+  drawLeftLabelValueWrapped("Kunde", input.customerName, 11);
+  drawLeftLabelValueWrapped("Telefon", input.phone, 11);
+  if (input.email?.trim()) drawLeftLabelValueWrapped("E-Mail", input.email.trim(), 11);
 
   if (input.fulfillment === "delivery" && input.deliveryAddressLine) {
     y -= GAP_SM;
@@ -274,7 +300,7 @@ async function renderReceiptContent(
     drawTextRight(page, rowTop, formatEur(line.lineTotalEur), rowFont, fontBold);
     let ty = rowTop;
     for (const nl of nameLines) {
-      page.drawText(nl, { x: MARGIN_X, y: ty, size: rowFont, font });
+      page.drawText(nl, { x: MARGIN_LEFT, y: ty, size: rowFont, font });
       ty -= rowStep;
     }
     y = ty - GAP_SM;
@@ -336,7 +362,7 @@ async function renderReceiptContent(
   const totalStr = `GESAMT: ${formatEur(input.grandTotalEur)}`;
   const totalSize = 15;
   const tw = fontBold.widthOfTextAtSize(totalStr, totalSize);
-  page.drawText(totalStr, { x: RECEIPT_W - MARGIN_X - tw, y, size: totalSize, font: fontBold });
+  page.drawText(totalStr, { x: RECEIPT_W - MARGIN_RIGHT - PRICE_RIGHT_INSET - tw, y, size: totalSize, font: fontBold });
   y -= totalSize + GAP_SM;
 
   ({ page, y } = ensureSpace(page, y, LINE_H * 4 + 24));

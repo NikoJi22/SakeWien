@@ -82,6 +82,10 @@ function formatTotalEurForMail(totalEur: number): string {
   return new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" }).format(totalEur);
 }
 
+function isValidEmailAddress(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function normalizePlz(raw: string): string {
   return raw.replace(/\s/g, "");
 }
@@ -199,6 +203,16 @@ export async function POST(request: Request) {
       console.error("[order] rejected: missing customer name");
       return NextResponse.json({ error: "missing_customer_name" }, { status: 400 });
     }
+    const customerEmail = String(body.email ?? "").trim();
+    if (!customerEmail) {
+      console.error("[order] rejected: missing customer email");
+      return NextResponse.json({ error: "missing_customer_email" }, { status: 400 });
+    }
+    if (!isValidEmailAddress(customerEmail)) {
+      console.error("[order] rejected: invalid customer email");
+      return NextResponse.json({ error: "invalid_customer_email" }, { status: 400 });
+    }
+    const orderLanguage: "de" | "en" = body.language === "en" ? "en" : "de";
 
     const rawPhone = String(body.phone ?? "").trim();
     let orderPhone: string | null = null;
@@ -262,7 +276,6 @@ export async function POST(request: Request) {
     }
 
     const orderCode = await allocateUniqueOrderCode();
-    const customerEmail = String(body.email ?? "").trim();
     const itemsSubtotalEur = body.lines.reduce((s, l) => s + Number(l.lineTotalEur || 0), 0);
     const grandTotalEur = Number(body.subtotalEur || 0);
     const requestedGiftIds = Array.isArray(body.giftItemIds)
@@ -387,31 +400,68 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "mail_failed" }, { status: 502 });
     }
 
-    if (customerEmail) {
-      try {
-        await sendMail({
-          to: customerEmail,
-          from: orderFromAddress(),
-          subject: "Bestätigung deiner Bestellung bei Sake",
-          lines: [
-            "Danke für deine Bestellung.",
-            "Wir haben deine Bestellung erhalten.",
-            "",
-            `Bestellnummer: ${orderCode}`,
-            `Bestellart: ${body.fulfillment === "pickup" ? "Abholung" : "Lieferung"}`,
-            `Gesamtbetrag: ${formatTotalEurForMail(grandTotalEur)}`,
-            "Zahlung: Barzahlung",
-            "",
-            "Bei Fragen kontaktiert dich das Restaurant telefonisch."
-          ]
-        });
-      } catch (err) {
-        console.error("[order] customer confirmation mail failed (non-blocking)", {
-          orderCode,
-          customerEmail: customerEmail.replace(/(.{2}).*(@.*)/, "$1…$2"),
-          error: err
-        });
-      }
+    try {
+      const customerLineItems =
+        orderLanguage === "en"
+          ? body.lines.flatMap((line, idx) => [
+              `Item ${idx + 1}: ${line.name}`,
+              `Qty: ${line.quantity}`,
+              `Unit price: ${formatTotalEurForMail(Number(line.unitPriceEur || 0))}`,
+              `Line total: ${formatTotalEurForMail(Number(line.lineTotalEur || 0))}`,
+              ""
+            ])
+          : body.lines.flatMap((line, idx) => [
+              `Artikel ${idx + 1}: ${line.name}`,
+              `Menge: ${line.quantity}`,
+              `Einzelpreis: ${formatTotalEurForMail(Number(line.unitPriceEur || 0))}`,
+              `Zeilenpreis: ${formatTotalEurForMail(Number(line.lineTotalEur || 0))}`,
+              ""
+            ]);
+
+      await sendMail({
+        to: customerEmail,
+        from: orderFromAddress(),
+        subject:
+          orderLanguage === "en"
+            ? "Confirmation of your order at Sake"
+            : "Bestätigung deiner Bestellung bei Sake",
+        lines:
+          orderLanguage === "en"
+            ? [
+                "Thank you for your order.",
+                "We have received your order.",
+                "",
+                `Order number: ${orderCode}`,
+                `Order type: ${body.fulfillment === "pickup" ? "Pickup" : "Delivery"}`,
+                "Payment method: Cash payment",
+                "",
+                "Order overview:",
+                ...customerLineItems,
+                `Total amount: ${formatTotalEurForMail(grandTotalEur)}`,
+                "",
+                "If you have any questions, the restaurant will contact you by phone."
+              ]
+            : [
+                "Danke für deine Bestellung.",
+                "Wir haben deine Bestellung erhalten.",
+                "",
+                `Bestellnummer: ${orderCode}`,
+                `Bestellart: ${body.fulfillment === "pickup" ? "Abholung" : "Lieferung"}`,
+                "Zahlungsart: Barzahlung",
+                "",
+                "Bestellübersicht:",
+                ...customerLineItems,
+                `Gesamtbetrag: ${formatTotalEurForMail(grandTotalEur)}`,
+                "",
+                "Bei Fragen kontaktiert dich das Restaurant telefonisch."
+              ]
+      });
+    } catch (err) {
+      console.error("[order] customer confirmation mail failed (non-blocking)", {
+        orderCode,
+        customerEmail: customerEmail.replace(/(.{2}).*(@.*)/, "$1…$2"),
+        error: err
+      });
     }
 
     store.delete(ORDER_PHONE_COOKIE);
