@@ -422,23 +422,21 @@ export async function POST(request: Request) {
     try {
       const customerLineItems =
         orderLanguage === "en"
-          ? body.lines.flatMap((line, idx) => {
+          ? body.lines.flatMap((line) => {
               const { title, details } = splitLineNameParts(line.name);
               return [
-                `Item ${idx + 1}: ${title}`,
-                ...details.map((detail) => (detail.includes(":") ? detail : `Option: ${detail}`)),
-                `Qty: ${line.quantity}`,
+                `${line.quantity}x ${title}`,
+                ...details.map((detail) => `   ${detail.includes(":") ? detail : `Option: ${detail}`}`),
                 `Unit price: ${formatTotalEurForMailEn(Number(line.unitPriceEur || 0))}`,
                 `Total: ${formatTotalEurForMailEn(Number(line.lineTotalEur || 0))}`,
                 ""
               ];
             })
-          : body.lines.flatMap((line, idx) => {
+          : body.lines.flatMap((line) => {
               const { title, details } = splitLineNameParts(line.name);
               return [
-                `Artikel ${idx + 1}: ${title}`,
-                ...details.map((detail) => (detail.includes(":") ? detail : `Option: ${detail}`)),
-                `Menge: ${line.quantity}`,
+                `${line.quantity}x ${title}`,
+                ...details.map((detail) => `   ${detail.includes(":") ? detail : `Option: ${detail}`}`),
                 `Einzelpreis: ${formatTotalEurForMail(Number(line.unitPriceEur || 0))}`,
                 `Summe: ${formatTotalEurForMail(Number(line.lineTotalEur || 0))}`,
                 ""
@@ -470,7 +468,7 @@ export async function POST(request: Request) {
                 "",
                 "Order overview:",
                 ...customerLineItems,
-                `Total amount: ${formatTotalEurForMailEn(grandTotalEur)}`,
+                `TOTAL AMOUNT: ${formatTotalEurForMailEn(grandTotalEur)}`,
                 "",
                 "If you have any questions, the restaurant will contact you by phone."
               ]
@@ -490,7 +488,7 @@ export async function POST(request: Request) {
                 "",
                 "Bestellübersicht:",
                 ...customerLineItems,
-                `Gesamtbetrag: ${formatTotalEurForMail(grandTotalEur)}`,
+                `GESAMTBETRAG: ${formatTotalEurForMail(grandTotalEur)}`,
                 "",
                 "Bei Fragen kontaktiert Sie das Restaurant telefonisch."
               ]

@@ -328,8 +328,6 @@ async function renderReceiptContent(
   const freeGiftItems = (input.freeGiftItems ?? []).map((item) => item.trim()).filter(Boolean);
   if (freeGiftItems.length > 0) {
     y -= GAP_MD;
-    drawLeft("Bonus / Geschenk", { size: 11, bold: true });
-    y -= GAP_SM;
     drawLeft("Gratisartikel:", { size: 12, bold: true });
     drawLeftWrapped(freeGiftItems.join(", "), 11);
     y -= GAP_MD;
