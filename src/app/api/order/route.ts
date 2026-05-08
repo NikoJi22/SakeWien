@@ -79,7 +79,26 @@ function orderFromAddress(): string | undefined {
 }
 
 function formatTotalEurForMail(totalEur: number): string {
-  return new Intl.NumberFormat("de-AT", { style: "currency", currency: "EUR" }).format(totalEur);
+  return `${new Intl.NumberFormat("de-AT", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(totalEur)} €`;
+}
+
+function formatTotalEurForMailEn(totalEur: number): string {
+  return `${new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(totalEur)} €`;
+}
+
+function splitLineNameParts(name: string): { title: string; details: string[] } {
+  const parts = name
+    .split("—")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const [title = name.trim(), ...details] = parts;
+  return { title, details };
 }
 
 function isValidEmailAddress(email: string): boolean {
@@ -403,20 +422,28 @@ export async function POST(request: Request) {
     try {
       const customerLineItems =
         orderLanguage === "en"
-          ? body.lines.flatMap((line, idx) => [
-              `Item ${idx + 1}: ${line.name}`,
-              `Qty: ${line.quantity}`,
-              `Unit price: ${formatTotalEurForMail(Number(line.unitPriceEur || 0))}`,
-              `Line total: ${formatTotalEurForMail(Number(line.lineTotalEur || 0))}`,
-              ""
-            ])
-          : body.lines.flatMap((line, idx) => [
-              `Artikel ${idx + 1}: ${line.name}`,
-              `Menge: ${line.quantity}`,
-              `Einzelpreis: ${formatTotalEurForMail(Number(line.unitPriceEur || 0))}`,
-              `Zeilenpreis: ${formatTotalEurForMail(Number(line.lineTotalEur || 0))}`,
-              ""
-            ]);
+          ? body.lines.flatMap((line, idx) => {
+              const { title, details } = splitLineNameParts(line.name);
+              return [
+                `Item ${idx + 1}: ${title}`,
+                ...details.map((detail) => (detail.includes(":") ? detail : `Option: ${detail}`)),
+                `Qty: ${line.quantity}`,
+                `Unit price: ${formatTotalEurForMailEn(Number(line.unitPriceEur || 0))}`,
+                `Total: ${formatTotalEurForMailEn(Number(line.lineTotalEur || 0))}`,
+                ""
+              ];
+            })
+          : body.lines.flatMap((line, idx) => {
+              const { title, details } = splitLineNameParts(line.name);
+              return [
+                `Artikel ${idx + 1}: ${title}`,
+                ...details.map((detail) => (detail.includes(":") ? detail : `Option: ${detail}`)),
+                `Menge: ${line.quantity}`,
+                `Einzelpreis: ${formatTotalEurForMail(Number(line.unitPriceEur || 0))}`,
+                `Summe: ${formatTotalEurForMail(Number(line.lineTotalEur || 0))}`,
+                ""
+              ];
+            });
 
       await sendMail({
         to: customerEmail,
@@ -424,7 +451,7 @@ export async function POST(request: Request) {
         subject:
           orderLanguage === "en"
             ? "Confirmation of your order at Sake"
-            : "Bestätigung deiner Bestellung bei Sake",
+            : "Bestätigung Ihrer Bestellung bei Sake",
         lines:
           orderLanguage === "en"
             ? [
@@ -434,26 +461,32 @@ export async function POST(request: Request) {
                 `Order number: ${orderCode}`,
                 `Order type: ${body.fulfillment === "pickup" ? "Pickup" : "Delivery"}`,
                 "Payment method: Cash payment",
+                body.fulfillment === "pickup"
+                  ? "Please mention your order number when you pick up your order."
+                  : "The restaurant will contact you by phone if there are any delivery questions.",
                 "",
                 "Order overview:",
                 ...customerLineItems,
-                `Total amount: ${formatTotalEurForMail(grandTotalEur)}`,
+                `Total amount: ${formatTotalEurForMailEn(grandTotalEur)}`,
                 "",
                 "If you have any questions, the restaurant will contact you by phone."
               ]
             : [
-                "Danke für deine Bestellung.",
-                "Wir haben deine Bestellung erhalten.",
+                "Danke für Ihre Bestellung.",
+                "Wir haben Ihre Bestellung erhalten.",
                 "",
                 `Bestellnummer: ${orderCode}`,
                 `Bestellart: ${body.fulfillment === "pickup" ? "Abholung" : "Lieferung"}`,
                 "Zahlungsart: Barzahlung",
+                body.fulfillment === "pickup"
+                  ? "Bitte nennen Sie bei der Abholung Ihre Bestellnummer."
+                  : "Das Restaurant kontaktiert Sie telefonisch, falls es Rückfragen zur Lieferung gibt.",
                 "",
                 "Bestellübersicht:",
                 ...customerLineItems,
                 `Gesamtbetrag: ${formatTotalEurForMail(grandTotalEur)}`,
                 "",
-                "Bei Fragen kontaktiert dich das Restaurant telefonisch."
+                "Bei Fragen kontaktiert Sie das Restaurant telefonisch."
               ]
       });
     } catch (err) {
