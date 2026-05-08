@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MenuItem } from "@/lib/menu-types";
-import { cartLineKey, itemRequiresLunchStarter, parseCartLineKey } from "@/lib/cart-line-key";
+import { cartLineKey, itemRequiresLunchStarter } from "@/lib/cart-line-key";
 import { formatPriceEur, labelMenuItem } from "@/lib/menu-helpers";
 import { getDiscountedPriceEur, getEffectivePriceEur } from "@/lib/menu-pricing";
 import { getItemSelectionGroup } from "@/lib/item-selection";
@@ -100,23 +100,6 @@ export function OrderMenuItem({
       opts.some((o) => o.id === cur) ? cur : (selectionGroup?.defaultOptionId ?? opts[0].id)
     );
   }, [item.id, selectionGroup?.options, selectionGroup?.defaultOptionId]);
-
-  /** Warenkorb-Zeile nutzt gewählten Starter in der Key — UI-Radio sonst ≠ Key → Menge 0, Minus wirkungslos */
-  useEffect(() => {
-    for (const [k, v] of Object.entries(quantities)) {
-      if (v <= 0) continue;
-      const p = parseCartLineKey(k);
-      if (p.itemId !== item.id) continue;
-      if (p.orderChoiceId && selectionGroup?.options?.some((o) => o.id === p.orderChoiceId)) {
-        setOrderChoiceId(p.orderChoiceId);
-      }
-      if (!needsStarter || !p.starterOptionId) continue;
-      const opts = item.lunchStarterChoice?.options;
-      if (opts?.some((o) => o.id === p.starterOptionId)) {
-        setStarterId(p.starterOptionId);
-      }
-    }
-  }, [quantities, item.id, item.lunchStarterChoice?.options, selectionGroup?.options, needsStarter]);
 
   const lineKey = useMemo(
     () =>
