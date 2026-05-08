@@ -325,13 +325,14 @@ async function renderReceiptContent(
     }
   }
 
-  if (input.giftEligible) {
-    y -= GAP_SM;
+  const freeGiftItems = (input.freeGiftItems ?? []).map((item) => item.trim()).filter(Boolean);
+  if (freeGiftItems.length > 0) {
+    y -= GAP_MD;
     drawLeft("Bonus / Geschenk", { size: 11, bold: true });
-    drawLeftWrapped(input.giftMessage?.trim() || "Aktiv (Schwellenwert erreicht)", 10);
-    if (input.freeGiftItems?.length) {
-      drawLeftWrapped(`Gratisartikel: ${input.freeGiftItems.join(", ")}`, 10);
-    }
+    y -= GAP_SM;
+    drawLeft("Gratisartikel:", { size: 12, bold: true });
+    drawLeftWrapped(freeGiftItems.join(", "), 11);
+    y -= GAP_MD;
   }
 
   if (input.comment?.trim()) {

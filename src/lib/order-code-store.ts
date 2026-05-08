@@ -8,8 +8,21 @@ const ORDER_CODES_FILE = path.join(DATA_DIR, "order-codes.json");
 const ORDER_CODES_BLOB = "sake-vienna/order-codes.json";
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const ORDER_CODE_LENGTH = 4;
 
-type CodesData = { codes: string[] };
+type CodesData = {
+  /** Legacy format (global used codes) */
+  codes?: string[];
+  /** New format: daily uniqueness buckets in Vienna timezone */
+  codesByDay?: Record<string, string[]>;
+  /** Legacy codes kept to avoid reusing historical ids */
+  legacyCodes?: string[];
+};
+
+type NormalizedCodesData = {
+  legacyCodes: Set<string>;
+  codesByDay: Map<string, Set<string>>;
+};
 
 function hasBlobStorage(): boolean {
   return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
@@ -22,12 +35,20 @@ function getBlobToken(): string {
 }
 
 function generateRandomOrderCode(): string {
-  const len = 6 + randomInt(0, 3);
   let out = "";
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < ORDER_CODE_LENGTH; i++) {
     out += ALPHABET[randomInt(0, ALPHABET.length)]!;
   }
   return out;
+}
+
+function viennaDateKey(d: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Vienna",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(d);
 }
 
 async function readJsonFromBlob<T>(pathname: string): Promise<T> {
@@ -47,36 +68,68 @@ async function writeJsonToBlob(pathname: string, data: unknown): Promise<void> {
   });
 }
 
-function normalizeCodesData(raw: unknown): Set<string> {
-  if (!raw || typeof raw !== "object") return new Set();
-  const codes = (raw as CodesData).codes;
-  if (!Array.isArray(codes)) return new Set();
-  const set = new Set<string>();
-  for (const c of codes) {
-    if (typeof c === "string" && c.length > 0) set.add(c);
+function normalizeCodesData(raw: unknown): NormalizedCodesData {
+  const legacyCodes = new Set<string>();
+  const codesByDay = new Map<string, Set<string>>();
+
+  if (!raw || typeof raw !== "object") return { legacyCodes, codesByDay };
+
+  const data = raw as CodesData;
+  const collectCodes = (arr: unknown) => {
+    if (!Array.isArray(arr)) return;
+    for (const code of arr) {
+      if (typeof code !== "string") continue;
+      const trimmed = code.trim();
+      if (!trimmed) continue;
+      legacyCodes.add(trimmed);
+    }
+  };
+
+  collectCodes(data.codes);
+  collectCodes(data.legacyCodes);
+
+  const byDay = data.codesByDay;
+  if (byDay && typeof byDay === "object") {
+    for (const [dayKey, codes] of Object.entries(byDay)) {
+      if (!Array.isArray(codes)) continue;
+      const daySet = new Set<string>();
+      for (const code of codes) {
+        if (typeof code !== "string") continue;
+        const trimmed = code.trim();
+        if (!trimmed) continue;
+        daySet.add(trimmed);
+      }
+      if (daySet.size > 0) codesByDay.set(dayKey, daySet);
+    }
   }
-  return set;
+
+  return { legacyCodes, codesByDay };
 }
 
-async function readUsedCodes(): Promise<Set<string>> {
+async function readUsedCodes(): Promise<NormalizedCodesData> {
   if (hasBlobStorage()) {
     try {
       const data = await readJsonFromBlob<unknown>(ORDER_CODES_BLOB);
       return normalizeCodesData(data);
     } catch {
-      return new Set();
+      return { legacyCodes: new Set(), codesByDay: new Map() };
     }
   }
   try {
     const raw = await readFile(ORDER_CODES_FILE, "utf-8");
     return normalizeCodesData(JSON.parse(raw) as unknown);
   } catch {
-    return new Set();
+    return { legacyCodes: new Set(), codesByDay: new Map() };
   }
 }
 
-async function writeUsedCodes(used: Set<string>): Promise<void> {
-  const data: CodesData = { codes: [...used] };
+async function writeUsedCodes(used: NormalizedCodesData): Promise<void> {
+  const data: CodesData = {
+    legacyCodes: [...used.legacyCodes],
+    codesByDay: Object.fromEntries(
+      [...used.codesByDay.entries()].map(([dayKey, codes]) => [dayKey, [...codes]])
+    )
+  };
   if (hasBlobStorage()) {
     await writeJsonToBlob(ORDER_CODES_BLOB, data);
     return;
@@ -91,17 +144,20 @@ let codeChain: Promise<unknown> = Promise.resolve();
 const MAX_ALLOC_ATTEMPTS = 64;
 
 /**
- * Vergeben einer eindeutigen Bestell-Kennung: 6–8 Zeichen (A–Z und 0–9).
+ * Vergeben einer eindeutigen Bestell-Kennung: 4 Zeichen (A–Z und 0–9).
  * Persistiert die Menge bereits vergebener Codes in Vercel Blob (`sake-vienna/order-codes.json`)
  * oder lokal `data/order-codes.json` (analog zur früheren Bestellnummern-Datei).
  */
 export function allocateUniqueOrderCode(): Promise<string> {
   const next = codeChain.then(async () => {
     const used = await readUsedCodes();
+    const dayKey = viennaDateKey(new Date());
+    const usedToday = new Set<string>(used.codesByDay.get(dayKey) ?? []);
     for (let attempt = 0; attempt < MAX_ALLOC_ATTEMPTS; attempt++) {
       const code = generateRandomOrderCode();
-      if (!used.has(code)) {
-        used.add(code);
+      if (!usedToday.has(code) && !used.legacyCodes.has(code)) {
+        usedToday.add(code);
+        used.codesByDay.set(dayKey, usedToday);
         await writeUsedCodes(used);
         return code;
       }

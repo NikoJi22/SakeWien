@@ -461,6 +461,9 @@ export async function POST(request: Request) {
                 `Order number: ${orderCode}`,
                 `Order type: ${body.fulfillment === "pickup" ? "Pickup" : "Delivery"}`,
                 "Payment method: Cash payment",
+                ...(selectedFreeGiftItems.length > 0
+                  ? [`Free items: ${selectedFreeGiftItems.join(", ")}`]
+                  : []),
                 body.fulfillment === "pickup"
                   ? "Please mention your order number when you pick up your order."
                   : "The restaurant will contact you by phone if there are any delivery questions.",
@@ -478,6 +481,9 @@ export async function POST(request: Request) {
                 `Bestellnummer: ${orderCode}`,
                 `Bestellart: ${body.fulfillment === "pickup" ? "Abholung" : "Lieferung"}`,
                 "Zahlungsart: Barzahlung",
+                ...(selectedFreeGiftItems.length > 0
+                  ? [`Gratisartikel: ${selectedFreeGiftItems.join(", ")}`]
+                  : []),
                 body.fulfillment === "pickup"
                   ? "Bitte nennen Sie bei der Abholung Ihre Bestellnummer."
                   : "Das Restaurant kontaktiert Sie telefonisch, falls es Rückfragen zur Lieferung gibt.",
